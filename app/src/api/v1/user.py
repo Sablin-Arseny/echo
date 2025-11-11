@@ -12,7 +12,10 @@ async def create_user(
     user: User,
     user_db: UserDB = Depends(UserDB.get_as_dependency),
 ) -> User:
-    return await user_db.create(user)
+    try:
+        return await user_db.create(user)
+    except Exception:
+        raise HTTPException(status_code=409, detail="Can't create user")
 
 
 @router.get("/all")
@@ -25,8 +28,8 @@ async def get_all_users(
 @router.get("/by_any_id")
 async def get_user(
     id: int | None = None,
-    username: str | None = None,
     tg_id: str | None = None,
+    username: str | None = None,
     full_name: str | None = None,
     user_db: UserDB = Depends(UserDB.get_as_dependency),
 ) -> User:
@@ -36,7 +39,10 @@ async def get_user(
         tg_id=tg_id,
         full_name=full_name,
     )
-    return await user_db.get(user)
+    user_response = await user_db.get(user)
+    if not user_response:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user_response
 
 @router.get("/check_user")
 async def check_user(
@@ -45,17 +51,7 @@ async def check_user(
     username: str | None = None,
     user_db: UserDB = Depends(UserDB.get_as_dependency),
 ) -> bool:
-    user_dict = {}
-    if id:
-        user_dict["id"] = id
-    if tg_id:
-        user_dict["tg_id"] = tg_id
-    if username:
-        user_dict["username"] = username
-    if not user_dict:
-        raise HTTPException(status_code=400)
-    
-    user_exists = await user_db.check_user(user_dict)
-    if not user_exists:
+    user = await get_user(id=id, username=username, tg_id=tg_id, user_db=user_db)
+    if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return True

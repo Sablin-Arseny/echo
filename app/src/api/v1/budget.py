@@ -7,14 +7,6 @@ from app.src.services.budget import BudgetService
 router = APIRouter()
 
 
-@router.get("/{event_id}")
-async def get_by_event_id(
-    event_id: int,
-    budget_service: BudgetService = Depends(BudgetService.get_as_dependency),
-) -> list[BudgetResponse]:
-    response = [budget async for budget in budget_service.get(event_id=event_id)]
-    return response
-
 @router.post("/create")
 async def create_budget(
     budget: CreateBudgetRequest,
@@ -24,6 +16,7 @@ async def create_budget(
         return await budget_service.create_budget_with_participants(budget)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=repr(e))
+
 
 @router.get("/user_expenses")
 async def get_user_expenses(
@@ -46,3 +39,12 @@ async def get_user_expenses(
         return await budget_service.get_user_expenses(user_dict, event_id)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=repr(e))
+
+
+@router.get("/{event_id}")
+async def get_by_event_id(
+    event_id: int,
+    budget_service: BudgetService = Depends(BudgetService.get_as_dependency),
+) -> list[BudgetResponse]:
+    response = [budget async for budget in budget_service.get(event_id=event_id)]
+    return response
