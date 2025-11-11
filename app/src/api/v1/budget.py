@@ -25,7 +25,7 @@ async def create_budget(
     except ValueError as e:
         raise HTTPException(status_code=404, detail=repr(e))
 
-@router.get("/user_expenses/")
+@router.get("/user_expenses")
 async def get_user_expenses(
     id: int | None = None,
     tg_id: str | None = None,

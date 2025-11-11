@@ -7,7 +7,7 @@ from app.src.schemas import User
 router = APIRouter()
 
 
-@router.post("/")
+@router.post("")
 async def create_user(
     user: User,
     user_db: UserDB = Depends(UserDB.get_as_dependency),
