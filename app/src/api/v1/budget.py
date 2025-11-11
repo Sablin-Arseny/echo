@@ -1,27 +1,27 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 
-from app.src.schemas import FullBudgetResponse, BudgetRequest, UserTotalExpenseResponse, UserExpenseResponse
+from app.src.schemas import BudgetResponse, CreateBudgetRequest, UserTotalExpenseResponse, UserExpenseResponse
 from app.src.services.budget import BudgetService
 
 
 router = APIRouter()
 
 
-@router.get("/full/{event_id}")
-async def get_full(
+@router.get("/{event_id}")
+async def get_by_event_id(
     event_id: int,
     budget_service: BudgetService = Depends(BudgetService.get_as_dependency),
-) -> list[FullBudgetResponse]:
+) -> list[BudgetResponse]:
     response = [budget async for budget in budget_service.get(event_id=event_id)]
     return response
 
 @router.post("/create")
 async def create_budget(
-    budget_request: BudgetRequest,
+    budget: CreateBudgetRequest,
     budget_service: BudgetService = Depends(BudgetService.get_as_dependency),
-) -> FullBudgetResponse:
+) -> BudgetResponse:
     try:
-        return await budget_service.create_budget_with_participants(budget_request)
+        return await budget_service.create_budget_with_participants(budget)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=repr(e))
 

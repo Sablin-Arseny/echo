@@ -7,7 +7,7 @@ from app.src.schemas import CreateEventRequest, EventResponse
 router = APIRouter()
 
 
-@router.post("")
+@router.post("/create")
 async def create_event(
     event: CreateEventRequest,
     event_service: EventService = Depends(EventService.get_as_dependency)
