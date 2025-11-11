@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Детальный бюджет</title>
+    <link rel="stylesheet" href="../css/budget-details.css">
+</head>
+<body>
+<div class="container">
+    <header class="page-header">
+        <h1>Детальный бюджет мероприятия</h1>
+        <button class="btn btn-back" id="back-btn">← Назад</button>
+    </header>
+
+    <div class="content">
+        <!-- Основная таблица расходов -->
+        <div class="panel expenses-panel">
+            <div class="panel-header">
+                <h2>Расходы</h2>
+                <button class="btn btn-primary" id="add-expense-btn">+ Новая трата</button>
+            </div>
+
+            <div class="expenses-table-container">
+                <table class="expenses-table" id="expenses-table">
+                    <thead>
+                    <tr>
+                        <th>Статья расхода</th>
+                        <th>Автор траты</th>
+                        <th>Участники</th>
+                        <th>Сумма с человека</th>
+                        <th>Общая сумма</th>
+                        <th>Действия</th>
+                    </tr>
+                    </thead>
+                    <tbody id="expenses-tbody">
+                    <!-- Строки будут добавляться динамически -->
+                    </tbody>
+                    <tfoot>
+                    <tr class="total-row">
+                        <td colspan="3"><strong>Итого:</strong></td>
+                        <td id="total-per-person">0 ₽</td>
+                        <td id="total-amount">0 ₽</td>
+                        <td></td>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+        <!-- Боковая панель с долгами -->
+        <div class="panel debts-panel">
+            <h2>Долги участников</h2>
+            <div class="debts-table-container">
+                <table class="debts-table" id="debts-table">
+                    <thead>
+                    <tr>
+                        <th>Участник</th>
+                        <th>Сумма долга</th>
+                    </tr>
+                    </thead>
+                    <tbody id="debts-tbody">
+                    <!-- Данные будут добавляться динамически -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для добавления траты -->
+<div class="modal-overlay" id="expense-modal">
+    <div class="modal">
+        <h3>Новая трата</h3>
+        <div class="form-group">
+            <label for="expense-description">Статья траты</label>
+            <input type="text" id="expense-description" placeholder="Введите название траты">
+        </div>
+        <div class="form-group">
+            <label for="expense-author">Автор траты</label>
+            <select id="expense-author">
+                <!-- Участники будут добавляться динамически -->
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="expense-participants">Участники траты</label>
+            <select multiple id="expense-participants" size="4">
+                <!-- Участники будут добавляться динамически -->
+            </select>
+            <div class="help-text">Для выбора нескольких участников удерживайте Ctrl</div>
+        </div>
+        <div class="form-group">
+            <label for="expense-amount">Сумма (₽)</label>
+            <input type="number" id="expense-amount" placeholder="Введите сумму" min="1">
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-secondary" id="cancel-expense-btn">Отмена</button>
+            <button class="btn btn-primary" id="save-expense-btn">Добавить</button>
+        </div>
+    </div>
+</div>
+
+<script type="module" src="../js/budget-details.js"></script>
+</body>
+</html>

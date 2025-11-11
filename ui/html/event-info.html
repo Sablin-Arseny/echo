@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Информация о мероприятии</title>
+    <link rel="stylesheet" href="../css/event-info.css">
+</head>
+<body>
+<div class="container">
+    <header class="page-header">
+        <h1>Информация о мероприятии</h1>
+        <button class="btn btn-back" id="back-btn">← Назад</button>
+    </header>
+
+    <div class="content">
+        <!-- Левая панель - информация о мероприятии -->
+        <div class="panel event-info">
+            <h2>Данные о мероприятии</h2>
+            <div class="event-details">
+                <div class="detail-item">
+                    <label>Название:</label>
+                    <span id="event-name-display">Не указано</span>
+                </div>
+                <div class="detail-item">
+                    <label>Дата:</label>
+                    <span id="event-date-display">Не указана</span>
+                </div>
+                <div class="detail-item">
+                    <label>Максимальная дата выхода:</label>
+                    <span id="event-exit-date-display">Не указана</span>
+                </div>
+                <div class="detail-item">
+                    <label>Место проведения:</label>
+                    <span id="event-place-display">Не указано</span>
+                </div>
+                <div class="detail-item">
+                    <label>Описание:</label>
+                    <p id="event-description-display">Описание не добавлено</p>
+                </div>
+                <div class="detail-item">
+                    <label>Участники:</label>
+                    <div class="participants-count" id="participants-count">0</div>
+
+                    <div class="participants-list-container">
+                        <div class="participants-scroll-list" id="participants-scroll-list">
+                            <!-- Список участников будет добавляться здесь -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Правая панель - бюджет -->
+        <div class="panel budget-section">
+            <div class="budget-header">
+                <h2>Общий бюджет</h2>
+                <div class="budget-amount" id="budget-amount">0 ₽</div>
+            </div>
+
+            <div class="budget-stats">
+                <div class="stat-item">
+                    <span class="stat-label">Запланировано:</span>
+                    <span class="stat-value" id="planned-amount">0 ₽</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Потрачено:</span>
+                    <span class="stat-value" id="spent-amount">0 ₽</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Остаток:</span>
+                    <span class="stat-value" id="remaining-amount">0 ₽</span>
+                </div>
+            </div>
+
+            <!-- Таблица последних расходов -->
+            <div class="recent-expenses">
+                <h3>Последние траты</h3>
+                <div class="expenses-list" id="expenses-list">
+                    <!-- Траты будут добавляться здесь -->
+                </div>
+            </div>
+
+            <!-- Кнопки действий -->
+            <div class="budget-actions">
+                <button class="btn btn-primary" id="new-expense-btn">Новая трата</button>
+                <button class="btn btn-secondary" id="detailed-budget-btn">Посмотреть детальный бюджет</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для добавления траты -->
+<div class="modal-overlay" id="expense-modal">
+    <div class="modal">
+        <h3>Новая трата</h3>
+        <div class="form-group">
+            <label for="expense-description">Статья траты</label>
+            <input type="text" id="expense-description" placeholder="Введите название траты">
+        </div>
+        <div class="form-group">
+            <label for="expense-author">Автор траты</label>
+            <select id="expense-author">
+                <!-- Участники будут добавляться динамически -->
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="expense-participants">Участники траты</label>
+            <select multiple id="expense-participants" size="4">
+                <!-- Участники будут добавляться динамически -->
+            </select>
+            <div class="help-text">Для выбора нескольких участников удерживайте Ctrl</div>
+        </div>
+        <div class="form-group">
+            <label for="expense-amount">Сумма (₽)</label>
+            <input type="number" id="expense-amount" placeholder="Введите сумму" min="1">
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-secondary" id="cancel-expense-btn">Отмена</button>
+            <button class="btn btn-primary" id="save-expense-btn">Добавить</button>
+        </div>
+    </div>
+</div>
+
+<script type="module" src="../js/event-info.js"></script>
+</body>
+</html>
