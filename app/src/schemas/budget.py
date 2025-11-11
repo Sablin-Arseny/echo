@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from app.src.schemas.user import User
 
 
-class FullBudgetResponse(BaseModel):
+class BudgetResponse(BaseModel):
     id: int
     event_id: int
     paid_by: User
@@ -12,26 +12,12 @@ class FullBudgetResponse(BaseModel):
     participants: list[User]
 
 
-class BudgetRequest(BaseModel):
-    id: int | None = None
+class CreateBudgetRequest(BaseModel):
     event_id: int
     paid_by: User
     amount: float
     description: str = ""
     participants: list[str]
-
-
-class BudgetCreate(BaseModel):
-    event_id: int
-    paid_by_id: int
-    amount: float
-    description: str = ""
-
-
-class ExpenseParticipantCreate(BaseModel):
-    expense_id: int
-    participant_id: int
-    share_amount: float
 
 
 class UserExpenseResponse(BaseModel):

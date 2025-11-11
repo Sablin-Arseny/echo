@@ -7,7 +7,7 @@ from app.src.schemas import CreateGroupRequest, GroupResponse
 router = APIRouter()
 
 
-@router.post("")
+@router.post("/create")
 async def create_group(
     group: CreateGroupRequest,
     group_db: GroupDB = Depends(GroupDB.get_as_dependency)

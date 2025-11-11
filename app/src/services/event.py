@@ -41,7 +41,7 @@ class EventService:
             )
             event.group_id = group.id
 
-        event = await self._event_db.create_event(event)
+        event = await self._event_db.create_event(event.model_dump(exclude_none=True, exclude={"participants"}))
         if not event:
             return
         return await self.get(event.id)
