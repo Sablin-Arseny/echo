@@ -48,3 +48,16 @@ class GroupDB(BaseDB):
             name=group.name,
             participants=participants
         )
+
+    async def add_participant(self, user_id: int, group_id: int):
+        group = await self.get(group_id)
+
+        if user_id not in [participant.id for participant in group.participants]:
+            async with self.create_session() as session:
+                group_member = GroupMember(group_id=group_id, user_id=user_id)
+                session.add(group_member)
+            if not group:
+                return
+        else:
+            raise Exception("User is already in this group")
+        return await self.get(group_id)
