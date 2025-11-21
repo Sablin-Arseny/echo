@@ -27,3 +27,18 @@ async def get_event_by_id(
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")
     return event
+
+
+@router.post("/add_user_to_event")
+async def add_user_to_event(
+    event_id: int,
+    user_id: int | None = None,
+    tg_id: str | None = None,
+    username: str | None = None,
+    event_service: EventService = Depends(EventService.get_as_dependency)
+) -> EventResponse:
+    try:
+        event = await event_service.add_user_to_event(event_id=event_id, user_id=user_id, tg_id=tg_id, username=username)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=repr(e))
+    return event
