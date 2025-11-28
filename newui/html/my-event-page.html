@@ -57,8 +57,50 @@
                 <div class="event-name">Песнопрепр</div>
             </div>
         </div>
-        <button class="create-button">Создать</button>
+        <button class="create-button" id="createBtn">Создать</button>
     </div>
 </main>
+
+<div id="createPopup" class="popup-overlay">
+    <div class="popup-content">
+        <button class="popup-close" id="closeBtn">×</button>
+        <h2>Создание мероприятия</h2>
+        <div class="popup-body">
+            <form class="event-form" id="eventForm">
+                <div class="form-row">
+                    <label for="eventName">Название:</label>
+                    <input type="text" id="eventName" class="form-input" placeholder="Введите название мероприятия">
+                </div>
+
+                <div class="form-row">
+                    <label for="eventDate">Дата проведения:</label>
+                    <input type="date" id="eventDate" class="form-input">
+                </div>
+
+                <div class="form-row">
+                    <label for="eventExitDate">Максимальная дата выхода:</label>
+                    <input type="date" id="eventExitDate" class="form-input">
+                </div>
+
+                <div class="form-row">
+                    <label for="eventPlace">Место проведения:</label>
+                    <input type="text" id="eventPlace" class="form-input" placeholder="Введите место проведения">
+                </div>
+
+                <div class="form-row form-row-full">
+                    <label for="eventDescription">Описание:</label>
+                    <textarea id="eventDescription" class="form-input form-textarea" placeholder="Опишите ваше мероприятие..."></textarea>
+                </div>
+            </form>
+
+            <div class="popup-buttons">
+                <button class="popup-cancel" id="cancelBtn">Отмена</button>
+                <button class="popup-confirm" id="approveBtn">Создать</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="../js/my-event-page.js"></script>
 </body>
 </html>
