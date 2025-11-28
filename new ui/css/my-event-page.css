@@ -1,0 +1,189 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Montserrat Alternates', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #1A1919;
+    background-image: url("../images/bottom_light.png");
+    background-position: bottom;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    width: 100%;
+    max-width: 1510px;
+    height: 124px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 auto;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+h1 {
+    background-image: linear-gradient(to right, #ffffff, #FD9C00);
+    background-clip: text;
+    color: transparent
+}
+
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+    gap: 10px;
+}
+
+.page-title {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+
+.container {
+    text-shadow: 0 0 2px #ffffff;
+    width: 100%;
+    max-width: 1200px;
+    height: 600px; /* Фиксированная высота */
+    border: 3px solid transparent;
+    border-radius: 14px;
+    border-image: linear-gradient(0deg, #FFFFFF2E, #ffffff);
+    border-image-slice: 1;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.all-my-events {
+    width: 100%;
+    flex: 1; /* Занимает всё доступное пространство */
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    overflow-y: auto; /* Вертикальная прокрутка */
+    padding-right: 10px; /* Отступ для скролла */
+}
+
+.all-my-events::-webkit-scrollbar {
+    width: 8px;
+}
+
+.all-my-events::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.all-my-events::-webkit-scrollbar-thumb {
+    background: #FD9C00;
+    border-radius: 4px;
+}
+
+.all-my-events::-webkit-scrollbar-thumb:hover {
+    background: #ffb133;
+}
+
+.event-card {
+    width: 100%;
+    min-height: 80px;
+    border: 2px solid #FD9C00;
+    border-radius: 10px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-shrink: 0; /* Не сжимается при прокрутке */
+}
+
+.event-card:hover {
+    background-color: rgba(253, 156, 0, 0.1);
+    transform: translateX(5px);
+}
+
+.event-label {
+    font-size: 1rem;
+    color: #FD9C00;
+    min-width: 120px;
+}
+
+.event-name {
+    font-size: 1.3rem;
+    font-weight: bold;
+    flex: 1;
+}
+
+.create-button {
+    padding: 15px 30px;
+    background-color: #FD9C00;
+    color: #000000;
+    border: none;
+    border-radius: 20px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    align-self: center;
+    flex-shrink: 0; /* Кнопка не сжимается */
+}
+
+.create-button:hover {
+    transform: translateY(3px);
+    box-shadow: 0 -5px 5px 0 #ffffff;
+}
+
+.logo {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+}
+
+.auth-button {
+    height: 60px;
+    width: 100%;
+    max-width: 168px;
+    min-width: 60px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    white-space: nowrap;
+    background-color: #FD9C00;
+    color: #000000;
+    font-size: 20px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.auth-button:hover {
+    transform: translateY(3px);
+    box-shadow: 0 -5px 5px 0 #ffffff;
+}
+
+.user-icon {
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    order: 2;
+}
+
+.auth-text {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    order: 1;
+    text-align: left;
+    padding-bottom: 5px;
+}
