@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бюджет мероприятия</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/budget.css">
+</head>
+<body>
+<header>
+    <img src="../images/Logo.svg" alt="наше лого" class="logo">
+    <button type="button" class="back-button" id="back-btn" onclick="history.back()" aria-label="Назад">← Назад</button>
+</header>
+
+<main class="main-content">
+    <h1 class="page-title">Бюджет мероприятия</h1>
+    <div class="container">
+        <!-- Панель расходов -->
+        <div class="panel expenses-panel">
+            <div class="panel-header">
+                <h2>Расходы</h2>
+                <button type="button" class="create-button" id="add-expense-btn">+ Новая трата</button>
+            </div>
+            <div class="all-my-events expenses-table-container">
+                <table class="expenses-table" id="expenses-table">
+                    <thead>
+                        <tr>
+                            <th>Статья расхода</th>
+                            <th>Автор траты</th>
+                            <th>Участники</th>
+                            <th>Сумма с человека</th>
+                            <th>Общая сумма</th>
+                            <th>Статус</th>
+                        </tr>
+                    </thead>
+                    <tbody id="expenses-tbody"></tbody>
+                    <tfoot>
+                        <tr class="total-row">
+                            <td colspan="3"><strong>Итого:</strong></td>
+                            <td id="total-per-person">0 ₽</td>
+                            <td id="total-amount">0 ₽</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+        <!-- Панель долгов -->
+        <div class="panel debts-panel">
+            <h2>Долги участников</h2>
+            <div class="all-my-events debts-table-container">
+                <table class="debts-table" id="debts-table">
+                    <thead>
+                        <tr>
+                            <th>Участник</th>
+                            <th>Сумма долга</th>
+                        </tr>
+                    </thead>
+                    <tbody id="debts-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Модальное окно для добавления траты -->
+<div class="popup-overlay" id="expense-modal">
+    <div class="popup-content">
+        <button class="popup-close" id="close-expense-btn">×</button>
+        <h2 class="modal-title">Новая трата</h2>
+        <div class="popup-body">
+            <form class="event-form" id="expenseForm">
+                <!-- Статья траты -->
+                <div class="form-row">
+                    <label for="expense-description">Статья траты:</label>
+                    <input type="text" id="expense-description" class="form-input" placeholder="Введите название траты">
+                </div>
+
+                <!-- Автор траты -->
+                <div class="form-row">
+                    <label>Автор траты:</label>
+                    <div class="custom-select" id="expense-author">
+                        <div class="select-selected">Выберите автора</div>
+                        <div class="select-items select-hide">
+                            <div data-value="Иван">Иван</div>
+                            <div data-value="Катя">Катя</div>
+                            <div data-value="Сергей">Сергей</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Участники траты -->
+                <div class="form-row form-row-full">
+                    <label>Участники траты:</label>
+                    <div class="custom-multi-select" id="expense-participants">
+                        <div class="multi-selected">Выберите участников</div>
+                        <div class="multi-items select-hide">
+                            <div class="multi-item">
+                                <label>
+                                    <input type="checkbox" value="Иван">
+                                    <span>Иван</span>
+                                </label>
+                            </div>
+                            <div class="multi-item">
+                                <label>
+                                    <input type="checkbox" value="Катя">
+                                    <span>Катя</span>
+                                </label>
+                            </div>
+                            <div class="multi-item">
+                                <label>
+                                    <input type="checkbox" value="Сергей">
+                                    <span>Сергей</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Сумма -->
+                <div class="form-row">
+                    <label for="expense-amount">Сумма (₽):</label>
+                    <input type="number" id="expense-amount" class="form-input" placeholder="Введите сумму" min="1">
+                </div>
+
+                <!-- Кнопки действия -->
+                <div class="popup-buttons">
+                    <button type="button" class="popup-cancel" id="cancel-expense-btn">Отмена</button>
+                    <button type="button" class="popup-confirm" id="save-expense-btn">Добавить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script type="module" src="../js/budget.js"></script>
+</body>
+</html>
