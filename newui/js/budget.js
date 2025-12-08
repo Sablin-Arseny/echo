@@ -9,6 +9,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const expenseForm = document.getElementById("expenseForm");
     const descInput = document.getElementById("expense-description");
     const amountInput = document.getElementById("expense-amount");
+    const statusSelect = document.getElementById('expense-status');
+    const selectedStatus = statusSelect.querySelector('.select-selected');
+    const statusItems = statusSelect.querySelector('.select-items');
+    const deleteExpenseBtn = document.getElementById('delete-expense-btn');
+    const modalTitle = document.getElementById('modal-title');
 
     const expensesTbody = document.getElementById("expenses-tbody");
     const debtsTbody = document.getElementById("debts-tbody");
@@ -17,11 +22,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let expenses = [];
     let debts = {};
+    const currentUser = 'Иван'; // Текущий пользователь для демо. Замените на реальную логику аутентификации.
+    let editingIndex = null;
 
     function openModal() { expenseModal.style.display = 'flex'; }
     function closeModal() { expenseModal.style.display = 'none'; }
 
-    addExpenseBtn.addEventListener('click', openModal);
+    addExpenseBtn.addEventListener('click', () => {
+        // Открываем модалку для создания новой статьи
+        editingIndex = null;
+        expenseForm.reset();
+        selectedAuthor.textContent = 'Выберите автора';
+        selectedAuthor.dataset.value = '';
+        multiSelected.textContent = 'Выберите участников';
+        multiItems.querySelectorAll('input').forEach(cb => cb.checked = false);
+        selectedStatus.textContent = 'Создано';
+        selectedStatus.dataset.value = 'Создано';
+        deleteExpenseBtn.style.display = 'none';
+        modalTitle.textContent = 'Новая трата';
+        openModal();
+    });
     closeExpenseBtn.addEventListener('click', closeModal);
     cancelExpenseBtn.addEventListener('click', () => { expenseForm.reset(); closeModal(); });
 
@@ -58,10 +78,24 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // --- Кастомный select статус ---
+    selectedStatus.addEventListener('click', () => {
+        statusItems.classList.toggle('select-hide');
+    });
+
+    statusItems.querySelectorAll('div').forEach(item => {
+        item.addEventListener('click', () => {
+            selectedStatus.textContent = item.textContent;
+            selectedStatus.dataset.value = item.dataset.value;
+            statusItems.classList.add('select-hide');
+        });
+    });
+
     // Закрытие кастомных select при клике вне
     document.addEventListener('click', (e) => {
         if (!authorSelect.contains(e.target)) authorItems.classList.add('select-hide');
         if (!multiSelect.contains(e.target)) multiItems.classList.add('select-hide');
+        if (!statusSelect.contains(e.target)) statusItems.classList.add('select-hide');
     });
 
     // --- Сохранение расхода ---
@@ -73,11 +107,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!desc || !author || participants.length === 0 || isNaN(amount) || amount <= 0) return;
 
-        // Добавляем расход
-        const expense = { desc, author, participants, amount };
-        expenses.push(expense);
-
-        updateExpensesTable();
+        if (editingIndex !== null) {
+            // Обновляем существующую статью
+            const ex = expenses[editingIndex];
+            // Менять автора и статус через модалку не будем — статус меняется в таблице селектом (только автор может)
+            ex.desc = desc;
+            ex.participants = participants;
+            ex.amount = amount;
+            // Статус можно поменять в модалке, но только если текущий пользователь — автор
+            if (currentUser === ex.author) ex.status = selectedStatus.dataset.value;
+            editingIndex = null;
+        } else {
+            // Добавляем новую статью (по умолчанию статус "Создано")
+            const expense = { desc, author, participants, amount, status: selectedStatus.dataset.value || 'Создано' };
+            expenses.push(expense);
+        }        updateExpensesTable();
         updateDebts();
         expenseForm.reset();
         selectedAuthor.textContent = 'Выберите автора';
@@ -85,6 +129,23 @@ document.addEventListener('DOMContentLoaded', () => {
         multiSelected.textContent = 'Выберите участников';
         multiItems.querySelectorAll('input').forEach(cb => cb.checked = false);
         closeModal();
+    });
+
+    // Удаление статьи из модалки (только автор)
+    deleteExpenseBtn.addEventListener('click', () => {
+        if (editingIndex === null) return;
+        if (expenses[editingIndex].author !== currentUser) return;
+        expenses.splice(editingIndex, 1);
+        editingIndex = null;
+        expenseForm.reset();
+        deleteExpenseBtn.style.display = 'none';
+        selectedAuthor.textContent = 'Выберите автора';
+        selectedAuthor.dataset.value = '';
+        multiSelected.textContent = 'Выберите участников';
+        multiItems.querySelectorAll('input').forEach(cb => cb.checked = false);
+        closeModal();
+        updateExpensesTable();
+        updateDebts();
     });
 
     function updateExpensesTable() {
@@ -99,35 +160,49 @@ document.addEventListener('DOMContentLoaded', () => {
             totalAmount += e.amount;
             totalPerPerson += parseFloat(perPerson);
 
+            // Строка с показом статуса (не редактируется в таблице)
+            row.classList.add('status-' + ((e.status || 'Создано').toLowerCase().replace(/\s+/g,'-')));
             row.innerHTML = `
                 <td>${e.desc}</td>
                 <td>${e.author}</td>
                 <td>${e.participants.join(', ')}</td>
                 <td>${perPerson} ₽</td>
                 <td>${e.amount} ₽</td>
-                <td><button class="popup-cancel" data-index="${index}">Удалить</button></td>
+                <td class="status-cell">${e.status || 'Создано'}</td>
             `;
+            // Открытие модалки по клику строки — только для автора
+            row.addEventListener('click', () => {
+                if (e.author !== currentUser) return;
+                editingIndex = index;
+                descInput.value = e.desc;
+                amountInput.value = e.amount;
+                selectedAuthor.textContent = e.author;
+                selectedAuthor.dataset.value = e.author;
+                multiItems.querySelectorAll('input').forEach(cb => cb.checked = e.participants.includes(cb.value));
+                const checked = Array.from(multiItems.querySelectorAll('input:checked')).map(cb => cb.value);
+                multiSelected.textContent = checked.length ? checked.join(', ') : 'Выберите участников';
+                selectedStatus.textContent = e.status || 'Создано';
+                selectedStatus.dataset.value = e.status || 'Создано';
+                deleteExpenseBtn.style.display = 'inline-block';
+                modalTitle.textContent = 'Изменение траты';
+                // Если текущий пользователь не автор, скрываем элементы — but click won't open for non-author
+                openModal();
+            });
             expensesTbody.appendChild(row);
         });
 
         totalAmountEl.textContent = totalAmount.toFixed(2) + ' ₽';
         totalPerPersonEl.textContent = totalPerPerson.toFixed(2) + ' ₽';
 
-        // Удаление
-        expensesTbody.querySelectorAll('button[data-index]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                expenses.splice(btn.dataset.index, 1);
-                updateExpensesTable();
-                updateDebts();
-            });
-        });
+        // Никаких дополнительных обработчиков — клик строки откроет модалку для автора
     }
 
     function updateDebts() {
         debtsTbody.innerHTML = '';
         debts = {};
 
-        expenses.forEach(e => {
+        // В таблице долгов учитываем только неоплаченные статьи (те, у которых статус !== 'Выполнено')
+        expenses.filter(e => (e.status !== 'Выполнено')).forEach(e => {
             const share = e.amount / e.participants.length;
             e.participants.forEach(p => {
                 if (!debts[p]) debts[p] = 0;
@@ -135,11 +210,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        for (let participant in debts) {
+        // Сортируем участников по убыванию долга
+        const sorted = Object.entries(debts).sort((a,b) => b[1] - a[1]);
+        sorted.forEach(([participant, amount]) => {
             const row = document.createElement('tr');
-            row.innerHTML = `<td>${participant}</td><td>${debts[participant].toFixed(2)} ₽</td>`;
+            row.innerHTML = `<td>${participant}</td><td>${amount.toFixed(2)} ₽</td>`;
             debtsTbody.appendChild(row);
-        }
+        });
     }
 
     // ESC для закрытия модалки

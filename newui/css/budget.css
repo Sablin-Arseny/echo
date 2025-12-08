@@ -76,6 +76,38 @@ header {
     background-color: rgba(253,156,0,0.06);
 }
 
+/* Цвета для статусов строк */
+.status-создано,
+.status-создано td {
+    background-color: rgba(255,255,255,0.02);
+}
+.status-в-процессе,
+.status-в-процессе td {
+    background-color: rgba(253, 232, 0, 0.15);
+}
+.status-выполнено,
+.status-выполнено td {
+    background-color: rgba(0,200,83,0.15);
+}
+
+.status-select {
+    padding: 6px 8px;
+    border-radius: 6px;
+    background: rgba(26,25,25,0.9);
+    color: #fff;
+    border: 1px solid rgba(253,156,0,0.3);
+}
+
+.edit-btn, .delete-btn {
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    margin-left: 6px;
+}
+.edit-btn { background-color: rgba(255,255,255,0.04); color: #FD9C00; }
+.delete-btn { background-color: rgba(255,255,255,0.02); color: #ff6b6b; border: 1px solid rgba(255,107,107,0.15); }
+
 .user-icon {
     flex-shrink: 0;
     width: 30px;
@@ -139,10 +171,17 @@ header {
 .debts-table th,
 .debts-table td {
     border: 2px solid rgba(253, 156, 0, 1); /* мягкая обводка */
-    padding: 15px 25px;
+    padding: 15px 23px;
     text-align: left;
     border-radius: 6px; /* скругление углов */
     background-color: rgba(255, 255, 255, 0.05); /* слегка затемнённый фон */
+}
+
+/* Расширенная колонка статуса (6-я колонка) */
+.expenses-table th:nth-child(6),
+.expenses-table td:nth-child(6) {
+    min-width: 120px;
+    white-space: nowrap;
 }
 
 .expenses-table th,
@@ -155,7 +194,7 @@ header {
 /* Hover на строке */
 .expenses-table tr:hover,
 .debts-table tr:hover {
-    background-color: rgba(253, 156, 0, 0.1); /* лёгкий акцент при наведении */
+    background-color: rgba(253, 156, 0, 0.15); /* лёгкий акцент при наведении */
 }
 
 /* Скролл для таблиц */
@@ -252,7 +291,7 @@ header {
     margin-bottom: 20px;
 }
 
-.form-input, select {
+.form-input {
     padding: 8px 12px;
     background: rgba(255,255,255,0.1);
     border: 1px solid rgba(253,156,0,0.5);
@@ -289,6 +328,20 @@ header {
     background-color: transparent;
     border: 2px solid #FD9C00;
     color: #FD9C00;
+}
+
+.popup-delete {
+    background-color: transparent;
+    border: 2px solid #ff6b6b;
+    color: #ff6b6b;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.popup-delete:hover {
+    background-color: rgba(255,107,107,0.1);
 }
 
 .popup-confirm {

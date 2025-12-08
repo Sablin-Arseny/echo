@@ -71,7 +71,7 @@
 <div class="popup-overlay" id="expense-modal">
     <div class="popup-content">
         <button class="popup-close" id="close-expense-btn">×</button>
-        <h2 class="modal-title">Новая трата</h2>
+        <h2 class="modal-title" id="modal-title">Новая трата</h2>
         <div class="popup-body">
             <form class="event-form" id="expenseForm">
                 <!-- Статья траты -->
@@ -127,10 +127,24 @@
                     <input type="number" id="expense-amount" class="form-input" placeholder="Введите сумму" min="1">
                 </div>
 
+                <!-- Статус (в модальном окне) -->
+                <div class="form-row">
+                    <label>Статус:</label>
+                    <div class="custom-select" id="expense-status">
+                        <div class="select-selected">Создано</div>
+                        <div class="select-items select-hide">
+                            <div data-value="Создано">Создано</div>
+                            <div data-value="В процессе">В процессе</div>
+                            <div data-value="Выполнено">Выполнено</div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Кнопки действия -->
                 <div class="popup-buttons">
                     <button type="button" class="popup-cancel" id="cancel-expense-btn">Отмена</button>
-                    <button type="button" class="popup-confirm" id="save-expense-btn">Добавить</button>
+                    <button type="button" class="popup-delete" id="delete-expense-btn" style="display:none;">Удалить</button>
+                    <button type="button" class="popup-confirm" id="save-expense-btn">Сохранить</button>
                 </div>
             </form>
         </div>
