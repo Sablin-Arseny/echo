@@ -1,0 +1,78 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Montserrat Alternates', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #1A1919;
+    background-image: url("../images/bottom_light.png");
+    background-position: bottom;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    width: 100%;
+    max-width: 1510px;
+    height: 124px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 auto;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+.logo {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+}
+
+.auth-button {
+    height: 60px;
+    width: 100%;
+    max-width: 168px;
+    min-width: 60px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    white-space: nowrap;
+    background-color: #FD9C00;
+    color: #000000;
+    font-size: 20px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.auth-button:hover {
+    transform: translateY(3px);
+    box-shadow: 0 -5px 5px 0 #ffffff;
+}
+
+.user-icon {
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    order: 2;
+}
+
+.auth-text {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    order: 1;
+    text-align: left;
+    padding-bottom: 5px;
+}
