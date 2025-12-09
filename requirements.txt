@@ -4,3 +4,6 @@ pydantic-settings~=2.11.0
 sqlalchemy~=2.0.39
 asyncpg~=0.30.0
 pydantic~=2.12.2
+python-jose~=3.5.0
+passlib~=1.7.4
+bcrypt==4.0.1
