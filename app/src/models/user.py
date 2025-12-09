@@ -11,6 +11,7 @@ class User(Base):
     username = Column(String, unique=True, nullable=False)
     tg_id = Column(String, unique=True, nullable=False)
     full_name = Column(String)
+    password_hash = Column(String)
 
     group_members = relationship("GroupMember", back_populates="users")
     tasks_author = relationship("Task", back_populates="author", foreign_keys="Task.author_id")
