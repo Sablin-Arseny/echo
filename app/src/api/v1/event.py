@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.src.services.event import EventService
-from app.src.schemas import CreateEventRequest, EventResponse
+from app.src.schemas import CreateEventRequest, EventResponse, User
 
 
 router = APIRouter()
@@ -26,4 +26,17 @@ async def get_event_by_id(
     event = await event_service.get(id)
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")
+    return event
+
+
+@router.post("/add_user_to_event")
+async def add_user_to_event(
+    event_id: int,
+    user: User,
+    event_service: EventService = Depends(EventService.get_as_dependency)
+) -> EventResponse:
+    try:
+        event = await event_service.add_user_to_event(event_id=event_id, user=user)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=repr(e))
     return event
