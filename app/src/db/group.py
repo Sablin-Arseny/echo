@@ -54,7 +54,7 @@ class GroupDB(BaseDB):
         if not group:
             return
 
-        if user_id not in [participant.id for participant in group.participants]:
+        if user_id not in {participant.id for participant in group.participants}:
             async with self.create_session() as session:
                 group_member = GroupMember(group_id=group_id, user_id=user_id)
                 session.add(group_member)
