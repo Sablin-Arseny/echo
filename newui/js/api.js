@@ -17,13 +17,12 @@ class EventAPI {
                     'accept': 'application/json',
                 },
                 body: JSON.stringify({
-                    group_id: 1,
                     name: eventData.name,
                     description: eventData.description,
                     start_date: eventData.date,
                     cancel_of_event_date: eventData.exitDate,
-                    venue_event: eventData.place,
-                    tg_chat: 'eventData.tg_chat'
+                    event_place: eventData.place,
+                    participants: [0],
                 })
             });
 
@@ -38,7 +37,7 @@ class EventAPI {
         }
     }
     // получать все эвенты usera по user id
-    static async getAllEvents(){
+    static async getUserEvents(userId){
 
     }
 }
@@ -53,7 +52,7 @@ class UserApi{
                     'accept': 'application/json'
                 },
                 body: JSON.stringify({
-                    id: 30,
+                    id: 1,
                     username: UserData.userName,
                     tg_id: UserData.tg_id,
                     full_name: UserData.fullname
@@ -71,7 +70,7 @@ class UserApi{
         }
     }
 }
-
+/*
 class LocalStorageHelper {
     static generateLocalEventId() {
         // Генерируем уникальный ID для локального мероприятия
@@ -156,7 +155,7 @@ class FallbackLocalStorage{
     }
 
 }
-
+ */
 class SmartAPI {
     // Добавить localstorage
     static async execute(apiCall, fallbackCall, ...args) {
@@ -173,7 +172,11 @@ class SmartAPI {
     }
 
     static createEvent(eventData){
-        return this.execute(EventAPI.createEvent, FallbackLocalStorage.createEventLocalStorage, eventData)
+        return EventAPI.createEvent(eventData);
+    }
+
+    static getUserEvents(userData){
+
     }
 
 }
