@@ -52,12 +52,7 @@ class EventService:
             return None
         return EventResponse.model_validate(event)
     
-    async def add_user_to_event(self, event_id: int, user_id: int | None, tg_id: str | None, username: str | None):
-        user = User(
-            id=user_id,
-            username=username,
-            tg_id=tg_id,
-        )
+    async def add_user_to_event(self, event_id: int, user: User):
         user_db = await self._user_db.get(user)
         event = await self.get(event_id)
 
