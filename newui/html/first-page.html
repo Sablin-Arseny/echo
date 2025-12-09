@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../css/first-page.css">
+    <link rel="stylesheet" href="/css/first-page.css">
 </head>
 <body>
 <header>
@@ -22,6 +22,41 @@
         </span>
     </button>
 </header>
-<script src="../js/first-page.js"></script>
+
+<div id="authPopup" class="popup-overlay">
+    <div class="popup-content">
+        <div class="popup-header">
+            <h2>Вход</h2>
+            <button class="close-btn" id="closePopup">&times;</button>
+        </div>
+        <form id="authForm">
+            <div class="form-group">
+                <label for="login">Логин</label>
+                <input
+                        type="text"
+                        id="login"
+                        name="login"
+                        placeholder="Введите логин"
+                        required
+                >
+            </div>
+            <div class="form-group">
+                <label for="password">Пароль</label>
+                <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Введите пароль"
+                        required
+                >
+            </div>
+            <button type="submit" class="submit-btn">Войти</button>
+        </form>
+        <div class="popup-footer">
+            <p>Нет аккаунта? <a href="#" class="register-link">Зарегистрироваться</a></p>
+        </div>
+    </div>
+</div>
+<script type="module" src="/js/first-page.js"></script>
 </body>
 </html>
