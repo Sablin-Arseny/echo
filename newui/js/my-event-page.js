@@ -22,6 +22,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     authText.innerHTML = `<b>${userData.username}</b>`;
 
+    // Инициализация localStorage ключей
+    function initLocalStorage() {
+        if (!localStorage.getItem('smart_event_counter')) {
+            localStorage.setItem('smart_event_counter', '0');
+        }
+        if (!localStorage.getItem('smart_all_events')) {
+            localStorage.setItem('smart_all_events', '[]');
+        }
+    }
+
+    initLocalStorage();
+
     // Функция для добавления мероприятия в DOM
     function addEventToDOM(eventData) {
         const eventCard = document.createElement('div');
@@ -46,36 +58,71 @@ document.addEventListener('DOMContentLoaded', function() {
         allMyEventsContainer.appendChild(eventCard);
     }
 
-    // Функция для загрузки мероприятий пользователя
-    /*
+// Функция для загрузки мероприятий пользователя
     async function loadUserEvents() {
         try {
-            // Проверяем, авторизован ли пользователь
-            // Поменять проверку
-            if (!userData || !userData.id) {
-                console.log('Пользователь не авторизован');
-                return;
+            console.log('Загрузка мероприятий...');
+
+            // 1. Сначала пробуем загрузить с сервера
+            if (userData && userData.id) {
+                try {
+                    // Здесь нужно реализовать метод getUserEvents в API
+                    // const serverEvents = await SmartAPI.getUserEvents(userData.id);
+                    // if (serverEvents && serverEvents.length > 0) {
+                    //     serverEvents.forEach(event => {
+                    //         addEventToDOM(event);
+                    //     });
+                    // }
+                } catch (serverError) {
+                    console.warn('Не удалось загрузить мероприятия с сервера:', serverError);
+                }
             }
 
-            // Получаем мероприятия пользователя
-            const userEvents = await SmartAPI.getUserEvents(userData.id);
-            console.log('Мероприятия пользователя:', userEvents);
+            // 2. Загружаем из localStorage (fallback и локальные мероприятия)
+            loadEventsFromLocalStorage();
 
-            // Очищаем контейнер (если нужно)
-            // allMyEventsContainer.innerHTML = '';
-
-            // Добавляем каждое мероприятие в DOM
-            if (userEvents && userEvents.length > 0) {
-                userEvents.forEach(event => {
-                    addEventToDOM(event);
-                });
+            // 3. Если есть локальные мероприятия, показываем уведомление
+            const localEvents = document.querySelectorAll('.event-local-badge');
+            if (localEvents.length > 0) {
+                console.log(`Загружено ${localEvents.length} локальных мероприятий`);
             }
+
         } catch (error) {
             console.error('Ошибка при загрузке мероприятий:', error);
         }
     }
 
-     */
+    // Функция для загрузки мероприятий из localStorage
+    function loadEventsFromLocalStorage() {
+        try {
+            // Загружаем все мероприятия из localStorage
+            const allEvents = JSON.parse(localStorage.getItem("smart_all_events"));
+
+            console.log('Мероприятия из localStorage:', allEvents);
+
+            if (allEvents.length > 0) {
+                // Сортируем по дате создания (новые сверху)
+                const sortedEvents = allEvents.sort((a, b) => {
+                    return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+                });
+
+                // Очищаем контейнер перед добавлением
+                allMyEventsContainer.innerHTML = '';
+
+                // Добавляем каждое мероприятие в DOM
+                sortedEvents.forEach(event => {
+                    addEventToDOM(event);
+                });
+
+                console.log(`Загружено ${sortedEvents.length} мероприятий из localStorage`);
+            } else {
+                console.log('Нет сохраненных мероприятий в localStorage');
+            }
+
+        } catch (error) {
+            console.error('Ошибка при загрузке мероприятий из localStorage:', error);
+        }
+    }
 
     // Функция создания мероприятия (обновленная)
     async function createEvent() {
@@ -113,6 +160,12 @@ document.addEventListener('DOMContentLoaded', function() {
             // 5. Закрываем попап и сбрасываем форму
             closePopup();
             resetInfo();
+
+            if (eventResult.isLocal) {
+                console.log('Мероприятие сохранено локально. Будет синхронизировано при восстановлении связи.', 'warning');
+            } else {
+                console.log('Мероприятие успешно создано!', 'success');
+            }
 
         } catch (error) {
             console.error('Ошибка при создании мероприятия:', error);
@@ -172,6 +225,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     })
     // Загружаем мероприятия при загрузке страницы
-    // loadUserEvents();
+    loadUserEvents();
 
 });
