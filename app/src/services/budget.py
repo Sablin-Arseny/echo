@@ -41,8 +41,8 @@ class BudgetService:
                 participants=participants,
             )
 
-    async def create_budget_with_participants(self, budget_request: CreateBudgetRequest) -> BudgetResponse:
-        paid_by_user_orm = await self._user_db.get(User(tg_id=budget_request.paid_by.tg_id))
+    async def create_budget_with_participants(self, budget_request: CreateBudgetRequest, paid_by: User) -> BudgetResponse:
+        paid_by_user_orm = await self._user_db.get(User(tg_id=paid_by.tg_id))
         if not paid_by_user_orm:
             raise ValueError(f"User with tg_id {budget_request.paid_by.tg_id} not found")
 
@@ -87,15 +87,15 @@ class BudgetService:
             participants=participants_users,
         )
 
-    async def get_user_expenses(self, user_dict: dict, event_id: int | None = None) -> UserTotalExpenseResponse:
-        user = await self._user_db.get(User(**user_dict))
+    async def get_user_expenses(self, user: User, event_id: int | None = None) -> UserTotalExpenseResponse:
+        user = await self._user_db.get(user)
         if not user:
             raise ValueError(f"User not found")
-        
-        total_amount = await self._budget_db.get_user_total_expense_by_tg_id(user_dict, event_id)
-        
-        expense_participants = await self._budget_db.get_user_expense_participants_by_tg_id(user_dict, event_id)
-        
+
+        total_amount = await self._budget_db.get_user_total_expense_by_tg_id(user.tg_id, event_id)
+
+        expense_participants = await self._budget_db.get_user_expense_participants_by_tg_id(user.tg_id, event_id)
+
         expenses = []
         for ep in expense_participants:
             expenses.append(UserExpenseResponse(

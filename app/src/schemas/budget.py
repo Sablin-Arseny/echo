@@ -14,7 +14,6 @@ class BudgetResponse(BaseModel):
 
 class CreateBudgetRequest(BaseModel):
     event_id: int
-    paid_by: User
     amount: float
     description: str = ""
     participants: list[str]

@@ -43,12 +43,18 @@ class EventService:
             return None
         return EventResponse.model_validate(event)
 
+    async def get_by_user(self, user: User):
+        events = await self._event_db.get_events_by_member(user)
+        if not events:
+            return []
+        return [EventResponse.model_validate(event) for event in events]
+
     async def get_participants(self, event_id: int) -> list[User]:
         participants = await self._event_db.get_members_by_event_id(event_id)
-        
+
         if not participants:
             return []
-        
+
         return [User.model_validate(user) for user in participants]
 
     async def add_user_to_event(self, event_id: int, participant: User):
