@@ -14,9 +14,9 @@ class UserDB(BaseDB):
     def get_as_dependency(cls):
         return cls()
 
-    async def create(self, user: User):
+    async def create(self, user: User, password_hash: str):
         async with self.create_session() as session:
-            user = UserOrm(**user.model_dump(exclude_none=True))
+            user = UserOrm(**user.model_dump(exclude_none=True), password_hash=password_hash)
             session.add(user)
 
         async with self.create_session() as session:

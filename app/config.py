@@ -16,6 +16,9 @@ class Settings(BaseSettings):
     db_port: int = 5432
     db_echo: bool = False
 
+    # Auth
+    secret_key: str = "<KEY>"
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
