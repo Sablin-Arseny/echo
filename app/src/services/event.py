@@ -6,6 +6,7 @@ from app.src.schemas import (
     CreateEventRequest,
     User,
     EventResponse,
+    STATUS,
 )
 
 
@@ -53,3 +54,7 @@ class EventService:
 
     async def add_user_to_event(self, event_id: int, participant: User):
         return await self._event_db.add_relation_event_member(event_id, participant)
+
+    async def update_status_of_member(self, event_id: int, user: User, status: STATUS):
+        user = await self._user_db.get(user)
+        return await self._event_db.update_status_of_member(event_id, user.id, status)

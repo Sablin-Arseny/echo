@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.src.services.event import EventService
-from app.src.schemas import CreateEventRequest, EventResponse, User
+from app.src.schemas import CreateEventRequest, EventResponse, User, STATUS
 
 
 router = APIRouter()
@@ -51,3 +51,16 @@ async def add_user_to_event(
     except Exception as e:
         raise HTTPException(status_code=500, detail=repr(e))
     return event_response
+
+@router.post("/update_status_of_member")
+async def update_status_of_member(
+    event_id: int,
+    user: User,
+    status: STATUS,
+    event_service: EventService = Depends(EventService.get_as_dependency)
+) -> EventResponse:
+    try:
+        event = await event_service.update_status_of_member(event_id=event_id, user=user, status=status)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=repr(e))
+    return event
