@@ -12,7 +12,6 @@ from app.src.schemas import (
 class EventService:
     _event_db: EventDB
     _user_db: UserDB
-    # _group_db: GroupDB
 
     def __init__(self, event_db: EventDB, user_db: UserDB):
         self._event_db = event_db
@@ -51,3 +50,6 @@ class EventService:
             return []
         
         return [User.model_validate(user) for user in participants]
+
+    async def add_user_to_event(self, event_id: int, participant: User):
+        return await self._event_db.add_relation_event_member(event_id, participant)

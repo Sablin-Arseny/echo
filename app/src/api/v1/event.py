@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
 
-from app.src.db.event import EventDB
 from app.src.services.event import EventService
 from app.src.schemas import CreateEventRequest, EventResponse, User
 
@@ -41,11 +40,11 @@ async def get_event_by_id(
 async def add_user_to_event(
     event_id: int,
     user: User,
-    event_db: EventDB = Depends(EventDB.get_as_dependency)
+    event_service: EventService = Depends(EventService.get_as_dependency)
 ) -> EventResponse:
     try:
-        event = await event_db.add_relation_event_member(event_id=event_id, user=user)
-        participants = await event_db.get_members_by_event_id(event_id)
+        event = await event_service.add_user_to_event(event_id=event_id, user=user)
+        participants = await event_service.get_participants(event_id)
         participants = [User.model_validate(user) for user in participants]
         event_response = EventResponse.model_validate(event)
         event_response.participants = participants
