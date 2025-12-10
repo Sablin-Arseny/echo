@@ -206,7 +206,7 @@ document.addEventListener('DOMContentLoaded', function() {
         closeAuthPopup();
         authForm.reset();
         const authUserData = await SmartAPI.getUserInfo(JSON.parse(localStorage.getItem("userToken")));
-        //window.location.href = `my-event-page.html?userId=${authUserData.id}`;
+        window.location.href = `my-event-page.html?userId=${authUserData.id}`;
 
 
     });

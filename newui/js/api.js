@@ -1,159 +1,46 @@
-const API_BASE = 'http://localhost:8000';
-// Ключи для localStorage
-const LOCAL_STORAGE_KEYS = {
-    CURRENT_EVENT: 'eventData',  // текущее выбранное мероприятие
-    ALL_EVENTS: 'smart_all_events',  // все мероприятия
-    EVENT_COUNTER: 'smart_event_counter',
-    SYNC_QUEUE: 'smart_sync_queue'
-};
-class EventAPI {
-    static async createEvent(eventData) {
+import EventApi from './eventApi.js'
+import UserApi from './userApi.js'
+
+class SmartAPI {
+    // Добавить localstorage
+    static async execute(apiCall, fallbackCall, ...args) {
         try {
-            const response = await fetch(`${API_BASE}/event/create`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Headers': 'Content-Type',
-                    'accept': 'application/json',
-                },
-                body: JSON.stringify({
-                    name: eventData.name,
-                    description: eventData.description,
-                    start_date: eventData.date,
-                    cancel_of_event_date: eventData.exitDate,
-                    event_place: eventData.place,
-                    participants: [0],
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            return await response.json();
+            return await apiCall(...args);
         } catch (error) {
-            console.error('Ошибка создания мероприятия:', error);
-            throw error;
+            console.warn('Бэкенд недоступен, используем localStorage:', error);
+            return await fallbackCall(...args);
         }
     }
-    // получать все эвенты usera по user id
-    static async getUserEvents(userId){
+
+    static createEvent(eventData){
+        return EventApi.createEvent(eventData);
+    }
+
+    static getUserEvents(userData){
 
     }
+    static registerUser(userData) {
+        return UserApi.registerUser(userData);
+    }
+    static getUserInfo(userToken){
+        return UserApi.getUserInfo(userToken)
+    }
+
+    static authorizationUser(userData){
+        return UserApi.authorizationUser(userData);
+    }
+
+    static getUserByUserName(userName){
+        return UserApi.getUserByUserName(userName);
+    }
+
+    static getUserByTgName(userTg){
+        return UserApi.getUserByTgName(userTg);
+    }
+
 }
 
-class UserApi{
-    static async registerUser(UserData){
-        try {
-            const response = await fetch(`${API_BASE}/auth/register?password=${UserData.password}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'accept': 'application/json'
-                },
-                body: JSON.stringify({
-                    username: UserData.userName,
-                    tg_id: UserData.tg_id,
-                    full_name: UserData.fullname
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            return await response.json();
-        } catch (error) {
-            console.error('Ошибка регистрации:', error);
-            throw error;
-        }
-    }
-
-    static async authorizationUser(UserData){
-        try {
-            const response = await fetch(`${API_BASE}/auth/login?password=${UserData.password}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'accept': 'application/json'
-                },
-                body: JSON.stringify({
-                    username: UserData.userName
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            return await response.json();
-        } catch (error) {
-            console.error('Ошибка авторизации:', error);
-            throw error;
-        }
-    }
-
-    static async getUserInfo(userToken){
-        try {
-            const response = await fetch(`${API_BASE}/auth/get_info`, {
-                method: 'GET',
-                headers: {
-                    'accept': 'application/json',
-                    'Authorization': `Bearer ${userToken}`,
-                },
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            return await response.json();
-        } catch (error) {
-            console.error('Ошибка получения данных пользователя:', error);
-            throw error;
-        }
-    }
-
-    static async getUserByUserName(userName){
-        try {
-            const response = await fetch(`${API_BASE}/user/by_any_id?username=${userName}`, {
-                method: 'GET',
-                headers: {
-                    'accept': 'application/json',
-                },
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            return await response.json();
-        } catch (error) {
-            console.error('Ошибка получения данных пользователя:', error);
-            throw error;
-        }
-    }
-
-    static async getUserByTgName(userName){
-        try {
-            const response = await fetch(`${API_BASE}/user/by_any_id?tg_id=${userName}`, {
-                method: 'GET',
-                headers: {
-                    'accept': 'application/json',
-                },
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            return await response.json();
-        } catch (error) {
-            console.error('Ошибка получения данных пользователя:', error);
-            throw error;
-        }
-    }
-}
+export default SmartAPI;
 /*
 class LocalStorageHelper {
     static generateLocalEventId() {
@@ -240,43 +127,3 @@ class FallbackLocalStorage{
 
 }
  */
-class SmartAPI {
-    // Добавить localstorage
-    static async execute(apiCall, fallbackCall, ...args) {
-        try {
-            return await apiCall(...args);
-        } catch (error) {
-            console.warn('Бэкенд недоступен, используем localStorage:', error);
-            return await fallbackCall(...args);
-        }
-    }
-
-    static createEvent(eventData){
-        return EventAPI.createEvent(eventData);
-    }
-
-    static getUserEvents(userData){
-
-    }
-    static registerUser(userData) {
-        return UserApi.registerUser(userData);
-    }
-    static getUserInfo(userToken){
-        return UserApi.getUserInfo(userToken)
-    }
-
-    static authorizationUser(userData){
-        return UserApi.authorizationUser(userData);
-    }
-
-    static getUserByUserName(userName){
-        return UserApi.getUserByUserName(userName);
-    }
-
-    static getUserByTgName(userTg){
-        return UserApi.getUserByTgName(userTg);
-    }
-
-}
-
-export default SmartAPI;
