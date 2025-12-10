@@ -26,7 +26,7 @@ class EventService:
             UserDB.get_as_dependency(),
         )
 
-    async def create(self, event: CreateEventRequest):
+    async def create(self, event: CreateEventRequest, user: User):
         participants = [await self._user_db.get(User(id=uid)) for uid in event.participants]
 
         event = await self._event_db.create_event(event.model_dump(exclude_none=True, exclude={"participants"}))
@@ -35,6 +35,8 @@ class EventService:
         
         for participant in participants:
             await self._event_db.add_relation_event_member(event.id, participant)
+
+        await self._event_db.update_status_of_member(event.id, user.id, "PARTICIPATING")
         
         return await self.get(event.id)
 

@@ -13,9 +13,10 @@ router = APIRouter()
 async def create_event(
     event: CreateEventRequest,
     event_service: EventService = Depends(EventService.get_as_dependency),
+    user: User = Depends(AuthService.check_auth),
 ) -> EventResponse:
     try:
-        event_response = await event_service.create(event)
+        event_response = await event_service.create(event, user)
         participants = await event_service.get_participants(event_response.id)
         event_response = EventResponse.model_validate(event_response)
         event_response.participants = participants
