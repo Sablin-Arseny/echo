@@ -1,7 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException
 
-from app.src.schemas import BudgetResponse, CreateBudgetRequest, UserTotalExpenseResponse, UserExpenseResponse
+from app.src.schemas import (
+    BudgetResponse,
+    CreateBudgetRequest,
+    UserTotalExpenseResponse,
+    User,
+)
 from app.src.services.budget import BudgetService
+from app.src.services.auth import AuthService
 
 
 router = APIRouter()
@@ -11,32 +17,22 @@ router = APIRouter()
 async def create_budget(
     budget: CreateBudgetRequest,
     budget_service: BudgetService = Depends(BudgetService.get_as_dependency),
+    user: User = Depends(AuthService.check_auth),
 ) -> BudgetResponse:
     try:
-        return await budget_service.create_budget_with_participants(budget)
+        return await budget_service.create_budget_with_participants(budget, user)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=repr(e))
 
 
 @router.get("/user_expenses")
 async def get_user_expenses(
-    id: int | None = None,
-    tg_id: str | None = None,
-    username: str | None = None,
     event_id: int | None = None,
     budget_service: BudgetService = Depends(BudgetService.get_as_dependency),
+    user: User = Depends(AuthService.check_auth),
 ) -> UserTotalExpenseResponse:
-    user_dict = {}
-    if id:
-        user_dict["id"] = id
-    if tg_id:
-        user_dict["tg_id"] = tg_id
-    if username:
-        user_dict["username"] = username
-    if not user_dict:
-        raise HTTPException(status_code=400)
     try:
-        return await budget_service.get_user_expenses(user_dict, event_id)
+        return await budget_service.get_user_expenses(user, event_id)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=repr(e))
 

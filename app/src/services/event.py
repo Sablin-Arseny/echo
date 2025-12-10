@@ -1,12 +1,10 @@
 from functools import cache
 
 from app.src.db.event import EventDB
-from app.src.db.group import GroupDB
 from app.src.db.user import UserDB
 from app.src.schemas import (
     CreateEventRequest,
     User,
-    CreateGroupRequest,
     EventResponse,
 )
 
@@ -14,12 +12,10 @@ from app.src.schemas import (
 class EventService:
     _event_db: EventDB
     _user_db: UserDB
-    _group_db: GroupDB
 
-    def __init__(self, event_db: EventDB, user_db: UserDB, group_db: GroupDB):
+    def __init__(self, event_db: EventDB, user_db: UserDB):
         self._event_db = event_db
         self._user_db = user_db
-        self._group_db = group_db
 
     @classmethod
     @cache
@@ -27,23 +23,18 @@ class EventService:
         return cls(
             EventDB.get_as_dependency(),
             UserDB.get_as_dependency(),
-            GroupDB.get_as_dependency(),
         )
 
     async def create(self, event: CreateEventRequest):
-        if event.group_id is None:
-            participants = [await self._user_db.get(User(id=uid)) for uid in event.participants]
-            group = await self._group_db.create(
-                CreateGroupRequest(
-                    name=f"{event.name}_group",
-                    participants=participants,
-                )
-            )
-            event.group_id = group.id
+        participants = [await self._user_db.get(User(id=uid)) for uid in event.participants]
 
         event = await self._event_db.create_event(event.model_dump(exclude_none=True, exclude={"participants"}))
         if not event:
             return
+        
+        for participant in participants:
+            await self._event_db.add_relation_event_member(event.id, participant)
+        
         return await self.get(event.id)
 
     async def get(self, id: int):
@@ -51,11 +42,20 @@ class EventService:
         if not event:
             return None
         return EventResponse.model_validate(event)
-    
-    async def add_user_to_event(self, event_id: int, user: User):
-        user_db = await self._user_db.get(user)
-        event = await self.get(event_id)
 
-        await self._group_db.add_participant(user_db.id, event.group_id)
+    async def get_by_user(self, user: User):
+        events = await self._event_db.get_events_by_member(user)
+        if not events:
+            return []
+        return [EventResponse.model_validate(event) for event in events]
 
-        return event
+    async def get_participants(self, event_id: int) -> list[User]:
+        participants = await self._event_db.get_members_by_event_id(event_id)
+
+        if not participants:
+            return []
+
+        return [User.model_validate(user) for user in participants]
+
+    async def add_user_to_event(self, event_id: int, participant: User):
+        return await self._event_db.add_relation_event_member(event_id, participant)
