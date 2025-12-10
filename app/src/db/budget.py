@@ -46,15 +46,13 @@ class BudgetDB(BaseDB):
             await session.get(ExpenseParticipant, participant.id)
             return participant
 
-    async def get_user_expense_participants_by_tg_id(self, user_dict: dict, event_id: int | None = None) -> list[ExpenseParticipant]:
+    async def get_user_expense_participants_by_tg_id(self, tg_id: int, event_id: int | None = None) -> list[ExpenseParticipant]:
         stmt = (
             select(ExpenseParticipant)
             .join(User, ExpenseParticipant.participant_id == User.id)
             .join(Budget, ExpenseParticipant.expense_id == Budget.id)
+            .where(User.tg_id == tg_id)
         )
-        for key, value in user_dict.items():
-            if hasattr(User, key) and value is not None:
-                stmt = stmt.where(getattr(User, key) == value)
 
         if event_id is not None:
             stmt = stmt.where(Budget.event_id == event_id)
@@ -62,15 +60,13 @@ class BudgetDB(BaseDB):
             result = await session.execute(stmt)
             return list(result.scalars().all())
 
-    async def get_user_total_expense_by_tg_id(self, user_dict: dict, event_id: int | None = None) -> float:
+    async def get_user_total_expense_by_tg_id(self, tg_id: int, event_id: int | None = None) -> float:
         stmt = (
             select(func.sum(ExpenseParticipant.share_amount))
             .join(User, ExpenseParticipant.participant_id == User.id)
             .join(Budget, ExpenseParticipant.expense_id == Budget.id)
+            .where(User.tg_id == tg_id)
         )
-        for key, value in user_dict.items():
-            if hasattr(User, key) and value is not None:
-                stmt = stmt.where(getattr(User, key) == value)
 
         if event_id is not None:
             stmt = stmt.where(Budget.event_id == event_id)

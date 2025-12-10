@@ -7,17 +7,6 @@ from app.src.schemas import User
 router = APIRouter()
 
 
-@router.post("/create")
-async def create_user(
-    user: User,
-    user_db: UserDB = Depends(UserDB.get_as_dependency),
-) -> User:
-    try:
-        return await user_db.create(user)
-    except Exception:
-        raise HTTPException(status_code=409, detail="Can't create user")
-
-
 @router.get("/all")
 async def get_all_users(
     user_db: UserDB = Depends(UserDB.get_as_dependency),
