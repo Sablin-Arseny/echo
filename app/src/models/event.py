@@ -8,7 +8,6 @@ class Event(Base):
     __tablename__ = "events"
 
     id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
-    group_id = Column(ForeignKey("groups.id"), nullable=False, index=True)
     name = Column(String, nullable=False)
     description = Column(String)
     start_date = Column(TIMESTAMP(timezone=True), nullable=False)
@@ -17,7 +16,7 @@ class Event(Base):
     tg_chat = Column(String)
     event_place = Column(String)
 
-    groups = relationship("Group", back_populates="events")
     budget = relationship("Budget", back_populates="events")
     tasks = relationship("Task", back_populates="events")
     media = relationship("Media", back_populates="events")
+    event_members = relationship("EventMember", back_populates="events")

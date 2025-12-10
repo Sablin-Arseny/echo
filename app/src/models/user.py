@@ -12,7 +12,7 @@ class User(Base):
     tg_id = Column(String, unique=True, nullable=False)
     full_name = Column(String)
 
-    group_members = relationship("GroupMember", back_populates="users")
+    event_members = relationship("EventMember", back_populates="users")
     tasks_author = relationship("Task", back_populates="author", foreign_keys="Task.author_id")
     tasks_executor = relationship("Task", back_populates="executor", foreign_keys="Task.executor_id")
     media = relationship("Media", back_populates="users")
