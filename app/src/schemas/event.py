@@ -1,7 +1,17 @@
 from pydantic import BaseModel, ConfigDict
 from datetime import datetime
+from typing import Literal
 
 from app.src.schemas import User
+
+
+STATUS = Literal[
+    "INVITED",
+    "REFUSED",
+    "PARTICIPATING",
+    "DELETED",
+    "DRAFT",
+]
 
 
 class CreateEventRequest(BaseModel):
