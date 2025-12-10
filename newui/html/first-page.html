@@ -23,40 +23,113 @@
     </button>
 </header>
 
+<!-- Попап для авторизации -->
 <div id="authPopup" class="popup-overlay">
     <div class="popup-content">
-        <div class="popup-header">
-            <h2>Вход</h2>
-            <button class="close-btn" id="closePopup">&times;</button>
+        <!-- Форма входа -->
+        <div id="loginForm" class="login-form">
+            <div class="popup-header">
+                <h2>Вход</h2>
+                <button class="close-btn" id="closePopup">&times;</button>
+            </div>
+            <form id="authForm">
+                <div class="form-group">
+                    <label for="login">Логин</label>
+                    <input
+                            type="text"
+                            id="login"
+                            name="login"
+                            placeholder="Введите логин"
+                            required
+                    >
+                </div>
+                <div class="form-group">
+                    <label for="password">Пароль</label>
+                    <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Введите пароль"
+                            required
+                    >
+                </div>
+                <div class="error-message" id="loginError"></div>
+                <button type="submit" class="submit-btn">Войти</button>
+            </form>
+            <div class="popup-footer">
+                <p>Нет аккаунта? <a href="#" class="register-link" id="showRegisterForm">Зарегистрироваться</a></p>
+            </div>
         </div>
-        <form id="authForm">
-            <div class="form-group">
-                <label for="login">Логин</label>
-                <input
-                        type="text"
-                        id="login"
-                        name="login"
-                        placeholder="Введите логин"
-                        required
-                >
+
+        <!-- Форма регистрации -->
+        <div id="registerForm" class="register-form">
+            <div class="popup-header">
+                <h2>Регистрация</h2>
+                <button class="close-btn" id="closeRegisterForm">&times;</button>
             </div>
-            <div class="form-group">
-                <label for="password">Пароль</label>
-                <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        placeholder="Введите пароль"
-                        required
-                >
+            <form id="registrationForm">
+                <div class="form-group">
+                    <label for="regUsername">Имя пользователя</label>
+                    <input
+                            type="text"
+                            id="regUsername"
+                            name="username"
+                            placeholder="Введите имя пользователя"
+                            required
+                    >
+                </div>
+                <div class="form-group">
+                    <label for="regTelegramId">Telegram ID</label>
+                    <input
+                            type="text"
+                            id="regTelegramId"
+                            name="tg_id"
+                            placeholder="Введите Telegram ID"
+                            required
+                    >
+                    <small style="color: #888; font-size: 12px; display: block; margin-top: 5px;">
+                        Чтобы получить Telegram ID, напишите боту @userinfobot
+                    </small>
+                </div>
+                <div class="form-group">
+                    <label for="regFullName">Полное имя</label>
+                    <input
+                            type="text"
+                            id="regFullName"
+                            name="full_name"
+                            placeholder="Введите полное имя"
+                            required
+                    >
+                </div>
+                <div class="form-group">
+                    <label for="regPassword">Пароль</label>
+                    <input
+                            type="password"
+                            id="regPassword"
+                            name="password"
+                            placeholder="Введите пароль"
+                            required
+                    >
+                </div>
+                <div class="form-group">
+                    <label for="regConfirmPassword">Подтвердите пароль</label>
+                    <input
+                            type="password"
+                            id="regConfirmPassword"
+                            placeholder="Подтвердите пароль"
+                            required
+                    >
+                </div>
+                <div class="error-message" id="registerError"></div>
+                <button type="submit" class="submit-btn">Зарегистрироваться</button>
+            </form>
+            <div class="form-switch">
+                <a href="#" class="back-to-login" id="showLoginForm">← Вернуться ко входу</a>
             </div>
-            <button type="submit" class="submit-btn">Войти</button>
-        </form>
-        <div class="popup-footer">
-            <p>Нет аккаунта? <a href="#" class="register-link">Зарегистрироваться</a></p>
         </div>
     </div>
 </div>
+
 <script type="module" src="/js/first-page.js"></script>
 </body>
 </html>

@@ -16,27 +16,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const eventPlaceInput = document.getElementById("eventPlace");
     const eventDescriptionInput = document.getElementById("eventDescription");
     // данные пользователя
-    const userData = JSON.parse(localStorage.getItem("userData"));
+    const userToken = JSON.parse(localStorage.getItem("userToken"));
 
     const allMyEventsContainer = document.querySelector('.all-my-events');
 
-    authText.innerHTML = `<b>${userData.username}</b>`;
+    getUserInfoByToken();
 
-    /*
-    // Инициализация localStorage ключей
-    function initLocalStorage() {
-        if (!localStorage.getItem('smart_event_counter')) {
-            localStorage.setItem('smart_event_counter', '0');
-        }
-        if (!localStorage.getItem('smart_all_events')) {
-            localStorage.setItem('smart_all_events', '[]');
-        }
+    async function getUserInfoByToken(){
+        const userData = await SmartAPI.getUserInfo(JSON.parse(localStorage.getItem("userToken")));
+        authText.innerHTML = `<b>${userData.username}</b>`;
     }
-
-
-
-    initLocalStorage();
-     */
 
     // Функция для добавления мероприятия в DOM
     function addEventToDOM(eventData) {
@@ -81,15 +70,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.warn('Не удалось загрузить мероприятия с сервера:', serverError);
                 }
             }
-
-            // 2. Загружаем из localStorage (fallback и локальные мероприятия)
-            // loadEventsFromLocalStorage();
-            //
-            // // 3. Если есть локальные мероприятия, показываем уведомление
-            // const localEvents = document.querySelectorAll('.event-local-badge');
-            // if (localEvents.length > 0) {
-            //     console.log(`Загружено ${localEvents.length} локальных мероприятий`);
-            // }
 
         } catch (error) {
             console.error('Ошибка при загрузке мероприятий:', error);
@@ -139,7 +119,6 @@ document.addEventListener('DOMContentLoaded', function() {
             place: eventPlaceInput.value,
             description: eventDescriptionInput.value,
             tg_chat: null,
-            creator_id: userData.id
         };
 
         try {

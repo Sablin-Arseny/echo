@@ -43,16 +43,15 @@ class EventAPI {
 }
 
 class UserApi{
-    static async createUser(UserData) {
+    static async registerUser(UserData){
         try {
-            const response = await fetch(`${API_BASE}/user/create`, {
+            const response = await fetch(`${API_BASE}/auth/register?password=${UserData.password}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'accept': 'application/json'
                 },
                 body: JSON.stringify({
-                    id: 1,
                     username: UserData.userName,
                     tg_id: UserData.tg_id,
                     full_name: UserData.fullname
@@ -65,7 +64,92 @@ class UserApi{
 
             return await response.json();
         } catch (error) {
-            console.error('Ошибка создания пользователя:', error);
+            console.error('Ошибка регистрации:', error);
+            throw error;
+        }
+    }
+
+    static async authorizationUser(UserData){
+        try {
+            const response = await fetch(`${API_BASE}/auth/login?password=${UserData.password}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: UserData.userName
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('Ошибка авторизации:', error);
+            throw error;
+        }
+    }
+
+    static async getUserInfo(userToken){
+        try {
+            const response = await fetch(`${API_BASE}/auth/get_info`, {
+                method: 'GET',
+                headers: {
+                    'accept': 'application/json',
+                    'Authorization': `Bearer ${userToken}`,
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('Ошибка получения данных пользователя:', error);
+            throw error;
+        }
+    }
+
+    static async getUserByUserName(userName){
+        try {
+            const response = await fetch(`${API_BASE}/user/by_any_id?username=${userName}`, {
+                method: 'GET',
+                headers: {
+                    'accept': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('Ошибка получения данных пользователя:', error);
+            throw error;
+        }
+    }
+
+    static async getUserByTgName(userName){
+        try {
+            const response = await fetch(`${API_BASE}/user/by_any_id?tg_id=${userName}`, {
+                method: 'GET',
+                headers: {
+                    'accept': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('Ошибка получения данных пользователя:', error);
             throw error;
         }
     }
@@ -167,16 +251,30 @@ class SmartAPI {
         }
     }
 
-    static createUser(userData){
-        return UserApi.createUser(userData);
-    }
-
     static createEvent(eventData){
         return EventAPI.createEvent(eventData);
     }
 
     static getUserEvents(userData){
 
+    }
+    static registerUser(userData) {
+        return UserApi.registerUser(userData);
+    }
+    static getUserInfo(userToken){
+        return UserApi.getUserInfo(userToken)
+    }
+
+    static authorizationUser(userData){
+        return UserApi.authorizationUser(userData);
+    }
+
+    static getUserByUserName(userName){
+        return UserApi.getUserByUserName(userName);
+    }
+
+    static getUserByTgName(userTg){
+        return UserApi.getUserByTgName(userTg);
     }
 
 }

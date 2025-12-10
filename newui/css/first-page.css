@@ -227,6 +227,53 @@ header {
     text-decoration: underline;
 }
 
+/* Стили для форм регистрации и входа */
+.register-form {
+    display: none;
+}
+
+.login-form {
+    display: block;
+}
+
+.back-to-login {
+    color: #FD9C00;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+    cursor: pointer;
+    display: block;
+    text-align: center;
+    margin-top: 15px;
+}
+
+.back-to-login:hover {
+    color: #FFB740;
+    text-decoration: underline;
+}
+
+.form-switch {
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #444;
+}
+
+.popup-footer p {
+    margin: 0;
+}
+
+.error-message {
+    color: #ff6b6b;
+    font-size: 14px;
+    margin-top: 5px;
+    display: none;
+}
+
+.error-message.show {
+    display: block;
+}
+
 /* Responsive */
 @media (max-width: 480px) {
     .popup-content {
