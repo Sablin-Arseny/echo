@@ -1,9 +1,10 @@
 from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 
+from app.src.schemas import User
+
 
 class CreateEventRequest(BaseModel):
-    group_id: int | None = None
     name: str
     description: str | None = None
     start_date: datetime
@@ -14,7 +15,6 @@ class CreateEventRequest(BaseModel):
 
 class EventResponse(BaseModel):
     id: int
-    group_id: int
     name: str
     description: str | None = None
     start_date: datetime
@@ -22,5 +22,6 @@ class EventResponse(BaseModel):
     created_at: datetime
     tg_chat: str | None = None
     event_place: str | None = None
+    participants: list[User] = []
 
     model_config = ConfigDict(from_attributes=True)
