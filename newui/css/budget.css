@@ -71,7 +71,7 @@ header {
     gap: 8px;
 }
 
-.back-button:hover {
+.back-button:hover, .popup-cancel:hover, .popup-delete:hover {
     transform: translateY(2px);
     background-color: rgba(253,156,0,0.06);
 }
@@ -83,11 +83,11 @@ header {
 }
 .status-в-процессе,
 .status-в-процессе td {
-    background-color: rgba(253, 232, 0, 0.15);
+    background-color: rgba(255, 190, 0, 0.6);
 }
 .status-выполнено,
 .status-выполнено td {
-    background-color: rgba(0,200,83,0.15);
+    background-color: rgba(0,200,83,0.6);
 }
 
 .status-select {
@@ -141,17 +141,17 @@ header {
 }
 
 .panel {
-    background-color: rgba(255,255,255,0.05);
-    border: 2px solid #FD9C00;
     border-radius: 14px;
-    padding: 20px;
+    padding: 24px;
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    overflow: hidden;
+    gap: 16px;
+    border: 3px solid transparent;
+    border-image: linear-gradient(0deg, #FFFFFF2E, #ffffff);
+    border-image-slice: 1;
 }
 
-.panel h1, .panel h2 {
+.panel h1, .panel h2, .page-title {
     background-image: linear-gradient(to right, #ffffff, #FD9C00);
     background-clip: text;
     color: transparent;
@@ -170,7 +170,7 @@ header {
 .expenses-table td,
 .debts-table th,
 .debts-table td {
-    border: 2px solid rgba(253, 156, 0, 1); /* мягкая обводка */
+    border: 2px solid rgba(67, 66, 66, 1); /* мягкая обводка */
     padding: 15px 23px;
     text-align: left;
     border-radius: 6px; /* скругление углов */
@@ -185,16 +185,16 @@ header {
 }
 
 .expenses-table th,
-.debts-table th {
-    font-weight: 600;
-    color: #ffffff;
+.debts-table th,
+.total-row td, .total-per-person-row td {
+    color: #FD9C00;
+    font-weight: 650;
     background-color: rgba(255, 255, 255, 0.1); /* чуть ярче для заголовка */
 }
 
 /* Hover на строке */
-.expenses-table tr:hover,
-.debts-table tr:hover {
-    background-color: rgba(253, 156, 0, 0.15); /* лёгкий акцент при наведении */
+.expenses-table tbody tr:hover {
+    background-color: rgba(201, 201, 201, 0.1); /* лёгкий акцент при наведении */
 }
 
 /* Скролл для таблиц */
@@ -227,7 +227,7 @@ header {
     align-self: flex-start;
 }
 
-.create-button:hover {
+.create-button:hover, .popup-confirm:hover {
     transform: translateY(3px);
     box-shadow: 0 -5px 5px 0 #ffffff;
 }
@@ -289,6 +289,16 @@ header {
     flex-direction: column;
     gap: 5px;
     margin-bottom: 20px;
+}
+
+.form-row label {
+    color: #FD9C00;
+    font-weight: 600;
+    min-width: 200px;
+    text-align: left;
+    flex-shrink: 0;
+    font-size: 0.95rem;
+    margin-top: 10px;
 }
 
 .form-input {
