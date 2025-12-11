@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from app.src.services.event import EventService
 from app.src.services.auth import AuthService
 
-from app.src.schemas import CreateEventRequest, EventResponse, User, STATUS
+from app.src.schemas import CreateEventRequest, EventResponse, UpdateEvent, User, STATUS
 
 
 router = APIRouter()
@@ -25,13 +25,34 @@ async def create_event(
         raise HTTPException(status_code=500, detail=repr(e))
 
 
+@router.patch("/update")
+async def update_event(
+    event: UpdateEvent,
+    event_service: EventService = Depends(EventService.get_as_dependency),
+    user: User = Depends(AuthService.check_auth),
+) -> EventResponse:
+    try:
+        event = await event_service.update(event)
+        participants = await event_service.get_participants(event.id)
+        event = EventResponse.model_validate(event)
+        event.participants = participants
+        return event
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=repr(e))
+
+
 @router.get("/get_user_events")
 async def get_user_events(
+    status: STATUS | None = None,
     event_service: EventService = Depends(EventService.get_as_dependency),
     user: User = Depends(AuthService.check_auth),
 ) -> list[EventResponse]:
     try:
-        return await event_service.get_by_user(user)
+        events = await event_service.get_by_user(user, status)
+        for event in events:
+            participants = await event_service.get_participants(event.id)
+            event.participants = participants
+        return events
     except Exception as e:
         raise HTTPException(status_code=500, detail=repr(e))
 
@@ -65,6 +86,7 @@ async def add_user_to_event(
     except Exception as e:
         raise HTTPException(status_code=500, detail=repr(e))
     return event_response
+
 
 @router.post("/update_status_of_member")
 async def update_status_of_member(

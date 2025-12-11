@@ -4,8 +4,7 @@ from sqlalchemy import select
 
 from app.src.db.core import BaseDB
 from app.src.models import Event, EventMember, User as UserOrm
-from app.src.schemas import User
-from app.src.schemas import STATUS
+from app.src.schemas import User, UpdateEvent, STATUS
 
 
 class EventDB(BaseDB):
@@ -23,6 +22,18 @@ class EventDB(BaseDB):
         async with self.create_session() as session:
             event = await session.get(Event, event.id)
             return event
+    
+    async def update_event(self, event_id: int, event: dict):
+        async with self.create_session() as session:
+            event_orm = await session.get(Event, event_id)
+
+            for key, value in event.items():
+                if hasattr(event_orm, key):
+                    setattr(event_orm, key, value)
+
+            await session.commit()
+            await session.refresh(event_orm)
+            return event_orm
 
     async def get_event_by_id(self, event_id: int) -> Event:
         async with self.create_session() as session:
@@ -59,12 +70,15 @@ class EventDB(BaseDB):
             members = members.scalars().all()
         return list(members) if members else None
 
-    async def get_events_by_member(self, user: User):
+    async def get_events_by_member(self, user: User, status: STATUS | None):
         stmt = (
             select(Event)
             .join(EventMember, Event.id == EventMember.event_id)
             .where(EventMember.user_id == user.id)
         )
+        if status:
+            stmt = stmt.where(EventMember.status == status)
+
         async with self.create_session() as session:
             events = await session.execute(stmt)
             events = events.scalars().all()
