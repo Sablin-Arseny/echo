@@ -479,7 +479,7 @@ header {
 #total-amount {
     font-weight: 700;
     font-size: 1.8rem; /* увеличиваем размер */
-    color: #e74c3c;   /* яркий цвет для выделения */
+    color: #FD9C00;   /* яркий цвет для выделения */
 }
 
 .expenses-total span {
