@@ -474,6 +474,7 @@ header {
 .expenses-total h2 {
     font-weight: 700;
     font-size: 1.3rem;
+    margin-bottom: 0%;
 }
 
 #total-amount {
@@ -483,7 +484,10 @@ header {
 }
 
 .expenses-total span {
-    white-space: nowrap;
+    font-size: 1.5rem;       /* больше, чем текст */
+    font-weight: 700;
+    white-space: nowrap;      /* не переносить сумму и знак ₽ */
+    margin-left: 0.3rem;      /* небольшой отступ от текста */
 }
 
 /* Адаптивность для мобильных устройств */
@@ -574,7 +578,9 @@ header {
 
     .expenses-total div {
         display: flex;
+        align-items: center;
         justify-content: space-between;
+        gap: 0.5rem;
     }
 
     .debts-table,
