@@ -571,7 +571,7 @@ textarea.form-input,
 }
 
 /* Адаптивность для мобильных устройств */
-@media (max-width: 768px) {
+@media (max-width: 1350px) {
     .form-row {
         flex-direction: column;
         align-items: flex-start;
