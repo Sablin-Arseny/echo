@@ -25,7 +25,7 @@ async def create_event(
         raise HTTPException(status_code=500, detail=repr(e))
 
 
-@router.post("/update")
+@router.patch("/update")
 async def update_event(
     event: UpdateEvent,
     event_service: EventService = Depends(EventService.get_as_dependency),

@@ -25,15 +25,15 @@ class EventDB(BaseDB):
     
     async def update_event(self, event_id: int, event: dict):
         async with self.create_session() as session:
-            event_db = await session.get(Event, event_id)
+            event_orm = await session.get(Event, event_id)
 
             for key, value in event.items():
-                if hasattr(event_db, key):
-                    setattr(event_db, key, value)
+                if hasattr(event_orm, key):
+                    setattr(event_orm, key, value)
 
             await session.commit()
-            await session.refresh(event_db)
-            return event_db
+            await session.refresh(event_orm)
+            return event_orm
 
     async def get_event_by_id(self, event_id: int) -> Event:
         async with self.create_session() as session:
