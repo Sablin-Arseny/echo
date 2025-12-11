@@ -6,6 +6,7 @@ from app.src.schemas import (
     CreateEventRequest,
     User,
     EventResponse,
+    UpdateEvent,
     STATUS,
 )
 
@@ -39,6 +40,14 @@ class EventService:
         await self._event_db.update_status_of_member(event.id, user.id, "PARTICIPATING")
         
         return await self.get(event.id)
+    
+    async def update(self, event: UpdateEvent):
+        update_event = event.model_dump(
+            exclude_none=True, 
+            exclude={"id"}
+        )
+        event = await self._event_db.update_event(event.id, update_event)
+        return EventResponse.model_validate(event)
 
     async def get(self, id: int):
         event = await self._event_db.get_event_by_id(id)
@@ -46,8 +55,8 @@ class EventService:
             return None
         return EventResponse.model_validate(event)
 
-    async def get_by_user(self, user: User):
-        events = await self._event_db.get_events_by_member(user)
+    async def get_by_user(self, user: User, status: STATUS | None):
+        events = await self._event_db.get_events_by_member(user, status)
         if not events:
             return []
         return [EventResponse.model_validate(event) for event in events]

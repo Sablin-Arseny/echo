@@ -35,3 +35,12 @@ class EventResponse(BaseModel):
     participants: list[User] = []
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class UpdateEvent(BaseModel):
+    id: int
+    name: str
+    description: str | None = None
+    start_date: datetime
+    cancel_of_event_date: datetime | None = None
+    event_place: str | None = None
