@@ -69,8 +69,8 @@ class EventService:
 
         return [User.model_validate(user) for user in participants]
 
-    async def add_user_to_event(self, event_id: int, participant: User):
-        return await self._event_db.add_relation_event_member(event_id, participant)
+    async def add_user_to_event(self, event_id: int, user: User):
+        return await self._event_db.add_relation_event_member(event_id, user)
 
     async def update_status_of_member(self, event_id: int, user: User, status: STATUS):
         user = await self._user_db.get(user)
