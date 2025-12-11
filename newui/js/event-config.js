@@ -1,14 +1,8 @@
+import SmartAPI from './api.js';
+
 document.addEventListener('DOMContentLoaded', () => {
     // Sample data
-    const eventData = {
-        title: '',
-        date: '',
-        maxdate: '',
-        place: '',
-        desc: ''
-    };
-
-    const participants = ['@ivan', '@katya', '@sergey'];
+    const eventData = JSON.parse(localStorage.getItem("eventData"));
 
     // Elements
     const evTitle = document.getElementById('ev-title');
@@ -29,12 +23,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const confirmAdd = document.getElementById('confirm-add');
     const tgInput = document.getElementById('participant-tg');
     const editBtn = document.getElementById('edit-btn');
+    const authText = document.getElementById("authText");
+    const registerError = document.getElementById('userAddError');
 
     const modal = document.getElementById('participant-modal');
     const openBtn = document.getElementById('add-participant-btn');
     const closeBtn = document.getElementById('close-participant-modal');
 
     let editing = false;
+
+    getUserInfoByToken();
+    initEventData()
+    initEventFields();
+
+    async function initEventData(){
+        const eventData = await SmartAPI.getEventById(JSON.parse(localStorage.getItem("currentEventId")));
+        localStorage.setItem('eventData', JSON.stringify(eventData));
+        renderParticipants();
+    }
+
+    async function getUserInfoByToken(){
+        const userData = await SmartAPI.getUserInfo(JSON.parse(localStorage.getItem("userToken")));
+        authText.innerHTML = `<b>${userData.username}</b>`;
+    }
 
     openBtn.addEventListener('click', () => {
         modal.classList.add('active'); // показываем модалку
@@ -94,21 +105,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Update input fields with current data from eventData
     function updateInputFields() {
-        evTitle.value = eventData.title || '';
-        evDate.value = eventData.date ? formatDateForInput(eventData.date) : '';
-        evMax.value = eventData.maxdate ? formatDateForInput(eventData.maxdate) : '';
-        evPlace.value = eventData.place || '';
-        evDesc.value = eventData.desc || '';
+        evTitle.value = eventData.name || '';
+        evDate.value = eventData.start_date ? formatDateForInput(eventData.start_date) : '';
+        evMax.value = eventData.cancel_of_event_date ? formatDateForInput(eventData.cancel_of_event_date) : '';
+        evPlace.value = eventData.event_place || '';
+        evDesc.value = eventData.description || '';
     }
 
     // Update display fields with current data
     function updateDisplayFields() {
         // Форматируем даты для отображения
-        const displayTitle = eventData.title
-        const displayDate = eventData.date ? formatDateForDisplay(eventData.date) : '';
-        const displayMaxdate = eventData.maxdate ? formatDateForDisplay(eventData.maxdate) : '';
-        const displayPlace = eventData.place;
-        const displayDesc = eventData.desc;
+        const displayTitle = eventData.name
+        const displayDate = eventData.start_date ? formatDateForDisplay(eventData.start_date) : '';
+        const displayMaxdate = eventData.cancel_of_event_date ? formatDateForDisplay(eventData.cancel_of_event_date) : '';
+        const displayPlace = eventData.event_place;
+        const displayDesc = eventData.description;
         
         evTitleDisplay.textContent = displayTitle;
         evDateDisplay.textContent = displayDate;
@@ -117,11 +128,11 @@ document.addEventListener('DOMContentLoaded', () => {
         evDescDisplay.textContent = displayDesc;
         
         // Update placeholder styling
-        updatePlaceholderStyle(evTitleDisplay, eventData.title);
-        updatePlaceholderStyle(evDateDisplay, eventData.date);
-        updatePlaceholderStyle(evMaxDisplay, eventData.maxdate);
-        updatePlaceholderStyle(evPlaceDisplay, eventData.place);
-        updatePlaceholderStyle(evDescDisplay, eventData.desc);
+        updatePlaceholderStyle(evTitleDisplay, eventData.name);
+        updatePlaceholderStyle(evDateDisplay, eventData.start_date);
+        updatePlaceholderStyle(evMaxDisplay, eventData.cancel_of_event_date);
+        updatePlaceholderStyle(evPlaceDisplay, eventData.event_place);
+        updatePlaceholderStyle(evDescDisplay, eventData.description);
     }
 
     // Function to toggle edit mode
@@ -186,11 +197,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const newDesc = evDesc.value.trim();
         
         // Сохраняем значения
-        eventData.title = newTitle;
-        eventData.date = newDate;
-        eventData.maxdate = newMaxdate;
-        eventData.place = newPlace;
-        eventData.desc = newDesc;
+        eventData.name = newTitle;
+        eventData.start_date = newDate;
+        eventData.cancel_of_event_date = newMaxdate;
+        eventData.event_place = newPlace;
+        eventData.description = newDesc;
         
         // Обновляем отображение
         updateDisplayFields();
@@ -206,20 +217,31 @@ document.addEventListener('DOMContentLoaded', () => {
         toggleEditMode(false);
     }
 
-    function renderParticipants() {
-        participantsList.innerHTML = '';
+    async function renderParticipants() {
+        const participants = JSON.parse(localStorage.getItem("eventData")).participants;
         participants.forEach((p, idx) => {
             const el = document.createElement('div');
-            el.className = 'participant-item';
-            el.innerHTML = `
-                <div class="participant-tg">${p}</div>
+            if (!(idx === 0)) {
+                el.className = 'participant-item';
+                el.innerHTML = `
+                <div class="participant-tg">${p.username}</div>
                 <div class="participant-actions">
                     <button class="btn btn-secondary small" data-idx="${idx}">x</button>
                 </div>
             `;
-            participantsList.appendChild(el);
+                participantsList.appendChild(el);
+            }else {
+                el.className = 'participant-item';
+                el.innerHTML = `
+                <div class="participant-tg">${p.username}</div>
+                <div class="participant-actions">
+                    admin
+                </div>
+            `;
+                participantsList.appendChild(el);
+            }
         });
-        
+
         // Attach delete handlers
         participantsList.querySelectorAll('button[data-idx]').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -230,10 +252,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Initialize everything
-    initEventFields();
-    renderParticipants();
-
     // Modal open
     addBtn.addEventListener('click', () => {
         tgInput.value = '';
@@ -241,20 +259,30 @@ document.addEventListener('DOMContentLoaded', () => {
         tgInput.focus();
     });
     
-    closeModalBtn.addEventListener('click', () => modal.style.display = 'none');
+    closeModalBtn.addEventListener('click',  () => modal.style.display = 'none');
 
     // Confirm add
-    confirmAdd.addEventListener('click', () => {
+    confirmAdd.addEventListener('click', async function ()  {
+        clearRegisterError();
         const val = tgInput.value.trim();
-        if (!val.startsWith('@') || val.length < 2) {
-            alert('Введите Telegram имя пользователя в формате @username');
+        try{
+            const isUser = await SmartAPI.checkUserByUserName(val);
+            console.log(isUser);
+            if (isUser){
+                console.log("isUser");
+            }
+        } catch (error) {
+            showRegisterError('Пользователь не найден');
             return;
         }
-        participants.push(val);
-        renderParticipants();
+
+        // participants.push(val);
+        // renderParticipants();
         modal.style.display = 'none';
     });
 
+    // Пока что отключил
+    /*
     // Edit button click handler
     editBtn.addEventListener('click', () => {
         if (!editing) {
@@ -266,6 +294,8 @@ document.addEventListener('DOMContentLoaded', () => {
             toggleEditMode(false);
         }
     });
+
+     */
 
     // Click outside modal to close
     window.addEventListener('click', (e) => {
@@ -281,4 +311,18 @@ document.addEventListener('DOMContentLoaded', () => {
             editBtn.click();
         }
     });
+
+    function clearRegisterError() {
+        if (registerError) {
+            registerError.textContent = '';
+            registerError.classList.remove('show');
+        }
+    }
+
+    function showRegisterError(message) {
+        if (registerError) {
+            registerError.textContent = message;
+            registerError.classList.add('show');
+        }
+    }
 });

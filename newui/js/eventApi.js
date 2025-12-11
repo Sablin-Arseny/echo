@@ -6,7 +6,7 @@ class EventApi {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Access-Control-Allow-Headers': 'Content-Type',
+                    'Authorization': `Bearer ${JSON.parse(localStorage.getItem("userToken"))}`,
                     'accept': 'application/json',
                 },
                 body: JSON.stringify({
@@ -15,7 +15,7 @@ class EventApi {
                     start_date: eventData.date,
                     cancel_of_event_date: eventData.exitDate,
                     event_place: eventData.place,
-                    participants: [0],
+                    participants: [eventData.userId],
                 })
             });
 
@@ -30,8 +30,45 @@ class EventApi {
         }
     }
     // получать все эвенты usera по user id
-    static async getUserEvents(userId){
+    static async getUserEvents(userToken){
+        try {
+            const response = await fetch(`${API_BASE}/event/get_user_events`, {
+                method: 'GET',
+                headers: {
+                    'accept': 'application/json',
+                    'Authorization': `Bearer ${userToken}`,
+                },
+            });
 
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('Ошибка получения мероприятий пользователя:', error);
+            throw error;
+        }
+    }
+    // получить ивент по id ивента
+    static async getEventById(eventId){
+        try {
+            const response = await fetch(`${API_BASE}/event/${eventId}`, {
+                method: 'GET',
+                headers: {
+                    'accept': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('Ошибка получения мероприятия по его id:', error);
+            throw error;
+        }
     }
 }
 

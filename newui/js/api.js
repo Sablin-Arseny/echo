@@ -15,10 +15,6 @@ class SmartAPI {
     static createEvent(eventData){
         return EventApi.createEvent(eventData);
     }
-
-    static getUserEvents(userData){
-
-    }
     static registerUser(userData) {
         return UserApi.registerUser(userData);
     }
@@ -36,6 +32,18 @@ class SmartAPI {
 
     static getUserByTgName(userTg){
         return UserApi.getUserByTgName(userTg);
+    }
+
+    static getUserEvents(userToken) {
+        return EventApi.getUserEvents(userToken);
+    }
+
+    static getEventById(eventId){
+        return EventApi.getEventById(eventId)
+    }
+
+    static checkUserByUserName(userName){
+        return UserApi.checkUserByUserName(userName);
     }
 
 }

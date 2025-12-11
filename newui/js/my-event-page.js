@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const eventPlaceInput = document.getElementById("eventPlace");
     const eventDescriptionInput = document.getElementById("eventDescription");
     // данные пользователя
-    const userToken = JSON.parse(localStorage.getItem("userToken"));
+    // const userToken = JSON.parse(localStorage.getItem("userToken"));
 
     const allMyEventsContainer = document.querySelector('.all-my-events');
 
@@ -32,9 +32,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const eventCard = document.createElement('div');
         eventCard.className = 'event-card';
 
-        // Добавляем id для возможности удаления/обновления
-        eventCard.dataset.eventId = eventData.id;
-
         eventCard.innerHTML = `
             <div class="event-label">Мероприятие</div>
             <div class="event-name">${eventData.name}</div>
@@ -42,9 +39,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Добавляем обработчик клика для перехода на страницу мероприятия
         eventCard.addEventListener('click', function() {
-            // localStorage.setItem('currentEventId', eventData.id);
-            // localStorage.setItem('eventData', JSON.stringify(eventData));
-            // window.location.href = `event-info.html?eventId=${eventData.id}`;
+            localStorage.setItem('currentEventId', eventData.id);
+            localStorage.setItem('eventData', JSON.stringify(eventData));
+            window.location.href = `event-config.html?eventId=${eventData.id}`;
         });
 
         // Добавляем карточку в контейнер
@@ -55,13 +52,14 @@ document.addEventListener('DOMContentLoaded', function() {
     async function loadUserEvents() {
         try {
             console.log('Загрузка мероприятий...');
-
+            const userToken = JSON.parse(localStorage.getItem("userToken"))
             // 1. Сначала пробуем загрузить с сервера
-            if (userData && userData.id) {
+            if (userToken && userToken.length > 0) {
                 try {
                     // Здесь нужно реализовать метод getUserEvents в API
-                    const serverEvents = await SmartAPI.getUserEvents(userData.id);
+                    const serverEvents = await SmartAPI.getUserEvents(userToken);
                     if (serverEvents && serverEvents.length > 0) {
+                        console.log(serverEvents);
                         serverEvents.forEach(event => {
                             addEventToDOM(event);
                         });
@@ -112,6 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Функция создания мероприятия (обновленная)
     async function createEvent() {
+        const userId = await SmartAPI.getUserInfo(JSON.parse(localStorage.getItem("userToken")));
         const eventData = {
             name: eventNameInput.value,
             date: eventDateInput.value,
@@ -119,22 +118,13 @@ document.addEventListener('DOMContentLoaded', function() {
             place: eventPlaceInput.value,
             description: eventDescriptionInput.value,
             tg_chat: null,
+            userId: userId.id,
         };
 
         try {
             // 1. Создаем мероприятие
             const eventResult = await SmartAPI.createEvent(eventData);
             console.log('Мероприятие создано:', eventResult);
-
-            // 2. Добавляем создателя как участника
-            /*
-            try {
-                await SmartAPI.addParticipant(eventResult.id, userData.id);
-                console.log('Создатель добавлен как участник');
-            } catch (participantError) {
-                console.warn('Не удалось добавить создателя как участника:', participantError);
-            }
-             */
 
             // 3. Сохраняем в localStorage
             localStorage.setItem('eventData', JSON.stringify(eventResult));

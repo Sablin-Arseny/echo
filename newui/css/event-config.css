@@ -569,3 +569,14 @@ textarea.form-input,
     background-color: rgba(253, 156, 0, 0.1);
     transform: translateY(2px);
 }
+
+.error-message {
+    color: #ff6b6b;
+    font-size: 14px;
+    margin-top: 5px;
+    display: none;
+}
+
+.error-message.show {
+    display: block;
+}
