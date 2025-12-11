@@ -569,3 +569,40 @@ textarea.form-input,
     background-color: rgba(253, 156, 0, 0.1);
     transform: translateY(2px);
 }
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+    .form-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .content-row {
+        max-width: 1510px;
+        display: table-column;
+        gap: 200px;
+    }
+
+    .participants-panel {
+        min-width: 100%;
+        max-width: 100%;
+        width: 100%;
+        margin-top: 20px;
+    }
+
+    .settings-panel {
+        min-width: 100%;
+        max-width: 100%;
+        width: 100%;
+    }
+    
+    .form-row label {
+        text-align: left;
+        min-width: auto;
+    }
+
+    .form-input {
+        width: 100%;
+    }
+}
