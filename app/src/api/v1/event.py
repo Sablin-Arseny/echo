@@ -48,7 +48,11 @@ async def get_user_events(
     user: User = Depends(AuthService.check_auth),
 ) -> list[EventResponse]:
     try:
-        return await event_service.get_by_user(user, status)
+        events = await event_service.get_by_user(user, status)
+        for event in events:
+            participants = await event_service.get_participants(event.id)
+            event.participants = participants
+        return events
     except Exception as e:
         raise HTTPException(status_code=500, detail=repr(e))
 
