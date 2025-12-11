@@ -17,19 +17,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const expensesTbody = document.getElementById("expenses-tbody");
     const debtsTbody = document.getElementById("debts-tbody");
-    const totalPerPersonEl = document.getElementById("total-per-person");
     const totalAmountEl = document.getElementById("total-amount");
 
     let expenses = [];
     let debts = {};
-    const currentUser = 'Иван'; // Текущий пользователь для демо. Замените на реальную логику аутентификации.
+    const currentUser = 'Иван';
     let editingIndex = null;
 
     function openModal() { expenseModal.style.display = 'flex'; }
     function closeModal() { expenseModal.style.display = 'none'; }
 
     addExpenseBtn.addEventListener('click', () => {
-        // Открываем модалку для создания новой статьи
         editingIndex = null;
         expenseForm.reset();
         selectedAuthor.textContent = 'Выберите автора';
@@ -50,10 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const selectedAuthor = authorSelect.querySelector('.select-selected');
     const authorItems = authorSelect.querySelector('.select-items');
 
-    selectedAuthor.addEventListener('click', () => {
-        authorItems.classList.toggle('select-hide');
-    });
-
+    selectedAuthor.addEventListener('click', () => authorItems.classList.toggle('select-hide'));
     authorItems.querySelectorAll('div').forEach(item => {
         item.addEventListener('click', () => {
             selectedAuthor.textContent = item.textContent;
@@ -67,22 +62,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const multiSelected = multiSelect.querySelector('.multi-selected');
     const multiItems = multiSelect.querySelector('.multi-items');
 
-    multiSelected.addEventListener('click', () => {
-        multiItems.classList.toggle('select-hide');
-    });
-
-    multiItems.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-        checkbox.addEventListener('change', () => {
+    multiSelected.addEventListener('click', () => multiItems.classList.toggle('select-hide'));
+    multiItems.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        cb.addEventListener('change', () => {
             const checked = Array.from(multiItems.querySelectorAll('input:checked')).map(cb => cb.value);
             multiSelected.textContent = checked.length ? checked.join(', ') : 'Выберите участников';
         });
     });
 
     // --- Кастомный select статус ---
-    selectedStatus.addEventListener('click', () => {
-        statusItems.classList.toggle('select-hide');
-    });
-
+    selectedStatus.addEventListener('click', () => statusItems.classList.toggle('select-hide'));
     statusItems.querySelectorAll('div').forEach(item => {
         item.addEventListener('click', () => {
             selectedStatus.textContent = item.textContent;
@@ -108,20 +97,18 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!desc || !author || participants.length === 0 || isNaN(amount) || amount <= 0) return;
 
         if (editingIndex !== null) {
-            // Обновляем существующую статью
             const ex = expenses[editingIndex];
-            // Менять автора и статус через модалку не будем — статус меняется в таблице селектом (только автор может)
             ex.desc = desc;
             ex.participants = participants;
             ex.amount = amount;
-            // Статус можно поменять в модалке, но только если текущий пользователь — автор
             if (currentUser === ex.author) ex.status = selectedStatus.dataset.value;
             editingIndex = null;
         } else {
-            // Добавляем новую статью (по умолчанию статус "Создано")
             const expense = { desc, author, participants, amount, status: selectedStatus.dataset.value || 'Создано' };
             expenses.push(expense);
-        }        updateExpensesTable();
+        }
+
+        updateExpensesTable();
         updateDebts();
         expenseForm.reset();
         selectedAuthor.textContent = 'Выберите автора';
@@ -131,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
         closeModal();
     });
 
-    // Удаление статьи из модалки (только автор)
+    // Удаление статьи (только автор)
     deleteExpenseBtn.addEventListener('click', () => {
         if (editingIndex === null) return;
         if (expenses[editingIndex].author !== currentUser) return;
@@ -151,26 +138,22 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateExpensesTable() {
         expensesTbody.innerHTML = '';
         let totalAmount = 0;
-        let totalPerPerson = 0;
 
         expenses.forEach((e, index) => {
             const row = document.createElement('tr');
-
             const perPerson = (e.amount / e.participants.length).toFixed(2);
             totalAmount += e.amount;
-            totalPerPerson += parseFloat(perPerson);
 
-            // Строка с показом статуса (не редактируется в таблице)
             row.classList.add('status-' + ((e.status || 'Создано').toLowerCase().replace(/\s+/g,'-')));
             row.innerHTML = `
-                <td>${e.desc}</td>
-                <td>${e.author}</td>
-                <td>${e.participants.join(', ')}</td>
-                <td>${perPerson} ₽</td>
-                <td>${e.amount} ₽</td>
-                <td class="status-cell">${e.status || 'Создано'}</td>
+                <td data-label="Описание">${e.desc}</td>
+                <td data-label="Автор">${e.author}</td>
+                <td data-label="Участники">${e.participants.join(', ')}</td>
+                <td data-label="С каждого">${perPerson} ₽</td>
+                <td data-label="Сумма">${e.amount} ₽</td>
+                <td data-label="Статус" class="status-cell">${e.status || 'Создано'}</td>
             `;
-            // Открытие модалки по клику строки — только для автора
+
             row.addEventListener('click', () => {
                 if (e.author !== currentUser) return;
                 editingIndex = index;
@@ -185,23 +168,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 selectedStatus.dataset.value = e.status || 'Создано';
                 deleteExpenseBtn.style.display = 'inline-block';
                 modalTitle.textContent = 'Изменение траты';
-                // Если текущий пользователь не автор, скрываем элементы — but click won't open for non-author
                 openModal();
             });
+
             expensesTbody.appendChild(row);
         });
 
-        totalAmountEl.textContent = totalAmount.toFixed(2) + ' ₽';
-        totalPerPersonEl.textContent = totalPerPerson.toFixed(2) + ' ₽';
-
-        // Никаких дополнительных обработчиков — клик строки откроет модалку для автора
+        totalAmountEl.textContent = (totalAmount % 1 === 0 ? totalAmount : totalAmount.toFixed(2)) + ' ₽';
     }
 
     function updateDebts() {
         debtsTbody.innerHTML = '';
         debts = {};
 
-        // В таблице долгов учитываем только неоплаченные статьи (те, у которых статус !== 'Выполнено')
         expenses.filter(e => (e.status !== 'Выполнено')).forEach(e => {
             const share = e.amount / e.participants.length;
             e.participants.forEach(p => {
@@ -210,19 +189,20 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // Сортируем участников по убыванию долга
         const sorted = Object.entries(debts).sort((a,b) => b[1] - a[1]);
         sorted.forEach(([participant, amount]) => {
             const row = document.createElement('tr');
-            row.innerHTML = `<td>${participant}</td><td>${amount.toFixed(2)} ₽</td>`;
+            row.innerHTML = `
+                <td data-label="Участник">${participant}</td>
+                <td data-label="Сумма долга">${amount.toFixed(2)} ₽</td>
+            `;
             debtsTbody.appendChild(row);
         });
     }
 
-    // ESC для закрытия модалки
     document.addEventListener('keydown', e => { if(e.key === 'Escape') closeModal(); });
 
-    // Примерные данные для демонстрации на странице
+    // Примерные данные
     expenses = [
         { desc: 'Пицца и закуски', author: 'Иван', participants: ['Иван', 'Катя', 'Сергей'], amount: 1200 },
         { desc: 'Аренда зала', author: 'Катя', participants: ['Катя', 'Сергей'], amount: 3000 },

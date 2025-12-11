@@ -151,7 +151,7 @@ header {
     border-image-slice: 1;
 }
 
-.panel h1, .panel h2, .page-title {
+.panel h1, .panel h2, .page-title, .expenses-total h2 {
     background-image: linear-gradient(to right, #ffffff, #FD9C00);
     background-clip: text;
     color: transparent;
@@ -255,6 +255,7 @@ header {
     width: 90%;
     position: relative;
     color: white;
+    overflow-y: auto;
 }
 
 .popup-close {
@@ -445,4 +446,175 @@ header {
 
 .select-items::-webkit-scrollbar-thumb:hover, .multi-items::-webkit-scrollbar-thumb:hover {
     background: #ffb133;
+}
+
+/* --- Контейнер таблицы расходов --- */
+.expenses-table-container {
+    max-height: 400px; /* высота области с прокруткой */
+    overflow-y: auto;
+    margin-bottom: 10px; /* небольшой отступ под фиксированной панелью */
+    position: relative;
+}
+
+/* --- Панель ИТОГО --- */
+.expenses-total {
+    position: sticky;
+    bottom: 0;
+    background-color: rgba(26,25,25,0.95); /* чуть затемнённый фон */
+    border-top: 2px solid #FD9C00;
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    z-index: 10;
+    flex-wrap: wrap;
+    font-size: 1rem;
+}
+
+.expenses-total h2 {
+    font-weight: 700;
+    font-size: 1.3rem;
+}
+
+#total-amount {
+    font-weight: 700;
+    font-size: 1.8rem; /* увеличиваем размер */
+    color: #e74c3c;   /* яркий цвет для выделения */
+}
+
+.expenses-total span {
+    white-space: nowrap;
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 1350px) {
+    .main-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .container {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .form-row label {
+        text-align: left;
+        min-width: auto;
+    }
+
+    .form-input {
+        width: 100%;
+    }
+
+    .popup-content {
+        max-width: 90%;
+        max-height: 94%;
+    }
+
+    .popup-buttons {
+        flex-direction: column;
+    }
+
+    /* Таблица превращается в блоки */
+    .expenses-table,
+    .expenses-table thead,
+    .expenses-table tbody,
+    .expenses-table th,
+    .expenses-table td,
+    .expenses-table tr {
+        display: block;
+        width: 100%;
+    }
+
+    /* Заголовок скрываем */
+    .expenses-table thead {
+        display: none;
+    }
+
+    /* Каждая строка -> карточка */
+    .expenses-table tr {
+        margin-bottom: 18px;
+        border-radius: 14px;
+        padding: 18px 16px;
+        background: rgba(255,255,255,0.05);
+        border: 2px solid rgba(67,66,66,1);
+    }
+
+    /* Итоговая строка */
+    .expenses-table tfoot tr {
+        background: rgba(253,156,0,0.1);
+        border: 2px solid #FD9C00;
+    }
+
+    /* Ячейки в карточках */
+    .expenses-table td {
+        display: inline-grid;
+        justify-content: flex-start;
+        padding: 10px 0;
+        border: none;
+        background: none;
+    }
+
+    /* Подписи полей */
+    .expenses-table td::before {
+        content: attr(data-label);
+        color: #FD9C00;
+        font-weight: 650;
+        margin-right: 10px;
+        text-align: left;
+    }
+
+    .expenses-total {
+        flex-direction: column;
+        gap: 6px;
+        padding: 10px 15px;
+    }
+
+    .expenses-total div {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .debts-table,
+    .debts-table thead,
+    .debts-table tbody,
+    .debts-table th,
+    .debts-table td,
+    .debts-table tr {
+        display: block;
+        width: 100%;
+    }
+
+    .debts-table thead {
+        display: none; /* скрываем заголовок */
+    }
+
+    .debts-table tbody tr {
+        margin-bottom: 18px;
+        border-radius: 14px;
+        padding: 18px 16px;
+        background: rgba(255,255,255,0.05);
+        border: 2px solid rgba(67,66,66,1);
+    }
+
+    .debts-table td {
+        display: inline-grid;
+        justify-content: flex-start;
+        padding: 10px 0;
+        border: none;
+        background: none;
+    }
+
+    .debts-table td:last-child {
+        border-bottom: none;
+    }
+
+    .debts-table td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        color: #FD9C00;
+        margin-right: 8px;
+    }
 }
