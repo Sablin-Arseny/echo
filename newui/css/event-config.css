@@ -42,7 +42,7 @@ header {
     flex-direction: column;
     align-items: center;
     padding: 40px 20px;
-    gap: 10px;
+    gap: 70px;
 }
 
 .content-row {
@@ -288,6 +288,24 @@ textarea.form-input,
 }
 
 .btn-primary:hover {
+    transform: translateY(3px);
+    box-shadow: 0 -5px 5px 0 #ffffff;
+}
+
+.btn-primary-budget {
+    background-color: #FD9C00;
+    color: #000000;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    text-overflow: ellipsis;
+    width: 100%;
+}
+
+.btn-primary-budget:hover {
     transform: translateY(3px);
     box-shadow: 0 -5px 5px 0 #ffffff;
 }

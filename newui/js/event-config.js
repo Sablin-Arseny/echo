@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const confirmAdd = document.getElementById('confirm-add');
     const tgInput = document.getElementById('participant-tg');
     const editBtn = document.getElementById('edit-btn');
+    const budgetBtn = document.getElementById('budget-btn');
     const authText = document.getElementById("authText");
     const registerError = document.getElementById('userAddError');
 
@@ -436,6 +437,11 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             editBtn.click();
         }
+    });
+
+    budgetBtn.addEventListener('click', () => {
+        const eventData = localStorage.getItem('currentEventId', JSON.stringify(eventId));
+        window.location.href = `budget.html?eventId=${eventData}`;
     });
 
     function clearRegisterError() {
