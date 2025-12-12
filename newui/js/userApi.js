@@ -91,9 +91,9 @@ class UserApi{
         }
     }
 
-    static async getUserByTgName(userName){
+    static async getUserByTgName(tgName){
         try {
-            const response = await fetch(`${API_BASE}/user/by_any_id?tg_id=${userName}`, {
+            const response = await fetch(`${API_BASE}/user/by_any_id?tg_id=${tgName}`, {
                 method: 'GET',
                 headers: {
                     'accept': 'application/json',
@@ -110,6 +110,27 @@ class UserApi{
             throw error;
         }
     }
+
+    static async checkUserByUserName(userName){
+        try {
+            const response = await fetch(`${API_BASE}/user/check_user?username=${userName}`, {
+                method: 'GET',
+                headers: {
+                    'accept': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('Ошибка проверки пользователя:', error);
+            throw error;
+        }
+    }
+
 }
 
 export default UserApi;

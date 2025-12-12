@@ -17,10 +17,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const registerError = document.getElementById('registerError');
     const overlay = authPopup;
 
-     initToken();
+    initToken();
 
-     async function initToken(){
-         try {
+    async function initToken(){
+        try {
              // Получаем токен из localStorage
              const userTokenString = localStorage.getItem("userToken");
 

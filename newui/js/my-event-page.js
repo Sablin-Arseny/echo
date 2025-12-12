@@ -15,10 +15,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const eventExitDateInput = document.getElementById("eventExitDate");
     const eventPlaceInput = document.getElementById("eventPlace");
     const eventDescriptionInput = document.getElementById("eventDescription");
-    // данные пользователя
-    const userToken = JSON.parse(localStorage.getItem("userToken"));
 
-    const allMyEventsContainer = document.querySelector('.all-my-events');
+    // Контейнеры для вкладок
+    const participatingEventsContainer = document.getElementById('participating-events');
+    const invitationEventsContainer = document.getElementById('invitation-events');
+
+    // Кнопки вкладок
+    const tabBtns = document.querySelectorAll('.tab-btn');
 
     getUserInfoByToken();
 
@@ -27,47 +30,184 @@ document.addEventListener('DOMContentLoaded', function() {
         authText.innerHTML = `<b>${userData.username}</b>`;
     }
 
-    // Функция для добавления мероприятия в DOM
-    function addEventToDOM(eventData) {
+    // ===== ФУНКЦИИ ДЛЯ ВКЛАДОК =====
+
+    // Переключение вкладок
+    function initTabs() {
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const tabId = this.dataset.tab;
+
+                // Убираем активный класс у всех кнопок
+                tabBtns.forEach(b => b.classList.remove('active'));
+                // Добавляем активный класс текущей кнопке
+                this.classList.add('active');
+
+                // Скрываем все вкладки
+                document.querySelectorAll('.tab-pane').forEach(pane => {
+                    pane.classList.remove('active');
+                });
+
+                // Показываем нужную вкладку
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+            });
+        });
+    }
+
+    // ===== ОБНОВЛЕННАЯ ФУНКЦИЯ ДЛЯ ДОБАВЛЕНИЯ МЕРОПРИЯТИЙ В DOM =====
+    function addEventToDOM(eventData, isInvitation = false) {
         const eventCard = document.createElement('div');
         eventCard.className = 'event-card';
 
         // Добавляем id для возможности удаления/обновления
         eventCard.dataset.eventId = eventData.id;
 
-        eventCard.innerHTML = `
-            <div class="event-label">Мероприятие</div>
-            <div class="event-name">${eventData.name}</div>
-        `;
+        // Разный контент для приглашений и обычных мероприятий
+        if (isInvitation) {
+            eventCard.innerHTML = `
+                <div class="event-label">Приглашение</div>
+                <div class="event-name">${eventData.name}</div>
+                <div class="event-actions">
+                    <button class="btn-accept" data-event-id="${eventData.id}">Принять</button>
+                    <button class="btn-decline" data-event-id="${eventData.id}">Отклонить</button>
+                </div>
+            `;
+        } else {
+            eventCard.innerHTML = `
+                <div class="event-label">Мероприятие</div>
+                <div class="event-name">${eventData.name}</div>
+            `;
+        }
 
-        // Добавляем обработчик клика для перехода на страницу мероприятия
+        // Обработчик клика для перехода на страницу мероприятия
         eventCard.addEventListener('click', function() {
-            // localStorage.setItem('currentEventId', eventData.id);
-            // localStorage.setItem('eventData', JSON.stringify(eventData));
-            // window.location.href = `event-info.html?eventId=${eventData.id}`;
+            localStorage.setItem('currentEventId', eventData.id);
+            localStorage.setItem('eventData', JSON.stringify(eventData));
+            window.location.href = `event-config.html?eventId=${eventData.id}`;
         });
 
-        // Добавляем карточку в контейнер
-        allMyEventsContainer.appendChild(eventCard);
+        // Добавляем карточку в соответствующий контейнер
+        if (isInvitation) {
+            invitationEventsContainer.appendChild(eventCard);
+
+            // Добавляем обработчики для кнопок приглашения
+            const acceptBtn = eventCard.querySelector('.btn-accept');
+            const declineBtn = eventCard.querySelector('.btn-decline');
+
+            if (acceptBtn) {
+                acceptBtn.addEventListener('click', async function(e) {
+                    e.stopPropagation(); // Останавливаем всплытие, чтобы не сработал клик на карточке
+                    const eventId = this.dataset.eventId;
+                    await handleInvitationResponse(eventId, 'PARTICIPATING');
+                });
+            }
+
+            if (declineBtn) {
+                declineBtn.addEventListener('click', async function(e) {
+                    e.stopPropagation(); // Останавливаем всплытие
+                    const eventId = this.dataset.eventId;
+                    await handleInvitationResponse(eventId, 'REFUSED');
+                });
+            }
+        } else {
+            const emptyState = participatingEventsContainer.querySelector('.empty-state');
+            if (emptyState) {
+                // Если есть сообщение, заменяем его на карточку
+                emptyState.remove();
+            }
+
+            participatingEventsContainer.appendChild(eventCard);
+        }
     }
 
-// Функция для загрузки мероприятий пользователя
+    // Функция для обработки ответа на приглашение
+    async function handleInvitationResponse(eventId, status) {
+        try {
+            console.log(`Обработка ответа на приглашение: ${status} для мероприятия ${eventId}`);
+
+            const userData = await SmartAPI.getUserInfo(JSON.parse(localStorage.getItem("userToken")));
+            const data = {
+                event_id: eventId,
+                id: userData.id,
+            }
+            // Здесь будет вызов API для обработки приглашения
+            await SmartAPI.updateStatusOfMemberToInvited(data, status);
+
+            // Удаляем карточку приглашения из DOM
+            const invitationCard = document.querySelector(`[data-event-id="${eventId}"]`);
+            if (invitationCard) {
+                invitationCard.remove();
+            }
+
+            // Если приглашение принято, можно перезагрузить список мероприятий
+            if (status === 'PARTICIPATING') {
+                // Можно добавить мероприятие во вкладку "Участвую"
+                loadUserEvents();
+            }
+
+        } catch (error) {
+            console.error('Ошибка при обработке приглашения:', error);
+        }
+    }
+
+    // Функция для загрузки мероприятий пользователя
     async function loadUserEvents() {
         try {
             console.log('Загрузка мероприятий...');
+            const userToken = JSON.parse(localStorage.getItem("userToken"));
 
-            // 1. Сначала пробуем загрузить с сервера
-            if (userData && userData.id) {
+            // Очищаем контейнеры перед загрузкой
+            participatingEventsContainer.innerHTML = '';
+            invitationEventsContainer.innerHTML = '';
+
+            if (userToken && userToken.length > 0) {
                 try {
-                    // Здесь нужно реализовать метод getUserEvents в API
-                    const serverEvents = await SmartAPI.getUserEvents(userData.id);
+                    // Загружаем мероприятия, в которых пользователь участвует
+                    const serverEvents = await SmartAPI.getParticipatingGUserEvents(userToken);
                     if (serverEvents && serverEvents.length > 0) {
+                        console.log('Найдено мероприятий (участвую):', serverEvents.length);
                         serverEvents.forEach(event => {
-                            addEventToDOM(event);
+                            addEventToDOM(event, false); // false = не приглашение
                         });
+                    } else {
+                        // Показываем состояние "пусто" во вкладке "Участвую"
+                        participatingEventsContainer.innerHTML = `
+                            <div class="empty-state">
+                                <p>Вы пока не участвуете в мероприятиях</p>
+                            </div>
+                        `;
                     }
+
+                    // Загружаем приглашения на мероприятия
+                    const serverInvitedEvents = await SmartAPI.getInvitedGUserEvents(userToken);
+                    if (serverInvitedEvents && serverInvitedEvents.length > 0) {
+                        console.log('Найдено приглашений:', serverInvitedEvents.length);
+                        serverInvitedEvents.forEach(event => {
+                            addEventToDOM(event, true); // true = приглашение
+                        });
+                    } else {
+                        // Показываем состояние "пусто" во вкладке "Приглашение"
+                        invitationEventsContainer.innerHTML = `
+                            <div class="empty-state">
+                                <p>Нет новых приглашений</p>
+                            </div>
+                        `;
+                    }
+
                 } catch (serverError) {
                     console.warn('Не удалось загрузить мероприятия с сервера:', serverError);
+
+                    // Показываем состояния "пусто" при ошибке
+                    participatingEventsContainer.innerHTML = `
+                        <div class="empty-state">
+                            <p>Не удалось загрузить мероприятия</p>
+                        </div>
+                    `;
+                    invitationEventsContainer.innerHTML = `
+                        <div class="empty-state">
+                            <p>Не удалось загрузить приглашения</p>
+                        </div>
+                    `;
                 }
             }
 
@@ -75,43 +215,10 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Ошибка при загрузке мероприятий:', error);
         }
     }
-/*
-    // Функция для загрузки мероприятий из localStorage
-    function loadEventsFromLocalStorage() {
-        try {
-            // Загружаем все мероприятия из localStorage
-            const allEvents = JSON.parse(localStorage.getItem("smart_all_events"));
 
-            console.log('Мероприятия из localStorage:', allEvents);
-
-            if (allEvents.length > 0) {
-                // Сортируем по дате создания (новые сверху)
-                const sortedEvents = allEvents.sort((a, b) => {
-                    return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
-                });
-
-                // Очищаем контейнер перед добавлением
-                allMyEventsContainer.innerHTML = '';
-
-                // Добавляем каждое мероприятие в DOM
-                sortedEvents.forEach(event => {
-                    addEventToDOM(event);
-                });
-
-                console.log(`Загружено ${sortedEvents.length} мероприятий из localStorage`);
-            } else {
-                console.log('Нет сохраненных мероприятий в localStorage');
-            }
-
-        } catch (error) {
-            console.error('Ошибка при загрузке мероприятий из localStorage:', error);
-        }
-    }
-
- */
-
-    // Функция создания мероприятия (обновленная)
+    // Функция создания мероприятия
     async function createEvent() {
+        const user = await SmartAPI.getUserInfo(JSON.parse(localStorage.getItem("userToken")));
         const eventData = {
             name: eventNameInput.value,
             date: eventDateInput.value,
@@ -119,45 +226,32 @@ document.addEventListener('DOMContentLoaded', function() {
             place: eventPlaceInput.value,
             description: eventDescriptionInput.value,
             tg_chat: null,
+            userId: user.id,
         };
 
         try {
-            // 1. Создаем мероприятие
+            // Создаем мероприятие
             const eventResult = await SmartAPI.createEvent(eventData);
             console.log('Мероприятие создано:', eventResult);
 
-            // 2. Добавляем создателя как участника
-            /*
-            try {
-                await SmartAPI.addParticipant(eventResult.id, userData.id);
-                console.log('Создатель добавлен как участник');
-            } catch (participantError) {
-                console.warn('Не удалось добавить создателя как участника:', participantError);
-            }
-             */
-
-            // 3. Сохраняем в localStorage
+            // Сохраняем в localStorage
             localStorage.setItem('eventData', JSON.stringify(eventResult));
 
-            // 4. Добавляем мероприятие в DOM
-            addEventToDOM(eventResult);
+            // Добавляем мероприятие в DOM (во вкладку "Участвую")
+            addEventToDOM(eventResult, false);
 
-            // 5. Закрываем попап и сбрасываем форму
+            // Закрываем попап и сбрасываем форму
             closePopup();
             resetInfo();
 
-            if (eventResult.isLocal) {
-                console.log('Мероприятие сохранено локально. Будет синхронизировано при восстановлении связи.', 'warning');
-            } else {
-                console.log('Мероприятие успешно создано!', 'success');
-            }
+            console.log('Мероприятие успешно создано!');
 
         } catch (error) {
             console.error('Ошибка при создании мероприятия:', error);
         }
     }
 
-    //Работа с кнопками открытия и закрытия модального окна
+    // Работа с кнопками открытия и закрытия модального окна
     function openCreateEventPopup() {
         popupCreateEvent.style.display = "flex";
     }
@@ -209,7 +303,12 @@ document.addEventListener('DOMContentLoaded', function() {
             closePopup()
         }
     })
+
+    // ===== ИНИЦИАЛИЗАЦИЯ =====
+
+    // Инициализируем вкладки
+    initTabs();
+
     // Загружаем мероприятия при загрузке страницы
     loadUserEvents();
-
 });
