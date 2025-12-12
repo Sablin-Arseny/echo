@@ -1,17 +1,7 @@
 from pydantic import BaseModel, ConfigDict
 from datetime import datetime
-from typing import Literal
 
-from app.src.schemas import User
-
-
-STATUS = Literal[
-    "INVITED",
-    "REFUSED",
-    "PARTICIPATING",
-    "DELETED",
-    "DRAFT",
-]
+from app.src.schemas import User, Participant
 
 
 class CreateEventRequest(BaseModel):
@@ -32,7 +22,7 @@ class EventResponse(BaseModel):
     created_at: datetime
     tg_chat: str | None = None
     event_place: str | None = None
-    participants: list[User] = []
+    participants: list[Participant] = []
 
     model_config = ConfigDict(from_attributes=True)
 
