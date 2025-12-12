@@ -10,7 +10,7 @@ class CreateEventRequest(BaseModel):
     start_date: datetime
     cancel_of_event_date: datetime | None = None
     event_place: str | None = None
-    participants: list[int]
+    participants: list[int] = []
 
 
 class EventResponse(BaseModel):
