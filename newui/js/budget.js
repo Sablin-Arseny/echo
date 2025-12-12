@@ -12,9 +12,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const expenseForm = document.getElementById("expenseForm");
     const descInput = document.getElementById("expense-description");
     const amountInput = document.getElementById("expense-amount");
-    const statusSelect = document.getElementById('expense-status');
-    const selectedStatus = statusSelect.querySelector('.select-selected');
-    const statusItems = statusSelect.querySelector('.select-items');
     const deleteExpenseBtn = document.getElementById('delete-expense-btn');
     const modalTitle = document.getElementById('modal-title');
 
@@ -50,6 +47,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function getCurrentUserInfo() {
         const userData = await SmartAPI.getUserInfo(JSON.parse(localStorage.getItem("userToken")));
         authText.innerHTML = `<b>${userData.username}</b>`;
+
+        const authorDisplay = document.getElementById("expense-author-display");
+        if (authorDisplay) authorDisplay.textContent = userData.username;
+
         return userData;
     }
 
@@ -60,10 +61,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Преобразуем серверный формат → в формат frontend
             expenses = serverExpenses.map(budget => ({
                 desc: budget.description || "",
-                author: budget.paid_by.username,       // автор = кто платил
+                author: budget.paid_by.username,
                 participants: budget.participants.map(p => p.username),
                 amount: budget.amount,
-                status: "Создано"                      // по умолчанию, если хочешь — можно менять
+                status: "Создано"
             }));
 
             updateExpensesTable();
@@ -74,7 +75,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-
     function openModal() { expenseModal.style.display = 'flex'; }
     function closeModal() { expenseModal.style.display = 'none'; }
 
@@ -83,29 +83,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         expenseForm.reset();
         multiSelected.textContent = 'Выберите участников';
         multiItems.querySelectorAll('input').forEach(cb => cb.checked = false);
-        selectedStatus.textContent = 'Создано';
-        selectedStatus.dataset.value = 'Создано';
         deleteExpenseBtn.style.display = 'none';
         modalTitle.textContent = 'Новая трата';
+        document.getElementById("expense-author-display").textContent = currentUser.username;
         openModal();
     });
 
     closeExpenseBtn.addEventListener('click', closeModal);
     cancelExpenseBtn.addEventListener('click', () => { expenseForm.reset(); closeModal(); });
 
-    // --- Статус select ---
-    selectedStatus.addEventListener('click', () => statusItems.classList.toggle('select-hide'));
-    statusItems.querySelectorAll('div').forEach(item => {
-        item.addEventListener('click', () => {
-            selectedStatus.textContent = item.textContent;
-            selectedStatus.dataset.value = item.dataset.value;
-            statusItems.classList.add('select-hide');
-        });
-    });
-
+    // --- закрытие мультиселекта ---
     document.addEventListener('click', e => {
         if (!multiSelect.contains(e.target)) multiItems.classList.add('select-hide');
-        if (!statusSelect.contains(e.target)) statusItems.classList.add('select-hide');
     });
 
     function loadParticipants(usernames) {
@@ -149,7 +138,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ex.desc = desc;
             ex.participants = participantsUsername;
             ex.amount = amount;
-            if (currentUser.username === ex.author) ex.status = selectedStatus.dataset.value;
+            ex.status = "Создано";
             editingIndex = null;
         } else {
             const expense = {
@@ -157,7 +146,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 author: currentUser.username,
                 participants: participantsUsername,
                 amount,
-                status: selectedStatus.dataset.value || 'Создано'
+                status: "Создано"
             };
             const data = {
                 event_id: currentEventId,
@@ -191,24 +180,24 @@ document.addEventListener('DOMContentLoaded', async () => {
             const perPerson = (e.amount / e.participants.length).toFixed(2);
             totalAmount += e.amount;
             totalPerPerson += parseFloat(perPerson);
-            row.classList.add('status-' + ((e.status || 'Создано').toLowerCase().replace(/\s+/g, '-')));
+
             row.innerHTML = `
                 <td data-label="Описание">${e.desc}</td>
                 <td data-label="Автор">${e.author}</td>
                 <td data-label="Участники">${e.participants.join(', ')}</td>
                 <td data-label="С каждого">${perPerson} ₽</td>
                 <td data-label="Сумма">${e.amount} ₽</td>
-                <td data-label="Статус" class="status-cell">${e.status || 'Создано'}</td>
+                <td data-label="Статус">Создано</td>
             `;
+
             row.addEventListener('click', () => {
                 if (e.author !== currentUser.username) return;
                 editingIndex = idx;
                 descInput.value = e.desc;
                 amountInput.value = e.amount;
+                document.getElementById("expense-author-display").textContent = e.author;
                 multiItems.querySelectorAll('input').forEach(cb => cb.checked = e.participants.includes(cb.value));
                 updateMultiSelectedText();
-                selectedStatus.textContent = e.status || 'Создано';
-                selectedStatus.dataset.value = e.status || 'Создано';
                 deleteExpenseBtn.style.display = 'inline-block';
                 modalTitle.textContent = 'Изменение траты';
                 openModal();
@@ -216,14 +205,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             expensesTbody.appendChild(row);
         });
+
         totalAmountEl.textContent = totalAmount.toFixed(2) + ' ₽';
-        totalPerPersonEl.textContent = totalPerPerson.toFixed(2) + ' ₽';
     }
 
     function updateDebts() {
         debtsTbody.innerHTML = '';
         debts = {};
-        expenses.filter(e => e.status !== 'Выполнено').forEach(e => {
+        expenses.forEach(e => {
             const share = e.amount / e.participants.length;
             e.participants.forEach(p => {
                 debts[p] = (debts[p] || 0) + share;

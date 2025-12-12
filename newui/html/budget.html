@@ -79,23 +79,16 @@
         <h2 class="modal-title" id="modal-title">Новая трата</h2>
         <div class="popup-body">
             <form class="event-form" id="expenseForm">
+                <!-- Автор траты -->
+                <div class="form-row">
+                    <label>Автор траты:</label>
+                    <div id="expense-author-display" class="author-display"></div>
+                </div>
+
                 <!-- Статья траты -->
                 <div class="form-row">
                     <label for="expense-description">Статья траты:</label>
                     <input type="text" id="expense-description" class="form-input" placeholder="Введите название траты">
-                </div>
-
-                <!-- Автор траты -->
-                <div class="form-row">
-                    <label>Автор траты:</label>
-                    <div class="custom-select" id="expense-author">
-                        <div class="select-selected">Выберите автора</div>
-                        <div class="select-items select-hide">
-                            <div data-value="Иван">Иван</div>
-                            <div data-value="Катя">Катя</div>
-                            <div data-value="Сергей">Сергей</div>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- Участники траты -->
@@ -112,19 +105,6 @@
                 <div class="form-row">
                     <label for="expense-amount">Сумма (₽):</label>
                     <input type="number" id="expense-amount" class="form-input" placeholder="Введите сумму" min="1">
-                </div>
-
-                <!-- Статус (в модальном окне) -->
-                <div class="form-row">
-                    <label>Статус:</label>
-                    <div class="custom-select" id="expense-status">
-                        <div class="select-selected">Создано</div>
-                        <div class="select-items select-hide">
-                            <div data-value="Создано">Создано</div>
-                            <div data-value="В процессе">В процессе</div>
-                            <div data-value="Выполнено">Выполнено</div>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- Кнопки действия -->
