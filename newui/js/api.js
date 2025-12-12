@@ -1,6 +1,7 @@
 import EventApi from './eventApi.js'
 import UserApi from './userApi.js'
 import eventApi from "./eventApi.js";
+import BudgetApi from './budgetApi.js';
 
 class SmartAPI {
     // Добавить localstorage
@@ -57,6 +58,14 @@ class SmartAPI {
 
     static updateStatusOfMemberToInvited(data, status){
         return EventApi.updateStatusOfMember(data, status);
+    }
+
+    static createBudget(data){
+        return BudgetApi.createBudget(data);
+    }
+
+    static getBudget(EventId){
+        return BudgetApi.getBudget(EventId);
     }
 
 }
