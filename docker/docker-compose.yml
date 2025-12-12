@@ -13,6 +13,7 @@ services:
       - postgre-db
     environment:
       - db_host=postgre-db
+    restart: unless-stopped
 
   postgre-db:
       image: postgres:latest
