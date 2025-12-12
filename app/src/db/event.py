@@ -4,7 +4,7 @@ from sqlalchemy import select
 
 from app.src.db.core import BaseDB
 from app.src.models import Event, EventMember, User as UserOrm
-from app.src.schemas import User, UpdateEvent, STATUS
+from app.src.schemas import User, STATUS
 
 
 class EventDB(BaseDB):
@@ -69,6 +69,17 @@ class EventDB(BaseDB):
             members = await session.execute(stmt)
             members = members.scalars().all()
         return list(members) if members else None
+    
+    async def get_members_with_status(self, event_id: int):
+        stmt = (
+            select(UserOrm, EventMember.status)
+            .join(EventMember, UserOrm.id == EventMember.user_id)
+            .where(EventMember.event_id == event_id)
+        )
+        async with self.create_session() as session:
+            members = await session.execute(stmt)
+            members = members.all()
+        return members if members else None
 
     async def get_events_by_member(self, user: User, status: STATUS | None):
         stmt = (

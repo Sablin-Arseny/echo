@@ -5,6 +5,7 @@ from app.src.db.user import UserDB
 from app.src.schemas import (
     CreateEventRequest,
     User,
+    Participant,
     EventResponse,
     UpdateEvent,
     STATUS,
@@ -68,8 +69,22 @@ class EventService:
             return []
 
         return [User.model_validate(user) for user in participants]
+    
+    async def get_participants_with_status(self, event_id: int) -> list[Participant]:
+        result = await self._event_db.get_members_with_status(event_id)
+
+        if not result:
+            return []
+        
+        participants = []
+        for user_orm, status in result:
+            user_data = User.model_validate(user_orm).model_dump()
+            participants.append(Participant(**user_data, status=status))
+
+        return participants
 
     async def add_user_to_event(self, event_id: int, user: User):
+        user = await self._user_db.get(user)
         return await self._event_db.add_relation_event_member(event_id, user)
 
     async def update_status_of_member(self, event_id: int, user: User, status: STATUS):
