@@ -1,0 +1,15 @@
+{
+  "name": "Echo",
+  "short_name": "Echo",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#FD9C00",
+  "icons": [
+    {
+      "src": "./newui/images/Logo.png",
+      "sizes": "341x325",
+      "type": "image/png"
+    }
+  ]
+}
