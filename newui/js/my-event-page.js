@@ -218,7 +218,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Функция создания мероприятия
     async function createEvent() {
-        const user = await SmartAPI.getUserInfo(JSON.parse(localStorage.getItem("userToken")));
         const eventData = {
             name: eventNameInput.value,
             date: eventDateInput.value,
@@ -226,7 +225,6 @@ document.addEventListener('DOMContentLoaded', function() {
             place: eventPlaceInput.value,
             description: eventDescriptionInput.value,
             tg_chat: null,
-            userId: user.id,
         };
 
         try {

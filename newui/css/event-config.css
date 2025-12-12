@@ -373,30 +373,8 @@ textarea.form-input,
     flex: 1;
     overflow-y: auto;
     padding-right: 5px;
-
     scrollbar-width: thin;
     scrollbar-color: rgba(253, 156, 0, 0.5) rgba(255, 255, 255, 0.05);
-}
-
-.participant-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 12px 14px;
-    border-radius: 10px;
-    margin-bottom: 10px;
-    gap: 10px;
-
-    width: 100%;
-    min-width: 0; /* ключ для сжатия flex-children */
-    box-sizing: border-box;
-}
-
-.participant-item:hover {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(253, 156, 0, 0.4);
 }
 
 /* Имя участника */
@@ -579,4 +557,75 @@ textarea.form-input,
 
 .error-message.show {
     display: block;
+}
+
+/* Стили для участников с разным статусом */
+.participant-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    gap: 10px;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+}
+
+/* Принявший приглашение (зеленый фон) */
+.participant-accepted {
+    background: rgba(76, 175, 80, 0.1);
+    border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+/* Ожидающий ответа (желтый фон) */
+.participant-pending {
+    background: rgba(255, 193, 7, 0.1);
+    border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+/* Администратор (оранжевый фон) */
+.participant-admin {
+    background: rgba(253, 156, 0, 0.1);
+    border: 1px solid rgba(253, 156, 0, 0.3);
+}
+
+/* Отказавшийся (красный фон) */
+.participant-refused {
+    background: rgba(244, 67, 54, 0.1);
+    border: 1px solid rgba(244, 67, 54, 0.3);
+}
+
+/* Вышедший (серый фон) */
+.participant-left {
+    background: rgba(158, 158, 158, 0.1);
+    border: 1px solid rgba(158, 158, 158, 0.3);
+}
+
+/* Текст статуса */
+.participant-status {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.85rem;
+    font-style: italic;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Hover эффекты */
+.participant-accepted:hover {
+    background: rgba(76, 175, 80, 0.15);
+    border-color: rgba(76, 175, 80, 0.5);
+}
+
+.participant-pending:hover {
+    background: rgba(255, 193, 7, 0.15);
+    border-color: rgba(255, 193, 7, 0.5);
+}
+
+.participant-admin:hover {
+    background: rgba(253, 156, 0, 0.15);
+    border-color: rgba(253, 156, 0, 0.5);
 }

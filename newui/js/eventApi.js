@@ -15,7 +15,6 @@ class EventApi {
                     start_date: eventData.date,
                     cancel_of_event_date: eventData.exitDate,
                     event_place: eventData.place,
-                    participants: [eventData.userId],
                 })
             });
 

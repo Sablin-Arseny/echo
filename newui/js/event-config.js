@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeBtn = document.getElementById('close-participant-modal');
 
     let editing = false;
+    let currentUser = null;
 
     getUserInfoByToken();
     initEventData();
@@ -40,16 +41,56 @@ document.addEventListener('DOMContentLoaded', () => {
         const eventData = await SmartAPI.getEventById(eventId);
         localStorage.setItem('eventData', JSON.stringify(eventData));
         const participants = JSON.parse(localStorage.getItem("eventData")).participants;
+        checkUserAccess(participants);
+
         renderParticipants(participants);
     }
 
     async function getUserInfoByToken(){
+        currentUser = await SmartAPI.getUserInfo(JSON.parse(localStorage.getItem("userToken")));
+        authText.innerHTML = `<b>${currentUser.username}</b>`;
+    }
+
+    async function checkUserAccess(participants) {
+        // Находим текущего пользователя в списке участников
         const userData = await SmartAPI.getUserInfo(JSON.parse(localStorage.getItem("userToken")));
-        authText.innerHTML = `<b>${userData.username}</b>`;
+        const userInParticipants = participants.find(p => p.id === userData.id);
+        // Проверяем статус пользователя
+        if (!userInParticipants || userInParticipants.status !== "PARTICIPATING") {
+            // Если пользователь не участник или его статус не PARTICIPATING,
+            // отключаем кнопку добавления участников
+            addBtn.disabled = true;
+            addBtn.style.opacity = "0.5";
+            addBtn.style.cursor = "not-allowed";
+            addBtn.title = "Только участники могут добавлять других пользователей";
+
+            // Также скрываем или отключаем кнопку редактирования мероприятия
+            if (editBtn) {
+                editBtn.disabled = true;
+                editBtn.style.opacity = "0.5";
+                editBtn.style.cursor = "not-allowed";
+                editBtn.title = "Только участники могут редактировать мероприятие";
+            }
+        } else {
+            // Если пользователь имеет доступ, включаем кнопки
+            addBtn.disabled = false;
+            addBtn.style.opacity = "1";
+            addBtn.style.cursor = "pointer";
+            addBtn.title = "Добавить участника";
+
+            if (editBtn) {
+                editBtn.disabled = false;
+                editBtn.style.opacity = "1";
+                editBtn.style.cursor = "pointer";
+                editBtn.title = "Редактировать мероприятие";
+            }
+        }
     }
 
     openBtn.addEventListener('click', () => {
-        modal.classList.add('active'); // показываем модалку
+        if (!addBtn.disabled) {
+            modal.classList.add('active'); // показываем модалку
+        }
     });
 
     closeBtn.addEventListener('click', () => {
@@ -64,34 +105,34 @@ document.addEventListener('DOMContentLoaded', () => {
     // Function to format date from YYYY-MM-DD to DD.MM.YYYY
     function formatDateForDisplay(dateString) {
         if (!dateString) return '';
-        
+
         // Проверяем, является ли строка валидной датой
         const date = new Date(dateString);
         if (isNaN(date.getTime())) return dateString; // Если не валидная, возвращаем как есть
-        
+
         const day = String(date.getDate()).padStart(2, '0');
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const year = date.getFullYear();
-        
+
         return `${day}.${month}.${year}`;
     }
 
     // Function to format date from DD.MM.YYYY to YYYY-MM-DD (для input[type="date"])
     function formatDateForInput(dateString) {
         if (!dateString) return '';
-        
+
         // Если уже в формате YYYY-MM-DD, возвращаем как есть
         if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
             return dateString;
         }
-        
+
         // Пробуем распарсить формат DD.MM.YYYY
         const parts = dateString.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
         if (parts) {
             const [, day, month, year] = parts;
             return `${year}-${month}-${day}`;
         }
-        
+
         return dateString; // Если не распарсилось, возвращаем как есть
     }
 
@@ -121,13 +162,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const displayMaxdate = eventData.cancel_of_event_date ? formatDateForDisplay(eventData.cancel_of_event_date) : '';
         const displayPlace = eventData.event_place;
         const displayDesc = eventData.description;
-        
+
         evTitleDisplay.textContent = displayTitle;
         evDateDisplay.textContent = displayDate;
         evMaxDisplay.textContent = displayMaxdate;
         evPlaceDisplay.textContent = displayPlace;
         evDescDisplay.textContent = displayDesc;
-        
+
         // Update placeholder styling
         updatePlaceholderStyle(evTitleDisplay, eventData.name);
         updatePlaceholderStyle(evDateDisplay, eventData.start_date);
@@ -139,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Function to toggle edit mode
     function toggleEditMode(isEditing) {
         editing = isEditing;
-        
+
         const displayFields = [
             evTitleDisplay,
             evDateDisplay,
@@ -147,43 +188,43 @@ document.addEventListener('DOMContentLoaded', () => {
             evPlaceDisplay,
             evDescDisplay
         ];
-        
+
         if (isEditing) {
             // Вход в режим редактирования
             // Обновляем поля ввода текущими данными из eventData
             updateInputFields();
-            
+
             // Показываем поля ввода
             document.querySelectorAll('.edit-field').forEach(inp => {
                 inp.classList.add('active');
             });
-            
+
             // Скрываем field-display элементы
             displayFields.forEach(field => {
                 field.classList.add('hidden');
             });
-            
+
             // Update button text
             editBtn.textContent = "Сохранить";
-            
+
             // Focus first field
             setTimeout(() => {
                 const firstField = document.querySelector('.edit-field.active');
                 if (firstField) firstField.focus();
             }, 10);
-            
+
         } else {
             // Выход из режима редактирования
             // Скрываем поля ввода
             document.querySelectorAll('.edit-field').forEach(inp => {
                 inp.classList.remove('active');
             });
-            
+
             // Показываем field-display элементы
             displayFields.forEach(field => {
                 field.classList.remove('hidden');
             });
-            
+
             // Update button text
             editBtn.textContent = "Редактировать";
         }
@@ -196,14 +237,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const newMaxdate = evMax.value; // Уже в формате YYYY-MM-DD
         const newPlace = evPlace.value.trim();
         const newDesc = evDesc.value.trim();
-        
+
         // Сохраняем значения
         eventData.name = newTitle;
         eventData.start_date = newDate;
         eventData.cancel_of_event_date = newMaxdate;
         eventData.event_place = newPlace;
         eventData.description = newDesc;
-        
+
         // Обновляем отображение
         updateDisplayFields();
     }
@@ -213,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Set initial values
         updateInputFields();
         updateDisplayFields();
-        
+
         // Start in non-edit mode
         toggleEditMode(false);
     }
@@ -221,46 +262,105 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderParticipants(participants) {
         participantsList.innerHTML = '';
 
-        participants.forEach((p, idx) => {
-            const el = document.createElement('div');
-            if (!(idx === 0)) {
-                el.className = 'participant-item';
+        // Фильтруем участников, оставляя только тех, у кого статус не REFUSED
+        const activeParticipants = participants.filter(p =>
+            p.status !== "REFUSED" && p.status !== "DELETED"
+        );
+
+        activeParticipants.forEach((p) => {
+            if (p.status === "PARTICIPATING") {
+                const el = document.createElement('div');
+                el.className = 'participant-item participant-accepted';
                 el.innerHTML = `
-                <div class="participant-tg">${p.username}</div>
-                <div class="participant-actions">
-                    <button class="btn btn-secondary small" data-idx="${idx}">x</button>
-                </div>
-            `;
+                    <div class="participant-tg">${p.username}</div>
+                    <div class="participant-actions">
+                        <button class="btn btn-secondary small delete-btn" data-user-id="${p.id}" data-username="${p.username}">x</button>
+                    </div>
+                `;
                 participantsList.appendChild(el);
-            }else {
-                el.className = 'participant-item';
+            } else {
+                // Участники с другими статусами (приглашенные и т.д.)
+                const el = document.createElement('div');
+                el.className = 'participant-item participant-pending';
+
+                let statusText = '';
+                if (p.status === "DRAFT" || p.status === "INVITED") {
+                    statusText = 'Приглашен';
+
+                }
+
                 el.innerHTML = `
-                <div class="participant-tg">${p.username}</div>
-                <div class="participant-actions">
-                    admin
-                </div>
-            `;
+                    <div class="participant-tg">${p.username}</div>
+                    <div class="participant-status">${statusText}</div>
+                `;
                 participantsList.appendChild(el);
             }
         });
 
         // Attach delete handlers
-        participantsList.querySelectorAll('button[data-idx]').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const idx = parseInt(btn.dataset.idx, 10);
-                participants.splice(idx, 1);
-                // renderParticipants(participants);
+        attachDeleteHandlers();
+    }
+
+    // Функция для добавления обработчиков удаления
+    function attachDeleteHandlers() {
+        const deleteButtons = participantsList.querySelectorAll('.delete-btn');
+
+        deleteButtons.forEach(btn => {
+            btn.addEventListener('click', async function(e) {
+                e.stopPropagation(); // Останавливаем всплытие события
+
+                const userId = this.dataset.userId;
+                const username = this.dataset.username;
+
+                // Подтверждение удаления
+                if (confirm(`Вы уверены, что хотите удалить участника ${username}?`)) {
+                    try {
+                        // Получаем ID пользователя из кнопки
+                        const userIdToDelete = parseInt(userId);
+
+                        // Проверяем, что ID валидный
+                        if (!userIdToDelete || isNaN(userIdToDelete)) {
+                            console.error('Некорректный ID пользователя:', userId);
+                            alert('Ошибка: некорректный ID пользователя');
+                            return;
+                        }
+
+                        console.log('Удаление пользователя:', {
+                            eventId: eventId,
+                            userId: userIdToDelete,
+                            username: username
+                        });
+
+                        // Вызываем API для изменения статуса участника на DELETED
+                        const result = await SmartAPI.updateStatusOfMemberToInvited({
+                            event_id: eventId,
+                            id: userIdToDelete
+                        }, "DELETED");
+
+                        console.log('Результат удаления:', result);
+
+                        // Обновляем список участников
+                        await initEventData();
+
+                        console.log(`Участник ${username} успешно удален`);
+
+                    } catch (error) {
+                        console.error('Ошибка при удалении участника:', error);
+                        alert('Не удалось удалить участника. Попробуйте еще раз.');
+                    }
+                }
             });
         });
     }
 
     // Modal open
     addBtn.addEventListener('click', () => {
+        if (addBtn.disabled) return;
         tgInput.value = '';
         modal.style.display = 'flex';
         tgInput.focus();
     });
-    
+
     closeModalBtn.addEventListener('click',  () => {
         modal.style.display = 'none'
         clearRegisterError()
@@ -283,6 +383,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     renderParticipants(inviteResult.participants);
                     modal.style.display = 'none';
                 }catch (error){
+                    const eventInfo = await SmartAPI.getEventById(eventId);
+                    eventInfo.participants.forEach(member => {
+                        if ((member.status === "REFUSED" || member.status === "DELETED") && member.id === userData.id){
+                            const data = {
+                                event_id: eventId,
+                                id: member.id,
+                            }
+                            SmartAPI.updateStatusOfMemberToInvited(data, "DRAFT");
+                        }
+                        initEventData();
+                        modal.style.display = 'none';
+                    });
                     showRegisterError('Пользователь уже добавлен');
                     return;
                 }
@@ -292,8 +404,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // participants.push(val);
-        // renderParticipants();
         modal.style.display = 'none';
     });
 
@@ -310,7 +420,6 @@ document.addEventListener('DOMContentLoaded', () => {
             toggleEditMode(false);
         }
     });
-
      */
 
     // Click outside modal to close
