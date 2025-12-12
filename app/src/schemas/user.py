@@ -8,3 +8,7 @@ class User(BaseModel):
     full_name: str | None = None
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class Participant(User):
+    status: str
