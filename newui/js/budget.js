@@ -20,7 +20,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const expensesTbody = document.getElementById("expenses-tbody");
     const debtsTbody = document.getElementById("debts-tbody");
-    const totalPerPersonEl = document.getElementById("total-per-person");
     const totalAmountEl = document.getElementById("total-amount");
 
     // --- Multi-select участников ---
@@ -194,12 +193,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             totalPerPerson += parseFloat(perPerson);
             row.classList.add('status-' + ((e.status || 'Создано').toLowerCase().replace(/\s+/g, '-')));
             row.innerHTML = `
-                <td>${e.desc}</td>
-                <td>${e.author}</td>
-                <td>${e.participants.join(', ')}</td>
-                <td>${perPerson} ₽</td>
-                <td>${e.amount} ₽</td>
-                <td class="status-cell">${e.status || 'Создано'}</td>
+                <td data-label="Описание">${e.desc}</td>
+                <td data-label="Автор">${e.author}</td>
+                <td data-label="Участники">${e.participants.join(', ')}</td>
+                <td data-label="С каждого">${perPerson} ₽</td>
+                <td data-label="Сумма">${e.amount} ₽</td>
+                <td data-label="Статус" class="status-cell">${e.status || 'Создано'}</td>
             `;
             row.addEventListener('click', () => {
                 if (e.author !== currentUser.username) return;
@@ -214,6 +213,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 modalTitle.textContent = 'Изменение траты';
                 openModal();
             });
+
             expensesTbody.appendChild(row);
         });
         totalAmountEl.textContent = totalAmount.toFixed(2) + ' ₽';
