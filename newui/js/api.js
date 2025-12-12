@@ -1,5 +1,6 @@
 import EventApi from './eventApi.js'
 import UserApi from './userApi.js'
+import eventApi from "./eventApi.js";
 
 class SmartAPI {
     // Добавить localstorage
@@ -34,8 +35,8 @@ class SmartAPI {
         return UserApi.getUserByTgName(userTg);
     }
 
-    static getUserEvents(userToken) {
-        return EventApi.getUserEvents(userToken);
+    static getParticipatingGUserEvents(userToken) {
+        return EventApi.getParticipatingGUserEvents(userToken);
     }
 
     static getEventById(eventId){
@@ -44,6 +45,18 @@ class SmartAPI {
 
     static checkUserByUserName(userName){
         return UserApi.checkUserByUserName(userName);
+    }
+
+    static addUserToEvent(data){
+        return EventApi.addUserToEvent(data);
+    }
+
+    static getInvitedGUserEvents(userToken){
+        return EventApi.getInvitedGUserEvents(userToken);
+    }
+
+    static updateStatusOfMemberToInvited(data, status){
+        return EventApi.updateStatusOfMember(data, status);
     }
 
 }

@@ -3,7 +3,7 @@ import SmartAPI from './api.js';
 document.addEventListener('DOMContentLoaded', () => {
     // Sample data
     const eventData = JSON.parse(localStorage.getItem("eventData"));
-
+    const eventId = JSON.parse(localStorage.getItem("currentEventId"));
     // Elements
     const evTitle = document.getElementById('ev-title');
     const evDate = document.getElementById('ev-date');
@@ -33,13 +33,14 @@ document.addEventListener('DOMContentLoaded', () => {
     let editing = false;
 
     getUserInfoByToken();
-    initEventData()
+    initEventData();
     initEventFields();
 
     async function initEventData(){
-        const eventData = await SmartAPI.getEventById(JSON.parse(localStorage.getItem("currentEventId")));
+        const eventData = await SmartAPI.getEventById(eventId);
         localStorage.setItem('eventData', JSON.stringify(eventData));
-        renderParticipants();
+        const participants = JSON.parse(localStorage.getItem("eventData")).participants;
+        renderParticipants(participants);
     }
 
     async function getUserInfoByToken(){
@@ -217,8 +218,9 @@ document.addEventListener('DOMContentLoaded', () => {
         toggleEditMode(false);
     }
 
-    async function renderParticipants() {
-        const participants = JSON.parse(localStorage.getItem("eventData")).participants;
+    function renderParticipants(participants) {
+        participantsList.innerHTML = '';
+
         participants.forEach((p, idx) => {
             const el = document.createElement('div');
             if (!(idx === 0)) {
@@ -247,7 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.addEventListener('click', (e) => {
                 const idx = parseInt(btn.dataset.idx, 10);
                 participants.splice(idx, 1);
-                renderParticipants();
+                // renderParticipants(participants);
             });
         });
     }
@@ -259,7 +261,10 @@ document.addEventListener('DOMContentLoaded', () => {
         tgInput.focus();
     });
     
-    closeModalBtn.addEventListener('click',  () => modal.style.display = 'none');
+    closeModalBtn.addEventListener('click',  () => {
+        modal.style.display = 'none'
+        clearRegisterError()
+    });
 
     // Confirm add
     confirmAdd.addEventListener('click', async function ()  {
@@ -267,9 +272,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const val = tgInput.value.trim();
         try{
             const isUser = await SmartAPI.checkUserByUserName(val);
-            console.log(isUser);
             if (isUser){
-                console.log("isUser");
+                const userData = await SmartAPI.getUserByUserName(val);
+                const data = {
+                    event_id: eventId,
+                    id: userData.id,
+                }
+                try {
+                    const inviteResult = await SmartAPI.addUserToEvent(data);
+                    renderParticipants(inviteResult.participants);
+                    modal.style.display = 'none';
+                }catch (error){
+                    showRegisterError('Пользователь уже добавлен');
+                    return;
+                }
             }
         } catch (error) {
             showRegisterError('Пользователь не найден');
@@ -301,6 +317,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('click', (e) => {
         if (e.target === modal) {
             modal.style.display = 'none';
+            clearRegisterError()
         }
     });
 

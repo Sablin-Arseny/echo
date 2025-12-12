@@ -25,10 +25,34 @@
 <main class="main-content">
     <h1 class="page-title">Мои мероприятия</h1>
     <div class="container">
-        <div class="all-my-events">
+        <!-- ===== НАЧАЛО: Панель вкладок ===== -->
+        <div class="tabs-container">
+            <div class="tabs-header">
+                <button class="tab-btn active" data-tab="participating">Участвую</button>
+                <button class="tab-btn" data-tab="invitations">Приглашение</button>
+            </div>
 
+            <div class="tabs-content">
+                <!-- Вкладка "Участвую" -->
+                <div class="tab-pane active" id="participating-tab">
+                    <div class="all-my-events" id="participating-events">
+                        <!-- Здесь будут мероприятия, в которых пользователь участвует -->
+                    </div>
+                </div>
 
+                <!-- Вкладка "Приглашение" -->
+                <div class="tab-pane" id="invitations-tab">
+                    <div class="all-my-events" id="invitation-events">
+                        <!-- Здесь будут приглашения на мероприятия -->
+                        <div class="empty-state">
+                            <p>Нет новых приглашений</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+        <!-- ===== КОНЕЦ: Панель вкладок ===== -->
+
         <button class="create-button" id="createBtn">Создать</button>
     </div>
 </main>
