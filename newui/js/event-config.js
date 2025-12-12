@@ -36,6 +36,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initEventData();
     initEventFields();
 
+
+
     async function initEventData(){
         const eventData = await SmartAPI.getEventById(eventId);
         localStorage.setItem('eventData', JSON.stringify(eventData));
@@ -221,24 +223,49 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderParticipants(participants) {
         participantsList.innerHTML = '';
 
-        participants.forEach((p, idx) => {
-            const el = document.createElement('div');
-            if (!(idx === 0)) {
-                el.className = 'participant-item';
+        // Фильтруем участников, оставляя только тех, у кого статус не REFUSED
+        const activeParticipants = participants.filter(p => p.status !== "REFUSED");
+
+        activeParticipants.forEach((p, idx) => {
+            // Нужно найти оригинальный индекс в массиве participants
+            const originalIdx = participants.findIndex(participant =>
+                participant.id === p.id || participant.username === p.username
+            );
+
+            if (p.status === "PARTICIPATING") {
+                const el = document.createElement('div');
+                if (!(originalIdx === 0)) {
+                    el.className = 'participant-item participant-accepted';
+                    el.innerHTML = `
+                    <div class="participant-tg">${p.username}</div>
+                    <div class="participant-actions">
+                        <button class="btn btn-secondary small" data-idx="${originalIdx}">x</button>
+                    </div>
+                `;
+                    participantsList.appendChild(el);
+                } else {
+                    el.className = 'participant-item participant-admin';
+                    el.innerHTML = `
+                    <div class="participant-tg">${p.username}</div>
+                    <div class="participant-actions">
+                        admin
+                    </div>
+                `;
+                    participantsList.appendChild(el);
+                }
+            } else {
+                // Участники с другими статусами (приглашенные и т.д.)
+                const el = document.createElement('div');
+                el.className = 'participant-item participant-pending';
+
+                let statusText = '';
+                if (p.status === "DRAFT" || p.status === "INVITED") {
+                    statusText = 'Приглашен';
+                }
+
                 el.innerHTML = `
                 <div class="participant-tg">${p.username}</div>
-                <div class="participant-actions">
-                    <button class="btn btn-secondary small" data-idx="${idx}">x</button>
-                </div>
-            `;
-                participantsList.appendChild(el);
-            }else {
-                el.className = 'participant-item';
-                el.innerHTML = `
-                <div class="participant-tg">${p.username}</div>
-                <div class="participant-actions">
-                    admin
-                </div>
+                <div class="participant-status">${statusText}</div>
             `;
                 participantsList.appendChild(el);
             }
@@ -283,6 +310,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     renderParticipants(inviteResult.participants);
                     modal.style.display = 'none';
                 }catch (error){
+                    const eventInfo = await SmartAPI.getEventById(eventId);
+                    eventInfo.participants.forEach(member => {
+                        if (member.status === "REFUSED" && member.id === userData.id){
+                            const data = {
+                                event_id: eventId,
+                                id: member.id,
+                            }
+                            SmartAPI.updateStatusOfMemberToInvited(data, "DRAFT");
+                        }
+                        initEventData();
+                        modal.style.display = 'none';
+                    });
                     showRegisterError('Пользователь уже добавлен');
                     return;
                 }
