@@ -1,4 +1,14 @@
 from pydantic import BaseModel, ConfigDict
+from typing import Literal
+
+
+STATUS = Literal[
+    "INVITED",
+    "REFUSED",
+    "PARTICIPATING",
+    "DELETED",
+    "DRAFT",
+]
 
 
 class User(BaseModel):
@@ -11,4 +21,4 @@ class User(BaseModel):
 
 
 class Participant(User):
-    status: str
+    status: STATUS
