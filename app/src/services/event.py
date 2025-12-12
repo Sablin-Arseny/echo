@@ -35,6 +35,7 @@ class EventService:
         if not event:
             return
         
+        await self._event_db.add_relation_event_member(event.id, user)
         for participant in participants:
             await self._event_db.add_relation_event_member(event.id, participant)
 
@@ -62,7 +63,7 @@ class EventService:
             return []
         return [EventResponse.model_validate(event) for event in events]
 
-    async def get_participants(self, event_id: int) -> list[User]:
+    async def get_participants(self, event_id: int) -> list[Participant]:
         result = await self._event_db.get_members_by_event_id(event_id)
 
         if not result:
@@ -77,8 +78,7 @@ class EventService:
         return participants
 
     async def add_user_to_event(self, event_id: int, user: User):
-        user_orm = await self._user_db.get(user)
-        user = User.model_validate(user_orm)
+        user = await self._user_db.get(user)
         return await self._event_db.add_relation_event_member(event_id, user)
 
     async def update_status_of_member(self, event_id: int, user: User, status: STATUS):

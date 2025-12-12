@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from app.src.services.event import EventService
 from app.src.services.auth import AuthService
 
-from app.src.schemas import CreateEventRequest, EventResponse, UpdateEvent, User, STATUS
+from app.src.schemas import CreateEventRequest, EventResponse, UpdateEvent, User, Participant, STATUS
 
 
 router = APIRouter()
@@ -80,7 +80,7 @@ async def add_user_to_event(
     try:
         event = await event_service.add_user_to_event(event_id=event_id, user=user)
         participants = await event_service.get_participants(event_id)
-        participants = [User.model_validate(user) for user in participants]
+        participants = [Participant.model_validate(user) for user in participants]
         event_response = EventResponse.model_validate(event)
         event_response.participants = participants
     except Exception as e:
