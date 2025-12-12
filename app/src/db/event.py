@@ -61,17 +61,6 @@ class EventDB(BaseDB):
 
     async def get_members_by_event_id(self, event_id: int):
         stmt = (
-            select(UserOrm)
-            .join(EventMember, UserOrm.id == EventMember.user_id)
-            .where(EventMember.event_id == event_id)
-        )
-        async with self.create_session() as session:
-            members = await session.execute(stmt)
-            members = members.scalars().all()
-        return list(members) if members else None
-    
-    async def get_members_with_status(self, event_id: int):
-        stmt = (
             select(UserOrm, EventMember.status)
             .join(EventMember, UserOrm.id == EventMember.user_id)
             .where(EventMember.event_id == event_id)

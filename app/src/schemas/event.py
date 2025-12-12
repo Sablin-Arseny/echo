@@ -22,7 +22,7 @@ class EventResponse(BaseModel):
     created_at: datetime
     tg_chat: str | None = None
     event_place: str | None = None
-    participants: list[User | Participant] = []
+    participants: list[Participant] = []
 
     model_config = ConfigDict(from_attributes=True)
 

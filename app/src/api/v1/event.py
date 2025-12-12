@@ -65,7 +65,7 @@ async def get_event_by_id(
     event = await event_service.get(id)
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")
-    participants = await event_service.get_participants_with_status(id)
+    participants = await event_service.get_participants(id)
     event_response = EventResponse.model_validate(event)
     event_response.participants = participants
     return event
