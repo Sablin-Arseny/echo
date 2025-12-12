@@ -12,7 +12,15 @@
 <body>
 <header>
     <img src="../images/Logo.svg" alt="наше лого" class="logo">
-    <button type="button" class="back-button" id="back-btn" onclick="history.back()" aria-label="Назад">← Назад</button>
+    <button id="authButton" class="auth-button">
+        <span id="authText" class="auth-text"><b>Войти</b></span>
+        <span class="user-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
+              <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+              <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
+            </svg>
+        </span>
+    </button>
 </header>
 
 <main class="main-content">
@@ -37,14 +45,6 @@
                         </tr>
                     </thead>
                     <tbody id="expenses-tbody"></tbody>
-                    <tfoot>
-                        <tr class="total-row">
-                            <td colspan="3"><strong>Итого:</strong></td>
-                            <td id="total-per-person">0 ₽</td>
-                            <td id="total-amount">0 ₽</td>
-                            <td></td>
-                        </tr>
-                    </tfoot>
                 </table>
             </div>
         </div>
@@ -65,6 +65,11 @@
             </div>
         </div>
     </div>
+
+    <div class="expenses-total">
+        <div><h2>Общая сумма мероприятия:</h2> <span id="total-amount">0 ₽</span></div>
+    </div>
+
 </main>
 
 <!-- Модальное окно для добавления траты -->
@@ -74,23 +79,16 @@
         <h2 class="modal-title" id="modal-title">Новая трата</h2>
         <div class="popup-body">
             <form class="event-form" id="expenseForm">
+                <!-- Автор траты -->
+                <div class="form-row">
+                    <label>Автор траты:</label>
+                    <div id="expense-author-display" class="author-display"></div>
+                </div>
+
                 <!-- Статья траты -->
                 <div class="form-row">
                     <label for="expense-description">Статья траты:</label>
                     <input type="text" id="expense-description" class="form-input" placeholder="Введите название траты">
-                </div>
-
-                <!-- Автор траты -->
-                <div class="form-row">
-                    <label>Автор траты:</label>
-                    <div class="custom-select" id="expense-author">
-                        <div class="select-selected">Выберите автора</div>
-                        <div class="select-items select-hide">
-                            <div data-value="Иван">Иван</div>
-                            <div data-value="Катя">Катя</div>
-                            <div data-value="Сергей">Сергей</div>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- Участники траты -->
@@ -99,24 +97,6 @@
                     <div class="custom-multi-select" id="expense-participants">
                         <div class="multi-selected">Выберите участников</div>
                         <div class="multi-items select-hide">
-                            <div class="multi-item">
-                                <label>
-                                    <input type="checkbox" value="Иван">
-                                    <span>Иван</span>
-                                </label>
-                            </div>
-                            <div class="multi-item">
-                                <label>
-                                    <input type="checkbox" value="Катя">
-                                    <span>Катя</span>
-                                </label>
-                            </div>
-                            <div class="multi-item">
-                                <label>
-                                    <input type="checkbox" value="Сергей">
-                                    <span>Сергей</span>
-                                </label>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -125,19 +105,6 @@
                 <div class="form-row">
                     <label for="expense-amount">Сумма (₽):</label>
                     <input type="number" id="expense-amount" class="form-input" placeholder="Введите сумму" min="1">
-                </div>
-
-                <!-- Статус (в модальном окне) -->
-                <div class="form-row">
-                    <label>Статус:</label>
-                    <div class="custom-select" id="expense-status">
-                        <div class="select-selected">Создано</div>
-                        <div class="select-items select-hide">
-                            <div data-value="Создано">Создано</div>
-                            <div data-value="В процессе">В процессе</div>
-                            <div data-value="Выполнено">Выполнено</div>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- Кнопки действия -->
