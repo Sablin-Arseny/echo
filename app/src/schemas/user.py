@@ -21,4 +21,4 @@ class User(BaseModel):
 
 
 class Participant(User):
-    status: STATUS
+    status: STATUS = "DRAFT"

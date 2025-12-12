@@ -78,8 +78,9 @@ class EventService:
         
         participants = []
         for user_orm, status in result:
-            user_data = User.model_validate(user_orm).model_dump()
-            participants.append(Participant(**user_data, status=status))
+            participant = Participant.model_validate(user_orm)
+            participant.status = status
+            participants.append(participant)
 
         return participants
 
