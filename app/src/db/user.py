@@ -23,6 +23,19 @@ class UserDB(BaseDB):
             await session.get(UserOrm, user.id)
             return user
 
+    async def update(self, user: User, update_user: User):
+        async with self.create_session() as session:
+            user_orm = await session.get(UserOrm, user.id)
+            update_data = update_user.model_dump(exclude_none=True)
+
+            for key, value in update_data.items():
+                if key != 'id':
+                    setattr(user_orm, key, value)
+
+            await session.commit()
+            await session.refresh(user_orm)
+            return user_orm
+
     async def get(self, user: User):
         stmt = select(UserOrm)
         for key, value in user.model_dump(exclude_none=True).items():

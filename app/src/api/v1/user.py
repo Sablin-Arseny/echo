@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from app.src.db.user import UserDB
 from app.src.schemas import User
+from app.src.services.auth import AuthService
 
 
 router = APIRouter()
@@ -44,3 +45,15 @@ async def check_user(
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return True
+
+@router.patch("/update_user")
+async def update_user(
+    update_user: User,
+    user: User = Depends(AuthService.check_auth),
+    user_db: UserDB = Depends(UserDB.get_as_dependency),
+) -> User:
+    try:
+        user_response = await user_db.update(user, update_user)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=repr(e))
+    return user_response
