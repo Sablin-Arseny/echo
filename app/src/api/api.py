@@ -5,6 +5,7 @@ from app.src.api.v1.budget import router as budget_router
 from app.src.api.v1.user import router as user_router
 from app.src.api.v1.event import router as event_router
 from app.src.api.v1.auth import router as auth_router
+from app.src.api.v1.task import router as task_router
 
 
 router = APIRouter()
@@ -33,4 +34,9 @@ router.include_router(
     auth_router,
     prefix="/auth",
     tags=["auth"],
+)
+router.include_router(
+    task_router,
+    prefix="/task",
+    tags=["task"],
 )

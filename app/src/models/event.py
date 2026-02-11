@@ -17,6 +17,6 @@ class Event(Base):
     event_place = Column(String)
 
     budget = relationship("Budget", back_populates="events")
-    tasks = relationship("Task", back_populates="events")
+    tasks = relationship("Task", back_populates="event")
     media = relationship("Media", back_populates="events")
     event_members = relationship("EventMember", back_populates="events")
