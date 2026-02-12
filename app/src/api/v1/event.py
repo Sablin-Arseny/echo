@@ -114,9 +114,13 @@ async def update_status_of_member(
         event = await event_service.update_status_of_member(
             event_id=event_id, user=user, status=status
         )
+        participants = await event_service.get_participants(event_id)
+        participants = [Participant.model_validate(user) for user in participants]
+        event_response = EventResponse.model_validate(event)
+        event_response.participants = participants
     except Exception as e:
         raise HTTPException(status_code=500, detail=repr(e))
-    return event
+    return event_response
 
 
 @router.post("/update_role_of_member")
@@ -131,10 +135,14 @@ async def update_role_of_member(
         event = await event_service.update_member_role(
             event_id=event_id, user_to_update=user_to_update, role=role, user=user
         )
+        participants = await event_service.get_participants(event_id)
+        participants = [Participant.model_validate(user) for user in participants]
+        event_response = EventResponse.model_validate(event)
+        event_response.participants = participants
     except LookupError as e:
         raise HTTPException(status_code=404, detail=repr(e))
     except ValueError as e:
         raise HTTPException(status_code=403, detail=repr(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=repr(e))
-    return event
+    return event_response
