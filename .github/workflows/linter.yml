@@ -3,7 +3,7 @@ on:
   push:
     branches-ignore: [ main ]
 jobs:
-  linter:
+  linter-js:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -16,12 +16,28 @@ jobs:
           VALIDATE_ALL_CODEBASE: true
           VALIDATE_JAVASCRIPT_ES: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  linter-py:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - name: Lint Python
         uses: github/super-linter@v4
         env:
           VALIDATE_ALL_CODEBASE: true
           VALIDATE_PYTHON_BLACK: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  linter-html:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - name: Lint HTML
         uses: github/super-linter@v4
         env:
