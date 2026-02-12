@@ -7,10 +7,10 @@ from app.src.schemas.user import User
 
 
 TASK_STATUS = Literal[
-    "CREATED",      # новый
+    "CREATED",  # новый
     "IN_PROGRESS",  # выполняется
-    "IN_REVIEW",    # на проверке
-    "DONE",         # выполнено
+    "IN_REVIEW",  # на проверке
+    "DONE",  # выполнено
 ]
 
 

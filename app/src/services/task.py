@@ -15,7 +15,9 @@ from app.src.schemas.task import (
 
 
 def _task_to_response(task: Task) -> TaskResponse:
-    observers = [User.model_validate(o.user) for o in task.observers] if task.observers else []
+    observers = (
+        [User.model_validate(o.user) for o in task.observers] if task.observers else []
+    )
     comments = [
         TaskCommentResponse(
             id=c.id,
@@ -60,7 +62,9 @@ class TaskService:
             EventDB.get_as_dependency(),
         )
 
-    async def create(self, payload: CreateTaskRequest, current_user: User) -> TaskResponse:
+    async def create(
+        self, payload: CreateTaskRequest, current_user: User
+    ) -> TaskResponse:
         event = await self._event_db.get_event_by_id(payload.event_id)
         if not event:
             raise ValueError("Event not found")
@@ -87,7 +91,11 @@ class TaskService:
         if not task:
             return None
         data = payload.model_dump(exclude_none=True, exclude={"id"})
-        if "status" in data and data["status"] == "IN_PROGRESS" and task.status != "IN_PROGRESS":
+        if (
+            "status" in data
+            and data["status"] == "IN_PROGRESS"
+            and task.status != "IN_PROGRESS"
+        ):
             data["started_at"] = datetime.now(timezone.utc).replace(tzinfo=None)
         updated = await self._task_db.update(payload.id, data)
         return _task_to_response(updated) if updated else None
@@ -109,7 +117,9 @@ class TaskService:
         )
         return [_task_to_response(t) for t in tasks]
 
-    async def add_comment(self, task_id: int, user: User, text: str) -> TaskCommentResponse | None:
+    async def add_comment(
+        self, task_id: int, user: User, text: str
+    ) -> TaskCommentResponse | None:
         comment = await self._task_db.add_comment(task_id, user.id, text)
         if not comment:
             return None

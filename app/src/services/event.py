@@ -29,25 +29,26 @@ class EventService:
         )
 
     async def create(self, event: CreateEventRequest, user: User):
-        participants = [await self._user_db.get(User(id=uid)) for uid in event.participants]
+        participants = [
+            await self._user_db.get(User(id=uid)) for uid in event.participants
+        ]
 
-        event = await self._event_db.create_event(event.model_dump(exclude_none=True, exclude={"participants"}))
+        event = await self._event_db.create_event(
+            event.model_dump(exclude_none=True, exclude={"participants"})
+        )
         if not event:
             return
-        
+
         await self._event_db.add_relation_event_member(event.id, user)
         for participant in participants:
             await self._event_db.add_relation_event_member(event.id, participant)
 
         await self._event_db.update_status_of_member(event.id, user.id, "PARTICIPATING")
-        
+
         return await self.get(event.id)
-    
+
     async def update(self, event: UpdateEvent):
-        update_event = event.model_dump(
-            exclude_none=True, 
-            exclude={"id"}
-        )
+        update_event = event.model_dump(exclude_none=True, exclude={"id"})
         event = await self._event_db.update_event(event.id, update_event)
         return EventResponse.model_validate(event)
 
@@ -68,7 +69,7 @@ class EventService:
 
         if not result:
             return []
-        
+
         participants = []
         for user_orm, status in result:
             participant = Participant.model_validate(user_orm)

@@ -16,7 +16,9 @@ class UserDB(BaseDB):
 
     async def create(self, user: User, password_hash: str):
         async with self.create_session() as session:
-            user = UserOrm(**user.model_dump(exclude_none=True), password_hash=password_hash)
+            user = UserOrm(
+                **user.model_dump(exclude_none=True), password_hash=password_hash
+            )
             session.add(user)
 
         async with self.create_session() as session:
@@ -29,7 +31,7 @@ class UserDB(BaseDB):
             update_data = update_user.model_dump(exclude_none=True)
 
             for key, value in update_data.items():
-                if key == 'id':
+                if key == "id":
                     raise KeyError("it is forbidden to change the id")
                 else:
                     setattr(user_orm, key, value)
