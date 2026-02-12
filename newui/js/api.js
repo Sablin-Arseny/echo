@@ -52,6 +52,10 @@ class SmartAPI {
         return UserApi.checkUserByUserName(userName);
     }
 
+    static updateUserInfo(userToken, userData){
+        return UserApi.updateUserInfo(userToken, userData);
+    }
+
     static addUserToEvent(data){
         return EventApi.addUserToEvent(data);
     }
