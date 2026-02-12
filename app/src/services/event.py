@@ -43,7 +43,9 @@ class EventService:
         await self._event_db.add_relation_event_member(event.id, user)
         for participant in participants:
             await self._event_db.add_relation_event_member(event.id, participant)
-            await self._event_db.update_role_of_member(event.id, participant.id, "PARTICIPANT")
+            await self._event_db.update_role_of_member(
+                event.id, participant.id, "PARTICIPANT",
+            )
 
         await self._event_db.update_status_of_member(event.id, user.id, "PARTICIPATING")
         await self._event_db.update_role_of_member(event.id, user.id, "OWNER")
@@ -92,7 +94,9 @@ class EventService:
         user_to_add = await self._user_db.get(user_to_add)
         return await self._event_db.add_relation_event_member(event_id, user_to_add)
 
-    async def update_member_role(self, event_id: int, user_to_update: User, role: ROLES, user: User):
+    async def update_member_role(
+        self, event_id: int, user_to_update: User, role: ROLES, user: User,
+    ):
         participants = await self.get_participants(event_id)
         users = [p for p in participants if p.id == user.id]
         if not user:
