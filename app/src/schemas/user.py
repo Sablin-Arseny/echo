@@ -27,5 +27,5 @@ class User(BaseModel):
 
 
 class Participant(User):
-    role: ROLES
+    role: ROLES | None = None
     status: STATUS = "DRAFT"

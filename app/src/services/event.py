@@ -74,9 +74,10 @@ class EventService:
             return []
 
         participants = []
-        for user_orm, status in result:
+        for user_orm, status, role in result:
             participant = Participant.model_validate(user_orm)
             participant.status = status
+            participant.role = role
             participants.append(participant)
 
         return participants
@@ -87,7 +88,7 @@ class EventService:
         if not user:
             raise LookupError(f"User is not found for event {event_id}")
         user_role = users[0].role
-        if user_role != "ADMIN" or user_role != "OWNER":
+        if user_role != "ADMIN" and user_role != "OWNER":
             raise ValueError("User role must be ADMIN or OWNER")
         user_to_add = await self._user_db.get(user_to_add)
         return await self._event_db.add_relation_event_member(event_id, user_to_add, "PARTICIPANT")
@@ -100,13 +101,11 @@ class EventService:
         if not user:
             raise LookupError(f"User is not found for event {event_id}")
         user_role = users[0].role
-        if user_role != "ADMIN" or user_role != "OWNER":
+        if user_role != "ADMIN" and user_role != "OWNER":
             raise ValueError("User role must be ADMIN or OWNER")
-        if role == "ADMIN" and user_role != "PARTICIPANT":
-            raise ValueError("ADMIN can't update OWNER or ADMIN")
 
         user_to_update = await self._user_db.get(user_to_update)
-        return await self._event_db.update_role_of_member(event_id, user_to_update)
+        return await self._event_db.update_role_of_member(event_id, user_to_update.id, role)
 
     async def update_status_of_member(self, event_id: int, user: User, status: STATUS):
         user = await self._user_db.get(user)
