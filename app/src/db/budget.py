@@ -55,15 +55,9 @@ class BudgetDB(BaseDB):
             return budget
 
     async def create_expense_participant(self, participant_data: dict) -> ExpenseParticipant:
-        if "share_amount" in participant_data:
-            participant_data["share_amount"] = round(participant_data["share_amount"], 2)
-        if "paid_amount" in participant_data:
-            participant_data["paid_amount"] = round(participant_data["paid_amount"], 2)
-        else:
-            participant_data["paid_amount"] = 0.0
-            
-        if "status" not in participant_data:
-            participant_data["status"] = "PENDING"
+        participant_data["share_amount"] = round(participant_data.get("share_amount", 0.), 2)
+        participant_data["paid_amount"] = round(participant_data.get("paid_amount", 0.), 2)
+        participant_data["status"] = participant_data.get("status") or "PENDING"
             
         async with self.create_session() as session:
             participant = ExpenseParticipant(**participant_data)
@@ -155,9 +149,11 @@ class BudgetDB(BaseDB):
         all_confirmed = all(p.status == "CONFIRMED" for p in participants)
         any_paid_or_confirmed = any(p.status in ["PAID", "CONFIRMED"] for p in participants)
         
+        status = "ACTIVE"
+
         if all_confirmed:
-            await self.update_budget_status(budget_id, "CLOSED")
+            status = "CLOSED"
         elif any_paid_or_confirmed:
-            await self.update_budget_status(budget_id, "PARTIALLY_PAID")
-        else:
-            await self.update_budget_status(budget_id, "ACTIVE")
+            status = "PARTIALLY_PAID"
+
+        await self.update_budget_status(budget_id, status)

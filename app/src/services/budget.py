@@ -83,14 +83,15 @@ class BudgetService:
 
         share_amount = round(budget_request.amount / len(budget_request.participants) if budget_request.participants else 0, 2)
 
-        creator_participant_data = {
-            "expense_id": budget_orm.id,
-            "participant_id": paid_by_user_orm.id,
-            "share_amount": share_amount,
-            "paid_amount": share_amount,
-            "status": "CONFIRMED"
-        }
-        await self._budget_db.create_expense_participant(creator_participant_data)
+        if paid_by.tg_id in budget_request.participants:
+            creator_participant_data = {
+                "expense_id": budget_orm.id,
+                "participant_id": paid_by_user_orm.id,
+                "share_amount": share_amount,
+                "paid_amount": share_amount,
+                "status": "CONFIRMED"
+            }
+            await self._budget_db.create_expense_participant(creator_participant_data)
 
         for tg_id in budget_request.participants:
             if tg_id == paid_by.tg_id:
@@ -115,7 +116,7 @@ class BudgetService:
             raise ValueError(f"Budget with id {request.budget_id} not found")
         
         if budget.status == "CLOSED":
-            raise ValueError(f"Budget is already closed")
+            raise ValueError("Budget is already closed")
 
         participant_orm = await self._user_db.get(User(tg_id=current_user.tg_id))
         if not participant_orm:
@@ -123,28 +124,25 @@ class BudgetService:
 
         current_user_orm = await self._user_db.get(User(tg_id=current_user.tg_id))
         if current_user_orm.id != participant_orm.id:
-            raise ValueError(f"You can only mark your own debts as paid")
+            raise ValueError("You can only mark your own debts as paid")
 
         expense_participant = await self._budget_db.get_budget_participant(
             request.budget_id, participant_orm.id
         )
         if not expense_participant:
-            raise ValueError(f"User is not a participant in this budget")
+            raise ValueError("User is not a participant in this budget")
 
         if expense_participant.status == "CONFIRMED":
-            raise ValueError(f"This debt is already confirmed")
+            raise ValueError("This debt is already confirmed")
 
-        if request.amount is not None:
-            amount_to_pay = request.amount
-        else:
-            amount_to_pay = expense_participant.share_amount - expense_participant.paid_amount
+        amount_to_pay = request.amount or expense_participant.share_amount - expense_participant.paid_amount
             
         if amount_to_pay <= 0:
-            raise ValueError(f"Payment amount must be positive")
+            raise ValueError("Payment amount must be positive")
         
         new_paid_amount = expense_participant.paid_amount + amount_to_pay
         if new_paid_amount > expense_participant.share_amount:
-            raise ValueError(f"Payment amount exceeds remaining debt")
+            raise ValueError("Payment amount exceeds remaining debt")
 
         await self._budget_db.mark_participant_paid(
             expense_participant.id, new_paid_amount
@@ -164,11 +162,11 @@ class BudgetService:
             raise ValueError(f"Budget with id {request.budget_id} not found")
         
         if budget.status == "CLOSED":
-            raise ValueError(f"Budget is already closed")
+            raise ValueError("Budget is already closed")
 
         current_user_orm = await self._user_db.get(User(tg_id=current_user.tg_id))
         if current_user_orm.id != budget.paid_by_id:
-            raise ValueError(f"Only the budget creator can confirm payments")
+            raise ValueError("Only the budget creator can confirm payments")
 
         participant_orm = await self._user_db.get(User(tg_id=request.participant_tg_id))
         if not participant_orm:
@@ -178,10 +176,10 @@ class BudgetService:
             request.budget_id, participant_orm.id
         )
         if not expense_participant:
-            raise ValueError(f"User is not a participant in this budget")
+            raise ValueError("User is not a participant in this budget")
 
         if expense_participant.status == "CONFIRMED":
-            raise ValueError(f"This debt is already confirmed")
+            raise ValueError("This debt is already confirmed")
 
         if expense_participant.paid_amount < expense_participant.share_amount:
             raise ValueError(
@@ -203,7 +201,7 @@ class BudgetService:
     async def get_user_expenses(self, user: User, event_id: int | None = None) -> UserTotalExpenseResponse:
         user_orm = await self._user_db.get(user)
         if not user_orm:
-            raise ValueError(f"User not found")
+            raise ValueError("User not found")
 
         total_amount = await self._budget_db.get_user_total_expense_by_tg_id(
             user_orm.tg_id, event_id

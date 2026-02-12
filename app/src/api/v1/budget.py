@@ -61,7 +61,7 @@ async def mark_participant_paid(
         raise HTTPException(status_code=400, detail=repr(e))
 
 
-@router.post("/confirm-payment")
+@router.post("/confirm_payment")
 async def confirm_payment(
     request: ConfirmPaymentRequest,
     budget_service: BudgetService = Depends(BudgetService.get_as_dependency),
