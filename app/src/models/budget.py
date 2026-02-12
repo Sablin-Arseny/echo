@@ -12,6 +12,7 @@ class Budget(Base):
     paid_by_id = Column(ForeignKey("users.id"), nullable=False, index=True)
     amount = Column(Float, nullable=False, server_default=text("0.0"))
     description = Column(String)
+    status = Column(String, nullable=False, server_default=text("'ACTIVE'"))
 
     events = relationship("Event", back_populates="budget")
     users = relationship("User", back_populates="budget")

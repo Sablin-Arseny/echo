@@ -22,7 +22,6 @@ session_maker = sessionmaker(
 
 
 class BaseDB:
-
     @asynccontextmanager
     async def create_session(self):
         session = session_maker()

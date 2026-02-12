@@ -8,12 +8,11 @@ from app.src.schemas import User, STATUS
 
 
 class EventDB(BaseDB):
-
     @classmethod
     @cache
     def get_as_dependency(cls):
         return cls()
-    
+
     async def create_event(self, event: dict) -> Event:
         async with self.create_session() as session:
             event = Event(**event)
@@ -22,7 +21,7 @@ class EventDB(BaseDB):
         async with self.create_session() as session:
             event = await session.get(Event, event.id)
             return event
-    
+
     async def update_event(self, event_id: int, event: dict):
         async with self.create_session() as session:
             event_orm = await session.get(Event, event_id)
@@ -42,14 +41,17 @@ class EventDB(BaseDB):
 
     async def add_relation_event_member(self, event_id: int, user: User):
         async with self.create_session() as session:
-            event_member = EventMember(event_id=event_id, user_id=user.id, status="DRAFT")
+            event_member = EventMember(
+                event_id=event_id, user_id=user.id, status="DRAFT"
+            )
             session.add(event_member)
         return await self.get_event_by_id(event_id)
-    
-    async def update_status_of_member(self, event_id: int, user_id: int, status: STATUS):
+
+    async def update_status_of_member(
+        self, event_id: int, user_id: int, status: STATUS
+    ):
         stmt = select(EventMember).where(
-            EventMember.event_id == event_id,
-            EventMember.user_id == user_id
+            EventMember.event_id == event_id, EventMember.user_id == user_id
         )
         async with self.create_session() as session:
             event_member = await session.execute(stmt)

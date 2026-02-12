@@ -12,7 +12,9 @@ class Event(Base):
     description = Column(String)
     start_date = Column(TIMESTAMP(timezone=True), nullable=False)
     cancel_of_event_date = Column(TIMESTAMP(timezone=True))
-    created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.now())
+    created_at = Column(
+        TIMESTAMP(timezone=True), nullable=False, server_default=func.now()
+    )
     tg_chat = Column(String)
     event_place = Column(String)
 

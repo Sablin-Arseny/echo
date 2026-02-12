@@ -34,6 +34,7 @@ async def get_user(
         raise HTTPException(status_code=404, detail="User not found")
     return user_response
 
+
 @router.get("/check_user")
 async def check_user(
     id: int | None = None,
@@ -45,6 +46,7 @@ async def check_user(
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return True
+
 
 @router.patch("/update_user")
 async def update_user(
