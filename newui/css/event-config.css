@@ -310,6 +310,11 @@ textarea.form-input,
     box-shadow: 0 -5px 5px 0 #ffffff;
 }
 
+.buttons {
+    display: flex;
+    gap: 20px;
+}
+
 .btn-primary-budget {
     background-color: #FD9C00;
     color: #000000;
@@ -324,6 +329,24 @@ textarea.form-input,
 }
 
 .btn-primary-budget:hover {
+    transform: translateY(3px);
+    box-shadow: 0 -5px 5px 0 #ffffff;
+}
+
+.btn-primary-task {
+    background-color: #FD9C00;
+    color: #000000;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    text-overflow: ellipsis;
+    width: 100%;
+}
+
+.btn-primary-task:hover {
     transform: translateY(3px);
     box-shadow: 0 -5px 5px 0 #ffffff;
 }

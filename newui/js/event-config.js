@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const tgInput = document.getElementById('participant-tg');
     const editBtn = document.getElementById('edit-btn');
     const budgetBtn = document.getElementById('budget-btn');
+    const taskBtn = document.getElementById("task-btn");
     const authText = document.getElementById("authText");
     const registerError = document.getElementById('userAddError');
     const logo = document.querySelector('.logo');
@@ -518,6 +519,11 @@ document.addEventListener('DOMContentLoaded', () => {
     budgetBtn.addEventListener('click', () => {
         const eventData = localStorage.getItem('currentEventId', JSON.stringify(eventId));
         window.location.href = `budget.html?eventId=${eventData}`;
+    });
+
+    taskBtn.addEventListener('click', () => {
+        const eventData = localStorage.getItem('currentEventId', JSON.stringify(eventId));
+        window.location.href = `task-page.html?eventId=${eventData}`;
     });
 
     // Logo click handler - navigate to events page and refresh

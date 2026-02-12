@@ -1,6 +1,7 @@
 import EventApi from './eventApi.js'
 import UserApi from './userApi.js'
 import BudgetApi from './budgetApi.js';
+import TaskApi from "./taskApi.js";
 
 class SmartAPI {
     // Добавить localstorage
@@ -18,7 +19,7 @@ class SmartAPI {
     }
 
     static updateEvent(eventData){
-        return EventApi.updateEvent(eventData);    
+        return EventApi.updateEvent(eventData);
     }
 
     static registerUser(userData) {
@@ -70,6 +71,24 @@ class SmartAPI {
 
     static getBudget(EventId){
         return BudgetApi.getBudget(EventId);
+    }
+
+    // task api
+
+    static getTasksByEventId(EventId, userToken){
+        return TaskApi.getTasksByEventId(EventId, userToken);
+    }
+
+    static createTask(taskData, userToken){
+        return TaskApi.createTask(taskData, userToken);
+    }
+
+    static updateTaskStatus(TaskId, TaskStatu, userToken){
+        return TaskApi.updateTaskStatus(TaskId, TaskStatu, userToken);
+    }
+
+    static updateTask(taskData, userToken){
+        return TaskApi.updateTask(taskData, userToken);
     }
 
 }
