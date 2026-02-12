@@ -9,7 +9,6 @@ from app.src.schemas.task import TASK_STATUS
 
 
 class TaskDB(BaseDB):
-
     @classmethod
     @cache
     def get_as_dependency(cls):
@@ -27,7 +26,8 @@ class TaskDB(BaseDB):
 
         async with self.create_session() as session:
             task = await session.get(
-                Task, task.id,
+                Task,
+                task.id,
                 options=[
                     selectinload(Task.author),
                     selectinload(Task.executor),
@@ -40,13 +40,14 @@ class TaskDB(BaseDB):
     async def get_by_id(self, task_id: int) -> Task | None:
         async with self.create_session() as session:
             task = await session.get(
-                Task, task_id,
+                Task,
+                task_id,
                 options=[
                     selectinload(Task.author),
                     selectinload(Task.executor),
                     selectinload(Task.observers).selectinload(TaskObserver.user),
                     selectinload(Task.comments).selectinload(TaskComment.user),
-                ]
+                ],
             )
             return task
 
@@ -60,7 +61,15 @@ class TaskDB(BaseDB):
                 if hasattr(task, key):
                     setattr(task, key, value)
             if observer_ids is not None:
-                existing = (await session.execute(select(TaskObserver).where(TaskObserver.task_id == task_id))).scalars().all()
+                existing = (
+                    (
+                        await session.execute(
+                            select(TaskObserver).where(TaskObserver.task_id == task_id)
+                        )
+                    )
+                    .scalars()
+                    .all()
+                )
                 for obs in existing:
                     await session.delete(obs)
                 for uid in observer_ids:
@@ -77,14 +86,11 @@ class TaskDB(BaseDB):
         observer_id: int | None = None,
         status: TASK_STATUS | None = None,
     ) -> list[Task]:
-        stmt = (
-            select(Task)
-            .options(
-                selectinload(Task.author),
-                selectinload(Task.executor),
-                selectinload(Task.observers).selectinload(TaskObserver.user),
-                selectinload(Task.comments).selectinload(TaskComment.user),
-            )
+        stmt = select(Task).options(
+            selectinload(Task.author),
+            selectinload(Task.executor),
+            selectinload(Task.observers).selectinload(TaskObserver.user),
+            selectinload(Task.comments).selectinload(TaskComment.user),
         )
         if event_id is not None:
             stmt = stmt.where(Task.event_id == event_id)
@@ -102,7 +108,9 @@ class TaskDB(BaseDB):
             tasks = result.unique().scalars().all()
         return list(tasks)
 
-    async def add_comment(self, task_id: int, user_id: int, text: str) -> TaskComment | None:
+    async def add_comment(
+        self, task_id: int, user_id: int, text: str
+    ) -> TaskComment | None:
         async with self.create_session() as session:
             task = await session.get(Task, task_id)
             if not task:
@@ -112,7 +120,9 @@ class TaskDB(BaseDB):
             await session.flush()
 
         async with self.create_session() as session:
-            comment = await session.get(TaskComment, comment.id, options=[selectinload(TaskComment.user)])
+            comment = await session.get(
+                TaskComment, comment.id, options=[selectinload(TaskComment.user)]
+            )
             return comment
 
     async def get_comments(self, task_id: int) -> list[TaskComment]:

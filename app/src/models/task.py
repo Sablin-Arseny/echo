@@ -15,17 +15,31 @@ class Task(Base):
     description = Column(String)
     status = Column(String, nullable=False, server_default="CREATED", index=True)
     created_at = Column(TIMESTAMP, nullable=False, server_default=func.now())
-    started_at = Column(TIMESTAMP, nullable=True)  # дата когда статус стал "выполняется"
+    started_at = Column(
+        TIMESTAMP, nullable=True
+    )  # дата когда статус стал "выполняется"
 
     event = relationship("Event", back_populates="tasks")
-    executor = relationship("User", back_populates="tasks_executor", foreign_keys=[executor_id])
-    author = relationship("User", back_populates="tasks_author", foreign_keys=[author_id])
-    observers = relationship("TaskObserver", back_populates="task", cascade="all, delete-orphan")
-    comments = relationship("TaskComment", back_populates="task", cascade="all, delete-orphan", order_by="TaskComment.created_at")
+    executor = relationship(
+        "User", back_populates="tasks_executor", foreign_keys=[executor_id]
+    )
+    author = relationship(
+        "User", back_populates="tasks_author", foreign_keys=[author_id]
+    )
+    observers = relationship(
+        "TaskObserver", back_populates="task", cascade="all, delete-orphan"
+    )
+    comments = relationship(
+        "TaskComment",
+        back_populates="task",
+        cascade="all, delete-orphan",
+        order_by="TaskComment.created_at",
+    )
 
 
 class TaskObserver(Base):
     """Наблюдатели задачи (many-to-many task — user)."""
+
     __tablename__ = "task_observers"
 
     task_id = Column(ForeignKey("tasks.id"), primary_key=True, nullable=False)
