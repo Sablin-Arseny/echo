@@ -1,6 +1,5 @@
 import EventApi from './eventApi.js'
 import UserApi from './userApi.js'
-import eventApi from "./eventApi.js";
 import BudgetApi from './budgetApi.js';
 
 class SmartAPI {
@@ -17,6 +16,11 @@ class SmartAPI {
     static createEvent(eventData){
         return EventApi.createEvent(eventData);
     }
+
+    static updateEvent(eventData){
+        return EventApi.updateEvent(eventData);    
+    }
+
     static registerUser(userData) {
         return UserApi.registerUser(userData);
     }

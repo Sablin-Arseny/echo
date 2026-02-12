@@ -2,7 +2,7 @@ import SmartAPI from './api.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // Sample data
-    const eventData = JSON.parse(localStorage.getItem("eventData"));
+    let eventData = JSON.parse(localStorage.getItem("eventData"));
     const eventId = JSON.parse(localStorage.getItem("currentEventId"));
     // Elements
     const evTitle = document.getElementById('ev-title');
@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const budgetBtn = document.getElementById('budget-btn');
     const authText = document.getElementById("authText");
     const registerError = document.getElementById('userAddError');
+    const logo = document.querySelector('.logo');
 
     const modal = document.getElementById('participant-modal');
     const openBtn = document.getElementById('add-participant-btn');
@@ -39,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initEventFields();
 
     async function initEventData(){
-        const eventData = await SmartAPI.getEventById(eventId);
+        eventData = await SmartAPI.getEventById(eventId);
         localStorage.setItem('eventData', JSON.stringify(eventData));
         const participants = JSON.parse(localStorage.getItem("eventData")).participants;
         checkUserAccess(participants);
@@ -107,15 +108,42 @@ document.addEventListener('DOMContentLoaded', () => {
     function formatDateForDisplay(dateString) {
         if (!dateString) return '';
 
-        // Проверяем, является ли строка валидной датой
-        const date = new Date(dateString);
-        if (isNaN(date.getTime())) return dateString; // Если не валидная, возвращаем как есть
+        try {
+            // Пробуем распарсить как дату
+            let date;
+            
+            // Если это строка в формате YYYY-MM-DD или ISO с временем
+            if (dateString.includes('T') || /^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+                // Для избежания проблем с часовыми поясами, парсим дату явно
+                const parts = dateString.split('T')[0].split('-');
+                if (parts.length === 3) {
+                    const [year, month, day] = parts;
+                    date = new Date(year, parseInt(month) - 1, parseInt(day));
+                } else {
+                    date = new Date(dateString);
+                }
+            } else if (/^(\d{2})\.(\d{2})\.(\d{4})$/.test(dateString)) {
+                // Если уже в формате DD.MM.YYYY, просто возвращаем
+                return dateString;
+            } else {
+                // Попытаемся распарсить как обычную дату
+                date = new Date(dateString);
+            }
 
-        const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const year = date.getFullYear();
+            // Проверяем валидность даты
+            if (isNaN(date.getTime())) {
+                return dateString;
+            }
 
-        return `${day}.${month}.${year}`;
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+
+            return `${day}.${month}.${year}`;
+        } catch (error) {
+            console.error('Ошибка форматирования даты:', error, dateString);
+            return dateString;
+        }
     }
 
     // Function to format date from DD.MM.YYYY to YYYY-MM-DD (для input[type="date"])
@@ -132,6 +160,19 @@ document.addEventListener('DOMContentLoaded', () => {
         if (parts) {
             const [, day, month, year] = parts;
             return `${year}-${month}-${day}`;
+        }
+
+        // Пробуем распарсить как ISO дату с временем (YYYY-MM-DDTHH:mm:ss)
+        try {
+            const date = new Date(dateString);
+            if (!isNaN(date.getTime())) {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+        } catch (e) {
+            // Если не смогли распарсить, продолжаем
         }
 
         return dateString; // Если не распарсилось, возвращаем как есть
@@ -190,6 +231,8 @@ document.addEventListener('DOMContentLoaded', () => {
             evDescDisplay
         ];
 
+        const settingsPanel = document.querySelector('.settings-panel');
+
         if (isEditing) {
             // Вход в режим редактирования
             // Обновляем поля ввода текущими данными из eventData
@@ -204,6 +247,11 @@ document.addEventListener('DOMContentLoaded', () => {
             displayFields.forEach(field => {
                 field.classList.add('hidden');
             });
+
+            // Добавляем класс для визуального выделения панели
+            if (settingsPanel) {
+                settingsPanel.classList.add('editing-mode');
+            }
 
             // Update button text
             editBtn.textContent = "Сохранить";
@@ -225,6 +273,11 @@ document.addEventListener('DOMContentLoaded', () => {
             displayFields.forEach(field => {
                 field.classList.remove('hidden');
             });
+
+            // Удаляем класс визуального выделения панели
+            if (settingsPanel) {
+                settingsPanel.classList.remove('editing-mode');
+            }
 
             // Update button text
             editBtn.textContent = "Редактировать";
@@ -408,20 +461,43 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.style.display = 'none';
     });
 
-    // Пока что отключил
-    /*
     // Edit button click handler
-    editBtn.addEventListener('click', () => {
+    editBtn.addEventListener('click', async () => {
         if (!editing) {
             // Entering edit mode
             toggleEditMode(true);
         } else {
-            // Exiting edit mode - save data
+            // Exiting edit mode - save data and send to backend
             saveFormData();
+            await sendEventDataToBackend();
             toggleEditMode(false);
         }
     });
-     */
+
+    // Function to send updated event data to backend
+    async function sendEventDataToBackend() {
+        try {
+            const updateData = {
+                id: eventId,
+                name: eventData.name,
+                description: eventData.description,
+                start_date: eventData.start_date,
+                cancel_of_event_date: eventData.cancel_of_event_date,
+                event_place: eventData.event_place
+            };
+
+            const response = await SmartAPI.updateEvent(updateData);
+            localStorage.setItem('eventData', JSON.stringify(eventData));
+
+            // alert('Обновлено на бэке:\n' + JSON.stringify(response, null, 2));
+
+        } catch (error) {
+            console.error('Ошибка при сохранении данных:', error);
+            alert('Ошибка при сохранении данных. Попробуйте еще раз.');
+            // Возвращаемся в режим редактирования при ошибке
+            toggleEditMode(true);
+        }
+    }
 
     // Click outside modal to close
     window.addEventListener('click', (e) => {
@@ -443,6 +519,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const eventData = localStorage.getItem('currentEventId', JSON.stringify(eventId));
         window.location.href = `budget.html?eventId=${eventData}`;
     });
+
+    // Logo click handler - navigate to events page and refresh
+    if (logo) {
+        logo.addEventListener('click', () => {
+            // Переходим на страницу "Мои мероприятия"
+            window.location.href = 'my-event-page.html';
+        });
+    }
 
     function clearRegisterError() {
         if (registerError) {
