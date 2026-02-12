@@ -16,6 +16,7 @@ ROLES = Literal[
     "PARTICIPANT",
 ]
 
+
 class User(BaseModel):
     id: int | None = None
     username: str | None = None
