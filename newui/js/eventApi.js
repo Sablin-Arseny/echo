@@ -138,6 +138,29 @@ class EventApi {
             throw error;
         }
     }
+
+    static async updateEvent(eventData){
+        try {
+            const response = await fetch(`${API_BASE}/event/update`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${JSON.parse(localStorage.getItem("userToken"))}`,
+                    'accept': 'application/json',
+                },
+                body: JSON.stringify(eventData)
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('Ошибка изменения информации о мероприятии:', error);
+            throw error;
+        }
+    }
 }
 
 export default EventApi;
