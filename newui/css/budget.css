@@ -28,9 +28,12 @@ header {
 }
 
 .logo {
-    width: auto;
-    height: auto;
-    max-width: 100%;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.logo:hover {
+    transform: translateY(3px);
 }
 
 .auth-button {

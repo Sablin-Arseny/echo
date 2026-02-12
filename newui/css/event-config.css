@@ -36,6 +36,16 @@ header {
     padding: 0 20px;
 }
 
+/* ===== LOGO STYLES ===== */
+.logo {
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.logo:hover {
+    transform: translateY(3px);
+}
+
 .main-content {
     flex: 1;
     display: flex;
@@ -74,6 +84,12 @@ header {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    transition: border-color 0.3s ease;
+}
+
+.settings-panel.editing-mode {
+    border-color: rgba(253, 156, 0, 0.8);
+    background: rgba(253, 156, 0, 0.05);
 }
 
 .settings-panel .event-form {
@@ -194,14 +210,16 @@ header {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
-    border: 1px solid rgba(253, 156, 0, 0.5);
+    border: 2px solid #FD9C00;
+    background: rgba(253, 156, 0, 0.15);
+    box-shadow: 0 0 8px rgba(253, 156, 0, 0.4);
 }
 
 .edit-field.active:focus {
     outline: none;
     border-color: #FD9C00;
-    background: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 0 0 2px rgba(253, 156, 0, 0.1);
+    background: rgba(253, 156, 0, 0.2);
+    box-shadow: 0 0 12px rgba(253, 156, 0, 0.6);
 }
 
 .edit-field.active + .field-display {

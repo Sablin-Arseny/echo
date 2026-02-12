@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const cancelExpenseBtn = document.getElementById("cancel-expense-btn");
     const saveExpenseBtn = document.getElementById("save-expense-btn");
     const authText = document.getElementById("authText");
+    const logo = document.querySelector('.logo');
 
     const expenseForm = document.getElementById("expenseForm");
     const descInput = document.getElementById("expense-description");
@@ -34,6 +35,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     await getEventUsers();
     await updateExpensesFromServer();
 
+    // Logo click handler - navigate to events page
+    if (logo) {
+        logo.addEventListener('click', () => {
+            // Переходим на страницу "Мои мероприятия"
+            window.location.href = 'my-event-page.html';
+        });
+    }
 
     async function getEventUsers() {
         const eventData = await SmartAPI.getEventById(currentEventId);
