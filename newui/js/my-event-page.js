@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const cancelBtn = document.getElementById("cancelBtn");
     const approveBtn = document.getElementById("approveBtn");
     const authText = document.getElementById("authText");
+    const authButton = document.getElementById('authButton');
     // Модальное окно
     const eventForm = document.getElementById("eventForm");
     const eventNameInput = document.getElementById("eventName");
@@ -301,6 +302,13 @@ document.addEventListener('DOMContentLoaded', function() {
             closePopup()
         }
     })
+
+    // Auth button click handler - navigate to personal account
+    if (authButton) {
+        authButton.addEventListener('click', () => {
+            window.location.href = 'personal-account.html';
+        });
+    }
 
     // ===== ИНИЦИАЛИЗАЦИЯ =====
 

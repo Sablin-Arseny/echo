@@ -1,0 +1,497 @@
+/* ===== RESET & BASE ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Montserrat Alternates', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #1A1919;
+    background-image: url("../images/bottom_light.png");
+    background-position: bottom;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ===== TYPOGRAPHY ===== */
+h1, h2 {
+    background-image: linear-gradient(to right, #ffffff, #FD9C00);
+    background-clip: text;
+    color: transparent;
+}
+
+/* ===== LAYOUT ===== */
+header {
+    width: 100%;
+    max-width: 1510px;
+    height: 124px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* ===== LOGO STYLES ===== */
+.logo {
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.logo:hover {
+    transform: translateY(-3px);
+}
+
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+    gap: 70px;
+}
+
+.content-row {
+    max-width: 1510px;
+    display: flex;
+    gap: 200px;
+}
+
+/* ===== PANELS ===== */
+.panel {
+    border-radius: 14px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    border: 3px solid transparent;
+    border-image: linear-gradient(0deg, #FFFFFF2E, #ffffff);
+    border-image-slice: 1;
+}
+
+.account-panel {
+    flex: 1;
+    min-width: 750px;
+    max-width: 750px;
+    width: 750px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: border-color 0.3s ease;
+}
+
+.account-panel.editing-mode {
+    border-color: rgba(253, 156, 0, 0.8);
+    background: rgba(253, 156, 0, 0.05);
+}
+
+.account-panel .account-form {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 8px;
+    margin-bottom: 16px;
+}
+
+/* ===== FORM STRUCTURE ===== */
+.form-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    margin: 15px 0;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #FD9C00;
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 0 0 2px rgba(253, 156, 0, 0.2);
+}
+
+.form-row label {
+    color: #FD9C00;
+    font-weight: 600;
+    min-width: 200px;
+    text-align: left;
+    flex-shrink: 0;
+    font-size: 0.95rem;
+    margin-top: 10px;
+}
+
+.form-row-full {
+    flex-direction: column;
+    width: 100%;
+}
+
+/* ===== FORM FIELDS (BASE) ===== */
+.form-input,
+.field-display,
+.edit-field {
+    padding: 10px 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    width: 100%;
+    line-height: 1.4;
+}
+
+/* ===== READ-ONLY FIELD DISPLAY ===== */
+.field-display {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    cursor: default;
+    word-break: break-word;
+}
+
+.field-display.placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.field-display.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* ===== EDITABLE FORM INPUTS ===== */
+.form-input {
+    border: 1px solid rgba(253, 156, 0, 0.5);
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #FD9C00;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* ===== EDIT FIELD OVERLAY ===== */
+.field-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.edit-field {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid transparent;
+    min-height: 40px;
+    z-index: 1;
+}
+
+.edit-field.active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    border: 2px solid #FD9C00;
+    background: rgba(253, 156, 0, 0.15);
+    box-shadow: 0 0 8px rgba(253, 156, 0, 0.4);
+}
+
+.edit-field.active:focus {
+    outline: none;
+    border-color: #FD9C00;
+    background: rgba(253, 156, 0, 0.2);
+    box-shadow: 0 0 12px rgba(253, 156, 0, 0.6);
+}
+
+.edit-field.active + .field-display {
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* ===== TEXTAREA SPECIFIC ===== */
+textarea.form-input,
+.form-row-full .field-display,
+.edit-field.textarea {
+    resize: none;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    word-break: break-word;
+    overflow-y: auto;
+    overflow-x: hidden;
+    font-family: inherit;
+}
+
+/* FIXED SIZE FOR DESCRIPTION FIELDS */
+.form-row-full .field-display,
+.edit-field.textarea {
+    height: 65px;
+    min-height: 65px;
+    max-height: 65px;
+    align-items: flex-start;
+}
+
+/* ===== BUTTONS ===== */
+.auth-button {
+    height: 60px;
+    width: 100%;
+    max-width: 168px;
+    min-width: 60px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    white-space: nowrap;
+    background-color: #FD9C00;
+    color: #000000;
+    font-size: 20px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.auth-button:hover {
+    transform: translateY(3px);
+    box-shadow: 0 -5px 5px 0 #ffffff;
+}
+
+.user-icon {
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    order: 2;
+}
+
+.auth-text {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    order: 1;
+    text-align: left;
+    padding-bottom: 5px;
+}
+
+.btn-primary {
+    background-color: #FD9C00;
+    color: #000000;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    text-overflow: ellipsis;
+}
+
+.btn-primary:hover {
+    transform: translateY(3px);
+    box-shadow: 0 -5px 5px 0 #ffffff;
+}
+
+.btn-logout {
+    background-color: #ff4444;
+    color: #ffffff;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    text-overflow: ellipsis;
+}
+
+.btn-logout:hover {
+    transform: translateY(3px);
+    box-shadow: 0 -5px 5px 0 #ffffff;
+}
+
+/* ===== ERROR MESSAGE ===== */
+.error-message {
+    color: #ff4444;
+    font-size: 0.85rem;
+    margin-top: 5px;
+    display: none;
+    animation: slideDown 0.3s ease;
+}
+
+.error-message.show {
+    display: block;
+}
+
+/* ===== FIELD NOTE ===== */
+.field-note {
+    color: #b0b0b0;
+    font-size: 0.8rem;
+    margin-top: 6px;
+    display: block;
+    font-style: italic;
+    line-height: 1.3;
+}
+
+/* ===== MODAL ===== */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-overlay.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background-color: #1A1919;
+    border: 3px solid #FD9C00;
+    border-radius: 14px;
+    padding: 32px;
+    max-width: 400px;
+    width: 90%;
+    animation: slideUp 0.3s ease;
+}
+
+.modal-content h3 {
+    background-image: linear-gradient(to right, #ffffff, #FD9C00);
+    background-clip: text;
+    color: transparent;
+    margin-bottom: 16px;
+    font-size: 20px;
+}
+
+.modal-content p {
+    color: #ffffff;
+    margin-bottom: 24px;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.btn-secondary {
+    background-color: #555555;
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background-color: #777777;
+    transform: translateY(2px);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===== PANEL ACTIONS ===== */
+.panel-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: auto;
+}
+
+/* ===== SCROLLBARS ===== */
+.account-panel .account-form::-webkit-scrollbar,
+textarea.form-input::-webkit-scrollbar,
+.edit-field.textarea::-webkit-scrollbar,
+.form-row-full .field-display::-webkit-scrollbar {
+    width: 6px;
+}
+
+.account-panel .account-form::-webkit-scrollbar-track,
+textarea.form-input::-webkit-scrollbar-track,
+.edit-field.textarea::-webkit-scrollbar-track,
+.form-row-full .field-display::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.account-panel .account-form::-webkit-scrollbar-thumb,
+textarea.form-input::-webkit-scrollbar-thumb,
+.edit-field.textarea::-webkit-scrollbar-thumb,
+.form-row-full .field-display::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 10px;
+}
+
+.account-panel .account-form::-webkit-scrollbar-thumb:hover,
+textarea.form-input::-webkit-scrollbar-thumb:hover,
+.edit-field.textarea::-webkit-scrollbar-thumb:hover,
+.form-row-full .field-display::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1200px) {
+    .content-row {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .account-panel,
+    .settings-panel,
+    .participants-panel {
+        min-width: 100%;
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .form-row label {
+        text-align: left;
+        min-width: auto;
+    }
+
+    .form-input {
+        width: 100%;
+    }
+}

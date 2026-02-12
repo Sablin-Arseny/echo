@@ -15,6 +15,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const registerForm = document.getElementById('registerForm');
     const loginError = document.getElementById('loginError');
     const registerError = document.getElementById('registerError');
+    const regTelegramId = document.getElementById('regTelegramId');
+    const regTgIdError = document.getElementById('regTgIdError');
     const overlay = authPopup;
 
     initToken();
@@ -137,6 +139,21 @@ document.addEventListener('DOMContentLoaded', function() {
         closeAuthPopup();
     });
 
+    // Real-time validation for Telegram ID in registration form
+    if (regTelegramId) {
+        regTelegramId.addEventListener('input', () => {
+            const tgIdValue = regTelegramId.value.trim();
+            
+            if (tgIdValue && !tgIdValue.startsWith('@')) {
+                regTgIdError.textContent = 'Telegram ID должен начинаться с символа @';
+                regTgIdError.classList.add('show');
+            } else {
+                regTgIdError.textContent = '';
+                regTgIdError.classList.remove('show');
+            }
+        });
+    }
+
     // Обработка формы регистрации
     registrationForm.addEventListener('submit', async function(event) {
         event.preventDefault();
@@ -148,6 +165,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const full_name = document.getElementById('regFullName').value;
         const password = document.getElementById('regPassword').value;
         const confirmPassword = document.getElementById('regConfirmPassword').value;
+
+        // Валидация Telegram ID
+        if (tg_id && !tg_id.startsWith('@')) {
+            showRegisterError('Telegram ID должен начинаться с символа @');
+            return;
+        }
 
         // Валидация
         if (!username || !tg_id || !full_name || !password || !confirmPassword) {
