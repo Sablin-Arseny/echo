@@ -748,6 +748,75 @@ h1 {
     transform: translateY(2px);
 }
 
+/* Добавляем статус для ревью */
+.status-dot.review {
+    background: #9b59b6;
+    box-shadow: 0 0 8px #9b59b6;
+}
+
+/* Обновляем ширину колонок для 4-х колонок */
+.kanban-column {
+    flex: 1;
+    min-width: 250px; /* уменьшаем минимальную ширину */
+}
+
+@media (max-width: 1200px) {
+    .kanban-board {
+        flex-wrap: wrap;
+    }
+
+    .kanban-column {
+        min-width: 100%;
+    }
+}
+
+/* Статус бейдж для ревью */
+.task-status-badge.review {
+    background: rgba(155, 89, 182, 0.2);
+    border: 1px solid #9b59b6;
+    color: #9b59b6;
+}
+
+/* ===== СТИЛИ ДЛЯ ЗАВЕРШЕННЫХ ЗАДАЧ ===== */
+.task-card.task-done {
+    opacity: 0.7;
+    border-color: rgba(46, 204, 113, 0.3);
+    background: rgba(46, 204, 113, 0.05);
+}
+
+.task-card.task-done:hover {
+    border-color: #2ecc71;
+    transform: translateX(5px);
+    box-shadow: -5px 5px 15px rgba(46, 204, 113, 0.2);
+    opacity: 0.9;
+}
+
+.task-card.task-done .task-id {
+    color: #2ecc71;
+}
+
+.task-card.task-done .task-title {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Подсказка при наведении на заблокированную задачу */
+.task-card.task-done[draggable="false"] {
+    cursor: pointer;
+}
+
+/* Адаптивность для подсказки */
+@media (max-width: 768px) {
+    .task-card.task-done[draggable="false"]:hover::after {
+        white-space: normal;
+        width: 200px;
+        bottom: auto;
+        top: 100%;
+        margin-top: 5px;
+    }
+}
+
 /* Скролл для селектов */
 .select-items::-webkit-scrollbar,
 .multi-items::-webkit-scrollbar {

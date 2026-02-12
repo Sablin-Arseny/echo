@@ -11,6 +11,9 @@ document.addEventListener('DOMContentLoaded', function() {
     let editingIndex = null;
     let participantsDict = {}; // username -> id
 
+    // Флаг для предотвращения множественных предупреждений
+    let isDragging = false;
+
     // ===== ЭЛЕМЕНТЫ =====
     // Шапка
     const authText = document.getElementById("authText");
@@ -23,11 +26,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Колонки
     const todoColumn = document.getElementById('todo-column');
     const progressColumn = document.getElementById('progress-column');
+    const reviewColumn = document.getElementById('review-column');
     const doneColumn = document.getElementById('done-column');
 
     // Счетчики
     const todoCount = document.getElementById('todo-count');
     const progressCount = document.getElementById('progress-count');
+    const reviewCount = document.getElementById('review-count');
     const doneCount = document.getElementById('done-count');
 
     // Попап создания/редактирования
@@ -182,10 +187,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const serverTasks = await SmartAPI.getTasksByEventId(eventId, userToken);
 
             if (serverTasks && serverTasks.length > 0) {
-                tasks = serverTasks.map(task => ({
-                    ...task,
-                    status: mapStatusFromServer(task.status)
-                }));
+                // Фильтруем задачи, исключая DELETED
+                tasks = serverTasks
+                    .filter(task => task.status !== 'DELETED')
+                    .map(task => ({
+                        ...task,
+                        status: mapStatusFromServer(task.status)
+                    }));
             } else {
                 tasks = [];
             }
@@ -199,27 +207,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // ===== ПРОВЕРКА ПРАВ =====
-    function canUserEditTask(task) {
-        if (!currentUser || !task) return false;
-
-        const isExecutor = task.executor?.id === currentUser.id;
-        const isObserver = task.observers?.some(observer => observer.id === currentUser.id);
-        const isAuthor = task.author?.id === currentUser.id;
-
-        return isExecutor || isObserver || isAuthor;
-    }
-
-    function canUserDeleteTask(task) {
-        if (!currentUser || !task) return false;
-        return task.author?.id === currentUser.id;
-    }
-
     // ===== МАППИНГ СТАТУСОВ =====
     function mapStatusFromServer(serverStatus) {
         const statusMap = {
             'CREATED': 'todo',
             'IN_PROGRESS': 'progress',
+            'IN_REVIEW': 'review',
             'DONE': 'done'
         };
         return statusMap[serverStatus] || 'todo';
@@ -229,29 +222,95 @@ document.addEventListener('DOMContentLoaded', function() {
         const statusMap = {
             'todo': 'CREATED',
             'progress': 'IN_PROGRESS',
+            'review': 'IN_REVIEW',
             'done': 'DONE'
         };
         return statusMap[clientStatus] || 'CREATED';
+    }
+
+    // ===== ПРОВЕРКА ПРАВ =====
+    function isUserAuthor(task) {
+        return task.author?.id === currentUser.id;
+    }
+
+    function isUserExecutor(task) {
+        return task.executor?.id === currentUser.id;
+    }
+
+    function isUserObserver(task) {
+        return task.observers?.some(observer => observer.id === currentUser.id);
+    }
+
+    function canUserMoveTask(task, targetStatus) {
+        if (!currentUser || !task) return false;
+
+        // НЕЛЬЗЯ ДВИГАТЬ ЗАДАЧИ ИЗ СТАТУСА DONE
+        if (task.status === 'done') {
+            return false;
+        }
+
+        const isAuthor = isUserAuthor(task);
+        const isExecutor = isUserExecutor(task);
+
+        // Если пользователь одновременно автор и исполнитель - имеет все права автора
+        if (isAuthor) {
+            return true; // Автор может перемещать куда угодно
+        }
+
+        // Исполнитель (не автор) может перемещать между todo, progress, review
+        if (isExecutor) {
+            // Не может переместить в done
+            if (targetStatus === 'done') return false;
+            return true;
+        }
+
+        return false;
+    }
+
+    function canUserEditTask(task) {
+        if (!currentUser || !task) return false;
+
+        // НЕЛЬЗЯ РЕДАКТИРОВАТЬ ЗАВЕРШЕННЫЕ ЗАДАЧИ
+        if (task.status === 'done') {
+            return false;
+        }
+
+        const isAuthor = isUserAuthor(task);
+        const isExecutor = isUserExecutor(task);
+        const isObserver = isUserObserver(task);
+
+        return isAuthor || isExecutor || isObserver;
+    }
+
+    function canUserDeleteTask(task) {
+        if (!currentUser || !task) return false;
+
+        // Только автор может удалять задачу
+        return isUserAuthor(task);
     }
 
     // ===== ОТОБРАЖЕНИЕ ДОСКИ =====
     function renderBoard() {
         todoColumn.innerHTML = '';
         progressColumn.innerHTML = '';
+        reviewColumn.innerHTML = '';
         doneColumn.innerHTML = '';
 
         const filteredTasks = getFilteredTasks();
 
         const todoTasks = filteredTasks.filter(t => t.status === 'todo');
         const progressTasks = filteredTasks.filter(t => t.status === 'progress');
+        const reviewTasks = filteredTasks.filter(t => t.status === 'review');
         const doneTasks = filteredTasks.filter(t => t.status === 'done');
 
         renderTasks(todoTasks, todoColumn);
         renderTasks(progressTasks, progressColumn);
+        renderTasks(reviewTasks, reviewColumn);
         renderTasks(doneTasks, doneColumn);
 
         showEmptyState(todoColumn, 'Нет задач');
         showEmptyState(progressColumn, 'Нет задач в работе');
+        showEmptyState(reviewColumn, 'Нет задач на ревью');
         showEmptyState(doneColumn, 'Нет завершенных задач');
 
         updateCounts();
@@ -269,39 +328,52 @@ document.addEventListener('DOMContentLoaded', function() {
         card.className = 'task-card';
         card.dataset.taskId = task.id;
 
-        const userCanEdit = canUserEditTask(task);
-
-        if (userCanEdit) {
-            card.setAttribute('draggable', 'true');
-        } else {
+        // Задачи в DONE нельзя перетаскивать
+        if (task.status === 'done') {
             card.setAttribute('draggable', 'false');
-            card.style.cursor = 'pointer';
+            card.classList.add('task-done');
+        } else {
+            card.setAttribute('draggable', 'true');
         }
 
-        if (userCanEdit) {
-            card.addEventListener('dragstart', function(e) {
-                draggedTask = this;
-                this.classList.add('dragging');
-                e.dataTransfer.setData('text/plain', task.id);
-            });
+        card.addEventListener('dragstart', function(e) {
+            // Запрещаем drag для done
+            if (task.status === 'done') {
+                e.preventDefault();
+                return;
+            }
 
-            card.addEventListener('dragend', function() {
-                draggedTask = null;
-                this.classList.remove('dragging');
-                document.querySelectorAll('.column-content').forEach(col => {
-                    col.classList.remove('drag-over');
-                });
+            isDragging = true;
+            draggedTask = this;
+            this.classList.add('dragging');
+            e.dataTransfer.setData('text/plain', task.id);
+        });
+
+        card.addEventListener('dragend', function() {
+            isDragging = false;
+            draggedTask = null;
+            this.classList.remove('dragging');
+            document.querySelectorAll('.column-content').forEach(col => {
+                col.classList.remove('drag-over');
             });
-        }
+        });
 
         card.addEventListener('click', function(e) {
-            if (!draggedTask) {
+            if (!isDragging) {
                 openViewPopup(task.id);
             }
         });
 
         const createdDate = task.created_at ? formatDateForDisplay(task.created_at) : '';
         const priority = task.priority || 'medium';
+
+        // Иконка замка для завершенных задач
+        const lockIcon = task.status === 'done' ?
+            '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="margin-left: 5px;" title="Завершенная задача (нельзя редактировать)"><path d="M4 7V5C4 2.79086 5.79086 1 8 1C10.2091 1 12 2.79086 12 5V7H13C13.5523 7 14 7.44772 14 8V14C14 14.5523 13.5523 15 13 15H3C2.44772 15 2 14.5523 2 14V8C2 7.44772 2.44772 7 3 7H4ZM10 5V7H6V5C6 3.89543 6.89543 3 8 3C9.10457 3 10 3.89543 10 5Z" fill="#FD9C00" fill-opacity="0.6"/></svg>' : '';
+
+        // Индикатор авторства
+        const authorIcon = isUserAuthor(task) ?
+            '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="margin-left: 5px;" title="Вы автор"><path d="M8 0C3.58 0 0 3.58 0 8C0 12.42 3.58 16 8 16C12.42 16 16 12.42 16 8C16 3.58 12.42 0 8 0ZM8 4C9.1 4 10 4.9 10 6C10 7.1 9.1 8 8 8C6.9 8 6 7.1 6 6C6 4.9 6.9 4 8 4ZM8 14C6 14 4.2 12.9 3.3 11.2C4.5 10.5 6.2 10 8 10C9.8 10 11.5 10.5 12.7 11.2C11.8 12.9 10 14 8 14Z" fill="#FD9C00"/></svg>' : '';
 
         card.innerHTML = `
             <div class="task-card-header">
@@ -310,6 +382,8 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
             <div class="task-title">
                 ${escapeHtml(task.title)}
+                ${authorIcon}
+                ${lockIcon}
             </div>
             ${task.description ? `<div class="task-description-preview">${escapeHtml(task.description.substring(0, 60))}${task.description.length > 60 ? '...' : ''}</div>` : ''}
             <div class="task-footer">
@@ -338,36 +412,64 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ===== DRAG AND DROP =====
     function setupDragAndDrop() {
-        const columns = [todoColumn, progressColumn, doneColumn];
+        const columns = [todoColumn, progressColumn, reviewColumn, doneColumn];
 
         columns.forEach(column => {
             if (!column) return;
 
-            column.addEventListener('dragover', function(e) {
-                e.preventDefault();
-                this.classList.add('drag-over');
-            });
+            // Удаляем старые обработчики перед добавлением новых
+            column.removeEventListener('dragover', handleDragOver);
+            column.removeEventListener('dragleave', handleDragLeave);
+            column.removeEventListener('drop', handleDrop);
 
-            column.addEventListener('dragleave', function() {
-                this.classList.remove('drag-over');
-            });
-
-            column.addEventListener('drop', async function(e) {
-                e.preventDefault();
-                this.classList.remove('drag-over');
-
-                const taskId = e.dataTransfer.getData('text/plain');
-                const task = tasks.find(t => t.id == taskId);
-
-                if (!canUserEditTask(task)) {
-                    alert('Вы не можете перемещать эту задачу. Только автор, исполнитель или наблюдатель могут изменять статус задачи.');
-                    return;
-                }
-
-                const newStatus = this.closest('.kanban-column').dataset.status;
-                await updateTaskStatus(taskId, newStatus);
-            });
+            // Добавляем новые обработчики
+            column.addEventListener('dragover', handleDragOver);
+            column.addEventListener('dragleave', handleDragLeave);
+            column.addEventListener('drop', handleDrop);
         });
+    }
+
+    function handleDragOver(e) {
+        e.preventDefault();
+        this.classList.add('drag-over');
+    }
+
+    function handleDragLeave() {
+        this.classList.remove('drag-over');
+    }
+
+    async function handleDrop(e) {
+        e.preventDefault();
+        this.classList.remove('drag-over');
+
+        // Сбрасываем флаг перетаскивания
+        if (isDragging) {
+            isDragging = false;
+        }
+
+        const taskId = e.dataTransfer.getData('text/plain');
+        const task = tasks.find(t => t.id == taskId);
+        const newStatus = this.closest('.kanban-column').dataset.status;
+
+        if (!task) return;
+
+        // Нельзя двигать задачи из статуса DONE
+        if (task.status === 'done') {
+            alert('Нельзя перемещать завершенные задачи');
+            return;
+        }
+
+        // Проверяем права на перемещение
+        if (!canUserMoveTask(task, newStatus)) {
+            if (isUserExecutor(task) && newStatus === 'done') {
+                alert('Исполнитель не может переместить задачу в "Готово". Только автор может завершить задачу.');
+            } else {
+                alert('У вас нет прав для перемещения задачи в эту колонку.');
+            }
+            return;
+        }
+
+        await updateTaskStatus(taskId, newStatus);
     }
 
     async function updateTaskStatus(taskId, newStatus) {
@@ -396,9 +498,9 @@ document.addEventListener('DOMContentLoaded', function() {
     function getFilteredTasks() {
         if (currentFilter === 'my' && currentUser) {
             return tasks.filter(task =>
-                task.executor?.id === currentUser.id ||
-                task.observers?.some(observer => observer.id === currentUser.id) ||
-                task.author?.id === currentUser.id
+                isUserExecutor(task) ||
+                isUserObserver(task) ||
+                isUserAuthor(task)
             );
         }
         return tasks;
@@ -447,8 +549,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const task = tasks.find(t => t.id == taskId);
         if (!task) return;
 
+        // Проверяем, можно ли редактировать задачу
         if (!canUserEditTask(task)) {
-            alert('Вы не можете редактировать эту задачу. Только автор, исполнитель или наблюдатель могут редактировать задачу.');
+            if (task.status === 'done') {
+                alert('Нельзя редактировать завершенные задачи');
+            } else {
+                alert('Вы не можете редактировать эту задачу. Только автор, исполнитель или наблюдатель могут редактировать задачу.');
+            }
             return;
         }
 
@@ -506,9 +613,11 @@ document.addEventListener('DOMContentLoaded', function() {
             viewTaskObservers.textContent = '-';
         }
 
+        // Проверяем права для отображения кнопок
         const userCanEdit = canUserEditTask(task);
         const userCanDelete = canUserDeleteTask(task);
 
+        // В DONE задачи нельзя редактировать, только удалять
         if (editTaskBtn) {
             editTaskBtn.style.display = userCanEdit ? 'block' : 'none';
         }
@@ -539,6 +648,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Получаем наблюдателей
         const observerUsernames = Array.from(observersItems.querySelectorAll('input:checked')).map(cb => cb.value);
+
+        // Автоматически добавляем автора в наблюдатели, если его нет
+        if (currentUser?.username && !observerUsernames.includes(currentUser.username)) {
+            observerUsernames.push(currentUser.username);
+        }
+
         const observerIds = observerUsernames.map(u => participantsDict[u]).filter(id => id);
 
         const taskData = {
@@ -553,7 +668,21 @@ document.addEventListener('DOMContentLoaded', function() {
             const userToken = JSON.parse(localStorage.getItem("userToken"));
 
             if (isEdit) {
-                await SmartAPI.updateTask(taskData, userToken);
+                // Получаем текущую задачу для получения task_id и статуса
+                const currentTask = tasks.find(t => t.id == currentTaskId);
+
+                // Формируем данные для обновления задачи с правильным статусом
+                const updateData = {
+                    task_id: currentTaskId,
+                    title: taskData.title,
+                    description: taskData.description,
+                    executor_id: taskData.executor_id,
+                    observer_ids: taskData.observer_ids,
+                    status: currentTask.serverStatus || mapStatusToServer(currentTask.status) // Используем серверный статус
+                };
+
+                console.log('Отправка данных на обновление:', updateData);
+                await SmartAPI.updateTask(updateData, userToken);
 
                 // Обновляем в локальном массиве
                 const taskIndex = tasks.findIndex(t => t.id == currentTaskId);
@@ -567,14 +696,16 @@ document.addEventListener('DOMContentLoaded', function() {
                         observers: observerIds.map((id, index) => ({
                             id,
                             username: observerUsernames[index]
-                        }))
+                        })),
+                        serverStatus: currentTask.serverStatus || mapStatusToServer(currentTask.status) // Сохраняем серверный статус
                     };
                 }
             } else {
                 const newTask = await SmartAPI.createTask(taskData, userToken);
                 tasks.push({
                     ...newTask,
-                    status: mapStatusFromServer(newTask.status)
+                    status: mapStatusFromServer(newTask.status),
+                    serverStatus: newTask.status // Сохраняем оригинальный статус с сервера
                 });
             }
 
@@ -600,9 +731,12 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!confirm('Вы уверены, что хотите удалить эту задачу?')) return;
 
         try {
-            // TODO: Добавить метод deleteTask в API
-            // await SmartAPI.deleteTask(currentTaskId, JSON.parse(localStorage.getItem("userToken")));
+            const userToken = JSON.parse(localStorage.getItem("userToken"));
 
+            // Меняем статус задачи на DELETED через updateTaskStatus
+            await SmartAPI.updateTaskStatus(currentTaskId, 'DELETED', userToken);
+
+            // Удаляем задачу из локального массива (она больше не будет отображаться)
             tasks = tasks.filter(t => t.id != currentTaskId);
 
             closePopup('taskPopup');
@@ -625,9 +759,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const map = {
             todo: 'Нужно сделать',
             progress: 'В процессе',
+            review: 'Ревью',
             done: 'Готово',
             CREATED: 'Нужно сделать',
             IN_PROGRESS: 'В процессе',
+            IN_REVIEW: 'Ревью',
             DONE: 'Готово'
         };
         return map[status] || status;
@@ -660,6 +796,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateCounts() {
         todoCount.textContent = tasks.filter(t => t.status === 'todo').length;
         progressCount.textContent = tasks.filter(t => t.status === 'progress').length;
+        reviewCount.textContent = tasks.filter(t => t.status === 'review').length;
         doneCount.textContent = tasks.filter(t => t.status === 'done').length;
     }
 

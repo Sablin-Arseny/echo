@@ -74,7 +74,7 @@ class TaskApi {
 
     static async updateTask(TaskData, userToken){
         try {
-            const response = await fetch(`${API_BASE}/task/create`, {
+            const response = await fetch(`${API_BASE}/task/update`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -82,11 +82,12 @@ class TaskApi {
                     'accept': 'application/json'
                 },
                 body: JSON.stringify({
-                    event_id: TaskData.event_id,
+                    id: TaskData.task_id,
                     title: TaskData.title,
                     description: TaskData.description,
                     executor_id: TaskData.executor_id,
                     observer_ids: TaskData.observer_ids,
+                    status: TaskData.status,
                 })
             });
 

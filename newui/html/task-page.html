@@ -39,7 +39,7 @@
       </button>
     </div>
 
-    <!-- Kanban доска -->
+    <!-- Kanban доска с 4 колонками -->
     <div class="kanban-board">
       <!-- Колонка TO DO -->
       <div class="kanban-column" data-status="todo">
@@ -63,6 +63,18 @@
           </div>
         </div>
         <div class="column-content" id="progress-column"></div>
+      </div>
+
+      <!-- Колонка IN REVIEW -->
+      <div class="kanban-column" data-status="review">
+        <div class="column-header">
+          <div class="column-title">
+            <span class="status-dot review"></span>
+            <h3>Ревью</h3>
+            <span class="task-count" id="review-count">0</span>
+          </div>
+        </div>
+        <div class="column-content" id="review-column"></div>
       </div>
 
       <!-- Колонка DONE -->
@@ -132,7 +144,7 @@
             <div class="multi-selected">Выберите наблюдателей</div>
             <div class="multi-items select-hide"></div>
           </div>
-          <div class="help-text small">Наблюдатели могут перемещать и редактировать задачу</div>
+          <div class="help-text small">Автор автоматически добавлен в наблюдатели</div>
         </div>
       </form>
 
