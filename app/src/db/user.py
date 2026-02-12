@@ -30,7 +30,7 @@ class UserDB(BaseDB):
 
             for key, value in update_data.items():
                 if key == 'id':
-                    raise Exception("Нельзя менять id")
+                    raise KeyError("it is forbidden to change the id")
                 else:
                     setattr(user_orm, key, value)
 
