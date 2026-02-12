@@ -11,6 +11,7 @@ TASK_STATUS = Literal[
     "IN_PROGRESS",  # выполняется
     "IN_REVIEW",  # на проверке
     "DONE",  # выполнено
+    "DELETED",  # удалена
 ]
 
 
