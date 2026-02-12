@@ -1,11 +1,22 @@
 name: Lint Code Base
 on:
   push:
-    branches-ignore:
-      - 'master'
+    branches-ignore: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
 jobs:
   linter:
     runs-on: ubuntu-latest
     steps:
-        - uses: actions/checkout@v2
-        - uses: docker://github/super-linter:v2.1.0
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Lint Code Base
+        uses: github/super-linter@v4
+        env:
+          VALIDATE_ALL_CODEBASE: true
+          VALIDATE_JAVASCRIPT_ES: true
+          VALIDATE_PYTHON_BLACK: true
+          VALIDATE_HTML: true
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
