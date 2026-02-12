@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const cancelExpenseBtn = document.getElementById("cancel-expense-btn");
     const saveExpenseBtn = document.getElementById("save-expense-btn");
     const authText = document.getElementById("authText");
+    const authButton = document.getElementById('authButton');
     const logo = document.querySelector('.logo');
 
     const expenseForm = document.getElementById("expenseForm");
@@ -248,5 +249,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+    // Auth button click handler - navigate to personal account
+    if (authButton) {
+        authButton.addEventListener('click', () => {
+            window.location.href = 'personal-account.html';
+        });
+    }
 
 });

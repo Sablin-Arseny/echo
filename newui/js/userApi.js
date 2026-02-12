@@ -131,6 +131,33 @@ class UserApi{
         }
     }
 
+    static async updateUserInfo(userToken, userData){
+        try {
+            const response = await fetch(`${API_BASE}/user/update_user`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'accept': 'application/json',
+                    'Authorization': `Bearer ${userToken}`,
+                },
+                body: JSON.stringify({
+                    username: userData.username,
+                    tg_id: userData.tg_id,
+                    full_name: userData.full_name
+                })
+            }); 
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('Ошибка изменения информации о пользователе:', error);
+            throw error;
+        }
+    }
+
 }
 
 export default UserApi;

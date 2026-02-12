@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/personal-account.css">
+</head>
+<body>
+<header>
+    <img src="../images/Logo.svg" alt="наше лого" class="logo">
+    <button id="authButton" class="auth-button">
+        <span id="authText" class="auth-text"><b>Войти</b></span>
+        <span class="user-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
+              <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+              <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
+            </svg>
+        </span>
+    </button>
+</header>
+
+<main class="main-content">
+    <div class="content-row">
+        <div class="panel account-panel">
+            <h2>Личный кабинет</h2>
+            <form id="account-form" class="account-form">
+                <div class="form-row">
+                    <label for="acc-username">Никнейм:</label>
+                    <div class="field-wrapper">
+                        <div class="field-display" id="acc-username-display"></div>
+                        <input type="text" id="acc-username" class="form-input edit-field">
+                        <small class="field-note">При изменении никнейма потребуется заново авторизоваться</small>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <label for="acc-tg-id">Telegram ID:</label>
+                    <div class="field-wrapper">
+                        <div class="field-display" id="acc-tg-id-display"></div>
+                        <input type="text" id="acc-tg-id" class="form-input edit-field" placeholder="@username">
+                        <div class="error-message" id="tg-id-error"></div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <label for="acc-full-name">Полное имя:</label>
+                    <div class="field-wrapper">
+                        <div class="field-display" id="acc-full-name-display"></div>
+                        <input type="text" id="acc-full-name" class="form-input edit-field">
+                    </div>
+                </div>
+            </form>
+            <div class="panel-actions">
+                <button class="btn btn-primary" id="edit-btn">Редактировать</button>
+                <button class="btn btn-logout" id="logout-btn">Выйти</button>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Logout Modal -->
+<div id="logout-modal" class="modal-overlay">
+    <div class="modal-content">
+        <h3>Выход из аккаунта</h3>
+        <p>Вы действительно хотите выйти из аккаунта?</p>
+        <div class="modal-actions">
+            <button id="logout-cancel-btn" class="btn btn-secondary">Отмена</button>
+            <button id="logout-confirm-btn" class="btn btn-logout">Выйти</button>
+        </div>
+    </div>
+</div>
+
+<script type="module" src="../js/personal-account.js"></script>
+</body>
+</html>

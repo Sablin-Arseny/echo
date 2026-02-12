@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const budgetBtn = document.getElementById('budget-btn');
     const taskBtn = document.getElementById("task-btn");
     const authText = document.getElementById("authText");
+    const authButton = document.getElementById('authButton');
     const registerError = document.getElementById('userAddError');
     const logo = document.querySelector('.logo');
 
@@ -531,6 +532,13 @@ document.addEventListener('DOMContentLoaded', () => {
         logo.addEventListener('click', () => {
             // Переходим на страницу "Мои мероприятия"
             window.location.href = 'my-event-page.html';
+        });
+    }
+
+    // Auth button click handler - navigate to personal account
+    if (authButton) {
+        authButton.addEventListener('click', () => {
+            window.location.href = 'personal-account.html';
         });
     }
 
