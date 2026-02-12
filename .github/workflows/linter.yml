@@ -1,7 +1,7 @@
 name: Lint Code Base
 on:
-  pull_request:
-    branches: [ master, main ]
+  push:
+    branches-ignore: [ main ]
 jobs:
   linter:
     runs-on: ubuntu-latest
