@@ -9,6 +9,7 @@ from app.src.schemas import (
     EventResponse,
     UpdateEvent,
     STATUS,
+    ROLES,
 )
 
 
@@ -42,8 +43,12 @@ class EventService:
         await self._event_db.add_relation_event_member(event.id, user)
         for participant in participants:
             await self._event_db.add_relation_event_member(event.id, participant)
+            await self._event_db.update_role_of_member(
+                event.id, participant.id, "PARTICIPANT"
+            )
 
         await self._event_db.update_status_of_member(event.id, user.id, "PARTICIPATING")
+        await self._event_db.update_role_of_member(event.id, user.id, "OWNER")
 
         return await self.get(event.id)
 
@@ -78,9 +83,32 @@ class EventService:
 
         return participants
 
-    async def add_user_to_event(self, event_id: int, user: User):
-        user = await self._user_db.get(user)
-        return await self._event_db.add_relation_event_member(event_id, user)
+    async def add_user_to_event(self, event_id: int, user_to_add: User, user: User):
+        participants = await self.get_participants(event_id)
+        users = [p for p in participants if p.id == user.id]
+        if not user:
+            raise LookupError(f"User is not found for event {event_id}")
+        user_role = users[0].role
+        if user_role != "ADMIN" or user_role != "OWNER":
+            raise ValueError("User role must be ADMIN or OWNER")
+        user_to_add = await self._user_db.get(user_to_add)
+        return await self._event_db.add_relation_event_member(event_id, user_to_add)
+
+    async def update_member_role(
+        self, event_id: int, user_to_update: User, role: ROLES, user: User
+    ):
+        participants = await self.get_participants(event_id)
+        users = [p for p in participants if p.id == user.id]
+        if not user:
+            raise LookupError(f"User is not found for event {event_id}")
+        user_role = users[0].role
+        if user_role != "ADMIN" or user_role != "OWNER":
+            raise ValueError("User role must be ADMIN or OWNER")
+        if role == "ADMIN" and user_role != "PARTICIPANT":
+            raise ValueError("ADMIN can't update OWNER or ADMIN")
+
+        user_to_update = await self._user_db.get(user_to_update)
+        return await self._event_db.update_role_of_member(event_id, user_to_update)
 
     async def update_status_of_member(self, event_id: int, user: User, status: STATUS):
         user = await self._user_db.get(user)

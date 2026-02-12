@@ -4,7 +4,7 @@ from sqlalchemy import select
 
 from app.src.db.core import BaseDB
 from app.src.models import Event, EventMember, User as UserOrm
-from app.src.schemas import User, STATUS
+from app.src.schemas import User, STATUS, ROLES
 
 
 class EventDB(BaseDB):
@@ -58,6 +58,18 @@ class EventDB(BaseDB):
             event_member = event_member.scalar()
 
             event_member.status = status
+            await session.commit()
+        return await self.get_event_by_id(event_id)
+
+    async def update_role_of_member(self, event_id: int, user_id: int, role: ROLES):
+        stmt = select(EventMember).where(
+            EventMember.event_id == event_id, EventMember.user_id == user_id
+        )
+        async with self.create_session() as session:
+            event_member = await session.execute(stmt)
+            event_member = event_member.scalar()
+
+            event_member.role = role
             await session.commit()
         return await self.get_event_by_id(event_id)
 
