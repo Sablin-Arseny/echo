@@ -7,7 +7,6 @@ from app.src.models import Budget, ExpenseParticipant, User
 
 
 class BudgetDB(BaseDB):
-
     @classmethod
     @cache
     def get_as_dependency(cls):

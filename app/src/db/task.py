@@ -9,7 +9,6 @@ from app.src.schemas.task import TASK_STATUS
 
 
 class TaskDB(BaseDB):
-
     @classmethod
     @cache
     def get_as_dependency(cls):

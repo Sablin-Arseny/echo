@@ -8,7 +8,6 @@ from app.src.schemas import User, STATUS
 
 
 class EventDB(BaseDB):
-
     @classmethod
     @cache
     def get_as_dependency(cls):
