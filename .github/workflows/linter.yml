@@ -12,11 +12,21 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Lint Code Base
+      - name: Lint JavaScript
         uses: github/super-linter@v4
         env:
           VALIDATE_ALL_CODEBASE: true
           VALIDATE_JAVASCRIPT_ES: true
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Lint Python
+        uses: github/super-linter@v4
+        env:
+          VALIDATE_ALL_CODEBASE: true
           VALIDATE_PYTHON_BLACK: true
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Lint HTML
+        uses: github/super-linter@v4
+        env:
+          VALIDATE_ALL_CODEBASE: true
           VALIDATE_HTML: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
