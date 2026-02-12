@@ -10,6 +10,11 @@ STATUS = Literal[
     "DRAFT",
 ]
 
+ROLES = Literal[
+    "OWNER",
+    "ADMIN",
+    "PARTICIPANT",
+]
 
 class User(BaseModel):
     id: int | None = None
@@ -21,4 +26,5 @@ class User(BaseModel):
 
 
 class Participant(User):
+    role: ROLES
     status: STATUS = "DRAFT"
