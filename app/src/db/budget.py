@@ -1,5 +1,4 @@
 from functools import cache
-from typing import Optional
 
 from sqlalchemy import select, update, func
 
@@ -21,7 +20,7 @@ class BudgetDB(BaseDB):
             result = result.scalars()
             return list(result)
 
-    async def get_budget_by_id(self, budget_id: int) -> Optional[Budget]:
+    async def get_budget_by_id(self, budget_id: int) -> Budget | None:
         stmt = select(Budget).where(Budget.id == budget_id)
         async with self.create_session() as session:
             result = await session.execute(stmt)
@@ -35,7 +34,7 @@ class BudgetDB(BaseDB):
             result = result.scalars()
             return list(result)
 
-    async def get_budget_participant(self, budget_id: int, participant_id: int) -> Optional[ExpenseParticipant]:
+    async def get_budget_participant(self, budget_id: int, participant_id: int) -> ExpenseParticipant | None:
         stmt = select(ExpenseParticipant).where(
             ExpenseParticipant.expense_id == budget_id,
             ExpenseParticipant.participant_id == participant_id
@@ -105,7 +104,7 @@ class BudgetDB(BaseDB):
             await session.execute(stmt)
             await session.commit()
 
-    async def get_participant_by_id(self, participant_id: int) -> Optional[ExpenseParticipant]:
+    async def get_participant_by_id(self, participant_id: int) -> ExpenseParticipant | None:
         stmt = select(ExpenseParticipant).where(ExpenseParticipant.id == participant_id)
         async with self.create_session() as session:
             result = await session.execute(stmt)

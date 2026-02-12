@@ -49,7 +49,7 @@ async def get_by_event_id(
     return response
 
 
-@router.post("/mark-paid")
+@router.post("/mark_paid")
 async def mark_participant_paid(
     request: MarkParticipantPaidRequest,
     budget_service: BudgetService = Depends(BudgetService.get_as_dependency),
