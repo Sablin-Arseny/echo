@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 from typing import Literal
 
 from app.src.schemas.user import User
@@ -35,7 +35,7 @@ class BudgetResponse(BaseModel):
     amount: float
     description: str = ""
     status: BUDGET_STATUS = "ACTIVE"
-    participants: list[ParticipantResponse] = []
+    participants: list[ParticipantResponse] = Field(default_factory=list)
 
     model_config = ConfigDict(from_attributes=True)
 
