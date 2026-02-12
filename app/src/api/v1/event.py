@@ -87,7 +87,9 @@ async def add_user_to_event(
     user: User = Depends(AuthService.check_auth),
 ) -> EventResponse:
     try:
-        event = await event_service.add_user_to_event(event_id=event_id, user_to_add=user_to_add, user=user)
+        event = await event_service.add_user_to_event(
+            event_id=event_id, user_to_add=user_to_add, user=user
+        )
         participants = await event_service.get_participants(event_id)
         participants = [Participant.model_validate(user) for user in participants]
         event_response = EventResponse.model_validate(event)
@@ -127,7 +129,7 @@ async def update_role_of_member(
 ) -> EventResponse:
     try:
         event = await event_service.update_member_role(
-            event_id=event_id, user_to_update=user_to_update, role=role, user=user,
+            event_id=event_id, user_to_update=user_to_update, role=role, user=user
         )
     except LookupError as e:
         raise HTTPException(status_code=404, detail=repr(e))

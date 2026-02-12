@@ -61,9 +61,7 @@ class EventDB(BaseDB):
             await session.commit()
         return await self.get_event_by_id(event_id)
 
-    async def update_role_of_member(
-        self, event_id: int, user_id: int, role: ROLES
-    ):
+    async def update_role_of_member(self, event_id: int, user_id: int, role: ROLES):
         stmt = select(EventMember).where(
             EventMember.event_id == event_id, EventMember.user_id == user_id
         )
