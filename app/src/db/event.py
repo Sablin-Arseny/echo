@@ -39,10 +39,10 @@ class EventDB(BaseDB):
             result = await session.get(Event, event_id)
             return result
 
-    async def add_relation_event_member(self, event_id: int, user: User):
+    async def add_relation_event_member(self, event_id: int, user: User, role: ROLES):
         async with self.create_session() as session:
             event_member = EventMember(
-                event_id=event_id, user_id=user.id, status="DRAFT"
+                event_id=event_id, user_id=user.id, status="DRAFT", role=role
             )
             session.add(event_member)
         return await self.get_event_by_id(event_id)
