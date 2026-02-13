@@ -274,6 +274,165 @@ header {
     display: block;
 }
 
+main {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+/* HERO */
+.hero {
+    text-align: center;
+    margin-top: 60px;
+    margin-bottom: 100px;
+}
+
+.hero h1 {
+    font-size: 48px;
+    margin-bottom: 20px;
+    color: #FD9C00;
+}
+
+.hero p {
+    font-size: 20px;
+    color: #ccc;
+    max-width: 700px;
+    margin: 0 auto 40px;
+}
+
+.hero-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+/* BUTTONS */
+.primary-btn {
+    background-color: #FD9C00;
+    color: #000;
+    border: none;
+    padding: 16px 28px;
+    border-radius: 12px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.primary-btn:hover {
+    background-color: #FFB740;
+    transform: translateY(-3px);
+}
+
+.secondary-btn {
+    background: transparent;
+    border: 2px solid #FD9C00;
+    color: #FD9C00;
+    padding: 16px 28px;
+    border-radius: 12px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.secondary-btn:hover {
+    background-color: #FD9C00;
+    color: #000;
+}
+
+.large {
+    font-size: 20px;
+    padding: 18px 36px;
+}
+
+/* FEATURES */
+.features {
+    margin-bottom: 100px;
+}
+
+.features h2 {
+    text-align: center;
+    margin-bottom: 60px;
+    font-size: 36px;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+}
+
+.feature-card {
+    background-color: #2D2B2B;
+    padding: 30px;
+    border-radius: 16px;
+    transition: 0.3s;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    border: 1px solid #FD9C00;
+}
+
+.feature-card h3 {
+    margin-bottom: 15px;
+    color: #FD9C00;
+}
+
+/* HOW IT WORKS */
+.how-it-works {
+    text-align: center;
+    margin-bottom: 100px;
+}
+
+.steps {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    flex-wrap: wrap;
+}
+
+.step {
+    max-width: 180px;
+}
+
+.step span {
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    background-color: #FD9C00;
+    color: #000;
+    border-radius: 50%;
+    line-height: 50px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+/* CTA */
+.cta {
+    text-align: center;
+    margin-bottom: 80px;
+}
+
+.cta h2 {
+    font-size: 32px;
+    margin-bottom: 20px;
+}
+
+.cta p {
+    color: #aaa;
+    margin-bottom: 30px;
+}
+
+/* FOOTER */
+.footer {
+    text-align: center;
+    padding: 30px 0;
+    color: #666;
+    font-size: 14px;
+}
+
 /* Responsive */
 @media (max-width: 480px) {
     .popup-content {

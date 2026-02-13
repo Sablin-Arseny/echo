@@ -792,6 +792,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ===== ОБРАБОТЧИКИ СОБЫТИЙ =====
     function setupEventListeners() {
+        const backBtn = document.getElementById('backBtn');
+
+        if (backBtn) {
+            backBtn.addEventListener('click', () => {
+                if (window.history.length > 1) {
+                    window.history.back();
+                } else {
+                    window.location.href = 'my-event-page.html';
+                }
+            });
+        }
         // Кнопка создания задачи
         createTaskBtn.addEventListener('click', openCreatePopup);
 

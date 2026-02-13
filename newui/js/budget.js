@@ -26,6 +26,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const multiSelected = multiSelect.querySelector('.multi-selected');
     const multiItems = multiSelect.querySelector('.multi-items');
 
+    const backBtn = document.getElementById('backBtn');
+
     let expenses = [];
     let debts = {};
     let participantsDict = {}; // username -> tg_id
@@ -53,6 +55,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
         loadParticipants(Object.keys(participantsDict));
+    }
+
+    if (backBtn) {
+        backBtn.addEventListener('click', () => {
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = 'my-event-page.html';
+            }
+        });
     }
 
     async function getCurrentUserInfo() {

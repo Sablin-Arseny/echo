@@ -17,6 +17,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const registerError = document.getElementById('registerError');
     const regTelegramId = document.getElementById('regTelegramId');
     const regTgIdError = document.getElementById('regTgIdError');
+    const startButton = document.getElementById("startNowBtn");
+    const registerButton = document.getElementById("ctaRegisterBtn");
     const overlay = authPopup;
 
     // Константы для валидации
@@ -72,6 +74,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Открытие popup
     authButton.addEventListener('click', function() {
+        authPopup.style.display = 'flex';
+        document.body.style.overflow = 'hidden'; // Блокируем скролл
+        clearLoginError();
+        clearRegisterError();
+    });
+
+    startButton.addEventListener('click', function() {
+        authPopup.style.display = 'flex';
+        document.body.style.overflow = 'hidden'; // Блокируем скролл
+        clearLoginError();
+        clearRegisterError();
+    });
+
+    registerButton.addEventListener('click', function() {
         authPopup.style.display = 'flex';
         document.body.style.overflow = 'hidden'; // Блокируем скролл
         clearLoginError();
