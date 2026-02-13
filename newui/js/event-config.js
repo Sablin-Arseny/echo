@@ -36,6 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let editing = false;
     let currentUser = null;
+    let currentUserRole = null;
 
     getUserInfoByToken();
     initEventData();
@@ -46,8 +47,18 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('eventData', JSON.stringify(eventData));
         const participants = JSON.parse(localStorage.getItem("eventData")).participants;
         checkUserAccess(participants);
+        setCurrentUserRole(participants);
 
         renderParticipants(participants);
+    }
+
+    function setCurrentUserRole(participants) {
+        const currentUserId = currentUser.id;
+        const me = participants.find(p => p.id === currentUserId);
+
+        if (me) {
+            currentUserRole = me.role;
+        }
     }
 
     async function getUserInfoByToken(){
@@ -325,14 +336,78 @@ document.addEventListener('DOMContentLoaded', () => {
 
         activeParticipants.forEach((p) => {
             if (p.status === "PARTICIPATING") {
+
+                const isOwner = p.role === "OWNER";
+                const isAdmin = p.role === "ADMIN";
+                const isMember = p.role === "PARTICIPATING";
+
+                let roleClass = "";
+                let roleBadgeClass = "";
+                let roleText = p.role;
+
+                if (isOwner) {
+                    roleClass = "participant-owner";
+                    roleBadgeClass = "role-owner";
+                    roleText = "OWNER";
+                } else if (isAdmin) {
+                    roleClass = "participant-admin";
+                    roleBadgeClass = "role-admin";
+                    roleText = "ADMIN";
+                } else {
+                    roleClass = "participant-member";
+                    roleBadgeClass = "role-member";
+                    roleText = "PARTICIPANT";
+                }
+
+                const canManageRoles = currentUserRole === "OWNER";
+                const canDelete =
+                    currentUserRole === "OWNER" ||
+                    (currentUserRole === "ADMIN" && !isOwner);
+
                 const el = document.createElement('div');
-                el.className = 'participant-item participant-accepted';
+                el.className = `participant-item ${roleClass}`;
+
                 el.innerHTML = `
-                    <div class="participant-tg">${p.username}</div>
+                    <div>
+                        ${p.username}
+                        <span class="participant-role ${roleBadgeClass}">
+                            ${roleText}
+                        </span>
+                    </div>
+            
                     <div class="participant-actions">
-                        <button class="btn btn-secondary small delete-btn" data-user-id="${p.id}" data-username="${p.username}">x</button>
+            
+                        ${
+                                canManageRoles && !isOwner && !isAdmin
+                                    ? `<button class="make-admin-btn"
+                                     data-user-id="${p.id}">
+                                     Сделать ADMIN
+                                   </button>`
+                                    : ''
+                            }
+            
+                        ${
+                                canManageRoles && isAdmin
+                                    ? `<button class="remove-admin-btn"
+                                     data-user-id="${p.id}">
+                                     Убрать ADMIN
+                                   </button>`
+                                    : ''
+                            }
+            
+                        ${
+                                canDelete && p.id !== currentUser.id
+                                    ? `<button class="btn btn-secondary small delete-btn"
+                                     data-user-id="${p.id}"
+                                     data-username="${p.username}">
+                                     x
+                                   </button>`
+                                    : ''
+                            }
+            
                     </div>
                 `;
+
                 participantsList.appendChild(el);
             } else {
                 // Участники с другими статусами (приглашенные и т.д.)
@@ -355,6 +430,50 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Attach delete handlers
         attachDeleteHandlers();
+        attachRoleHandlers();
+    }
+
+    function attachRoleHandlers() {
+        const makeButtons = participantsList.querySelectorAll('.make-admin-btn');
+        const removeButtons = participantsList.querySelectorAll('.remove-admin-btn');
+
+        const userToken = JSON.parse(localStorage.getItem("userToken"));
+
+        makeButtons.forEach(btn => {
+            btn.addEventListener('click', async function () {
+
+                const userId = parseInt(this.dataset.userId);
+
+                await SmartAPI.updateRoleOfMember(
+                    {
+                        event_id: eventId,
+                        user_id: userId
+                    },
+                    "ADMIN",
+                    userToken
+                );
+
+                await initEventData();
+            });
+        });
+
+        removeButtons.forEach(btn => {
+            btn.addEventListener('click', async function () {
+
+                const userId = parseInt(this.dataset.userId);
+
+                await SmartAPI.updateRoleOfMember(
+                    {
+                        event_id: eventId,
+                        user_id: userId
+                    },
+                    "PARTICIPATING",
+                    userToken
+                );
+
+                await initEventData();
+            });
+        });
     }
 
     // Функция для добавления обработчиков удаления
