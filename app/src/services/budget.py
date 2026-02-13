@@ -155,20 +155,23 @@ class BudgetService:
         if expense_participant.status == "CONFIRMED":
             raise ValueError("This debt is already confirmed")
 
-        amount_to_pay = (
-            request.amount
-            or expense_participant.share_amount - expense_participant.paid_amount
-        )
-
-        if amount_to_pay <= 0:
+        # Получаем полную сумму оплаты, которая приходит с фронта
+        paid_amount = request.amount
+        
+        if paid_amount is None or paid_amount <= 0:
             raise ValueError("Payment amount must be positive")
 
-        new_paid_amount = expense_participant.paid_amount + amount_to_pay
-        if new_paid_amount > expense_participant.share_amount:
-            raise ValueError("Payment amount exceeds remaining debt")
+        # Проверяем, что сумма не должна быть меньше уже оплаченной
+        if paid_amount < expense_participant.paid_amount:
+            raise ValueError(f"Payment amount cannot be less than already paid {expense_participant.paid_amount}")
+        
+        # Проверяем, что сумма не превышает требуемую (автоматически приводим к максимуму)
+        if paid_amount > expense_participant.share_amount:
+            paid_amount = expense_participant.share_amount
 
+        # Просто устанавливаем полную сумму оплаты
         await self._budget_db.mark_participant_paid(
-            expense_participant.id, new_paid_amount
+            expense_participant.id, paid_amount
         )
 
         await self._budget_db.recalculate_budget_status(request.budget_id)

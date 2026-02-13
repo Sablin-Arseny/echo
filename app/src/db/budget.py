@@ -84,10 +84,23 @@ class BudgetDB(BaseDB):
 
     async def mark_participant_paid(self, participant_id: int, paid_amount: float):
         paid_amount = round(paid_amount, 2)
+        
+        # Получаем текущего участника для сравнения с share_amount
+        participant = await self.get_participant_by_id(participant_id)
+        if not participant:
+            raise ValueError(f"Participant with id {participant_id} not found")
+        
+        # Определяем статус в зависимости от соотношения оплаченной и требуемой суммы
+        share_amount = round(participant.share_amount, 2)
+        if paid_amount >= share_amount:
+            new_status = "PAID"
+        else:
+            new_status = "PARTIALLY_PAID"
+        
         stmt = (
             update(ExpenseParticipant)
             .where(ExpenseParticipant.id == participant_id)
-            .values(paid_amount=paid_amount, status="PAID")
+            .values(paid_amount=paid_amount, status=new_status)
         )
         async with self.create_session() as session:
             await session.execute(stmt)
