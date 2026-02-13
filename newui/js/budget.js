@@ -48,7 +48,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const eventData = await SmartAPI.getEventById(currentEventId);
         participantsDict = {};
         eventData.participants.forEach(p => {
-            participantsDict[p.username] = p.tg_id;
+            if (p.status === "PARTICIPATING") {
+                participantsDict[p.username] = p.tg_id;
+            }
         });
         loadParticipants(Object.keys(participantsDict));
     }

@@ -48,7 +48,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Поля формы
     const taskTitle = document.getElementById('taskTitle');
     const taskDescription = document.getElementById('taskDescription');
-    const taskPriority = document.getElementById('taskPriority');
 
     // Селекты для исполнителя и наблюдателей
     const executorSelected = document.getElementById('task-executor-selected');
@@ -69,7 +68,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const viewTaskId = document.getElementById('viewTaskId');
     const viewTaskTitle = document.getElementById('viewTaskTitle');
     const viewTaskDescription = document.getElementById('viewTaskDescription');
-    const viewTaskPriority = document.getElementById('viewTaskPriority');
     const viewTaskAuthor = document.getElementById('viewTaskAuthor');
     const viewTaskExecutor = document.getElementById('viewTaskExecutor');
     const viewTaskObservers = document.getElementById('viewTaskObservers');
@@ -107,11 +105,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const eventData = await SmartAPI.getEventById(eventId);
             participantsDict = {};
             eventData.participants.forEach(p => {
-                participantsDict[p.username] = p.id;
+                if (p.status === "PARTICIPATING") {
+                    participantsDict[p.username] = p.id;
+                }
             });
 
             // Загружаем участников в селекты
             const usernames = Object.keys(participantsDict);
+            console.log(usernames)
             loadExecutorSelect(usernames);
             loadObserversMultiSelect(usernames);
 
@@ -365,7 +366,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         const createdDate = task.created_at ? formatDateForDisplay(task.created_at) : '';
-        const priority = task.priority || 'medium';
 
         // Иконка замка для завершенных задач
         const lockIcon = task.status === 'done' ?
@@ -378,7 +378,6 @@ document.addEventListener('DOMContentLoaded', function() {
         card.innerHTML = `
             <div class="task-card-header">
                 <span class="task-id">TASK-${task.id}</span>
-                <span class="priority-badge priority-${priority}">${getPriorityText(priority)}</span>
             </div>
             <div class="task-title">
                 ${escapeHtml(task.title)}
@@ -567,7 +566,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         taskTitle.value = task.title || '';
         taskDescription.value = task.description || '';
-        taskPriority.value = task.priority || 'medium';
         taskAuthorDisplay.textContent = task.author?.username || currentUser?.username;
 
         // Устанавливаем исполнителя
@@ -599,10 +597,6 @@ document.addEventListener('DOMContentLoaded', function() {
         viewTaskTitle.textContent = task.title;
         viewTaskDescription.textContent = task.description || 'Нет описания';
         viewTaskStatus.textContent = getStatusText(task.status);
-
-        const priority = task.priority || 'medium';
-        viewTaskPriority.textContent = getPriorityText(priority);
-        viewTaskPriority.className = `priority-badge priority-${priority}`;
 
         viewTaskAuthor.textContent = task.author?.username || 'Не назначен';
         viewTaskExecutor.textContent = task.executor?.username || 'Не назначен';
@@ -750,10 +744,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ===== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ =====
-    function getPriorityText(priority) {
-        const map = { low: 'Низкий', medium: 'Средний', high: 'Высокий', critical: 'Критичный' };
-        return map[priority] || 'Средний';
-    }
 
     function getStatusText(status) {
         const map = {

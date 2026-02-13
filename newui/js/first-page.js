@@ -45,6 +45,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (authUserData && authUserData.username) {
                         authText.innerHTML = `<b>${authUserData.username}</b>`;
                         console.log('Пользователь авторизован:', authUserData.username);
+                        // Если токен валидный кидаем сразу на страницу с эвентами
+                        window.location.href = `my-event-page.html?userId=${authUserData.id}`;
+
                     } else {
                         // Если не получилось получить данные пользователя, удаляем токен
                         localStorage.removeItem("userToken");

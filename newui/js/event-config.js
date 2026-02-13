@@ -330,9 +330,26 @@ document.addEventListener('DOMContentLoaded', () => {
         participantsList.innerHTML = '';
 
         // Фильтруем участников, оставляя только тех, у кого статус не REFUSED
-        const activeParticipants = participants.filter(p =>
-            p.status !== "REFUSED" && p.status !== "DELETED"
-        );
+        const activeParticipants = participants
+            .filter(p => p.status !== "REFUSED" && p.status !== "DELETED")
+            .sort((a, b) => {
+
+                // 1️Сначала сортируем по статусу (DRAFT в самый низ)
+                if (a.status === "DRAFT" && b.status !== "DRAFT") return 1;
+                if (a.status !== "DRAFT" && b.status === "DRAFT") return -1;
+
+                // 2️Затем по роли
+                const rolePriority = {
+                    "OWNER": 1,
+                    "ADMIN": 2,
+                    "PARTICIPATING": 3
+                };
+
+                const aPriority = rolePriority[a.role] || 4;
+                const bPriority = rolePriority[b.role] || 4;
+
+                return aPriority - bPriority;
+            });
 
         activeParticipants.forEach((p) => {
             if (p.status === "PARTICIPATING") {
@@ -360,9 +377,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 const canManageRoles = currentUserRole === "OWNER";
+                const isCurrentUser = p.id === currentUser.id;
+
                 const canDelete =
-                    currentUserRole === "OWNER" ||
-                    (currentUserRole === "ADMIN" && !isOwner);
+                    // Любой может удалить себя
+                    isCurrentUser ||
+
+                    // OWNER может удалить любого (кроме себя — если захочешь, можно запретить)
+                    (currentUserRole === "OWNER" && !isCurrentUser) ||
+
+                    // ADMIN может удалить только PARTICIPATING
+                    (
+                        currentUserRole === "ADMIN" &&
+                        p.role === "PARTICIPANT"
+                    );
 
                 const el = document.createElement('div');
                 el.className = `participant-item ${roleClass}`;
@@ -396,7 +424,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
             
                         ${
-                                canDelete && p.id !== currentUser.id
+                                canDelete
                                     ? `<button class="btn btn-secondary small delete-btn"
                                      data-user-id="${p.id}"
                                      data-username="${p.username}">
@@ -467,7 +495,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         event_id: eventId,
                         user_id: userId
                     },
-                    "PARTICIPATING",
+                    "PARTICIPANT",
                     userToken
                 );
 

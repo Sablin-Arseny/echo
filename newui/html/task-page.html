@@ -117,17 +117,6 @@
           <textarea id="taskDescription" class="form-input form-textarea" placeholder="Опишите задачу..."></textarea>
         </div>
 
-        <!-- Приоритет -->
-        <div class="form-row">
-          <label for="taskPriority">Приоритет:</label>
-          <select id="taskPriority" class="form-input">
-            <option value="low">Низкий</option>
-            <option value="medium" selected>Средний</option>
-            <option value="high">Высокий</option>
-            <option value="critical">Критичный</option>
-          </select>
-        </div>
-
         <!-- Исполнитель (одиночный селект) -->
         <div class="form-row">
           <label>Исполнитель:</label>
@@ -166,12 +155,7 @@
       <span class="task-status-badge" id="viewTaskStatus">В процессе</span>
     </div>
     <h2 id="viewTaskTitle">Название задачи</h2>
-
     <div class="task-metadata">
-      <div class="metadata-item">
-        <span class="metadata-label">Приоритет:</span>
-        <span class="priority-badge" id="viewTaskPriority">Средний</span>
-      </div>
       <div class="metadata-item">
         <span class="metadata-label">Автор:</span>
         <span id="viewTaskAuthor">@username</span>
