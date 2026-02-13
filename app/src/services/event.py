@@ -91,7 +91,9 @@ class EventService:
         if user_role != "ADMIN" and user_role != "OWNER":
             raise ValueError("User role must be ADMIN or OWNER")
         user_to_add = await self._user_db.get(user_to_add)
-        return await self._event_db.add_relation_event_member(event_id, user_to_add, "PARTICIPANT")
+        return await self._event_db.add_relation_event_member(
+            event_id, user_to_add, "PARTICIPANT"
+        )
 
     async def update_member_role(
         self, event_id: int, user_to_update: User, role: ROLES, user: User
@@ -105,7 +107,9 @@ class EventService:
             raise ValueError("User role must be ADMIN or OWNER")
 
         user_to_update = await self._user_db.get(user_to_update)
-        return await self._event_db.update_role_of_member(event_id, user_to_update.id, role)
+        return await self._event_db.update_role_of_member(
+            event_id, user_to_update.id, role
+        )
 
     async def update_status_of_member(self, event_id: int, user: User, status: STATUS):
         user = await self._user_db.get(user)
