@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             // Пробуем распарсить как дату
             let date;
-            
+
             // Если это строка в формате YYYY-MM-DD или ISO с временем
             if (dateString.includes('T') || /^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
                 // Для избежания проблем с часовыми поясами, парсим дату явно
@@ -435,7 +435,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     id: userData.id,
                 }
                 try {
-                    const inviteResult = await SmartAPI.addUserToEvent(data);
+                    const userToken = JSON.parse(localStorage.getItem("userToken"));
+                    const inviteResult = await SmartAPI.addUserToEvent(data, userToken);
                     renderParticipants(inviteResult.participants);
                     modal.style.display = 'none';
                 }catch (error){

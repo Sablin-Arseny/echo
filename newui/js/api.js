@@ -57,8 +57,8 @@ class SmartAPI {
         return UserApi.updateUserInfo(userToken, userData);
     }
 
-    static addUserToEvent(data){
-        return EventApi.addUserToEvent(data);
+    static addUserToEvent(data, userToken){
+        return EventApi.addUserToEvent(data, userToken);
     }
 
     static getInvitedGUserEvents(userToken){
@@ -67,6 +67,10 @@ class SmartAPI {
 
     static updateStatusOfMemberToInvited(data, status){
         return EventApi.updateStatusOfMember(data, status);
+    }
+
+    static updateRoleOfMember(data, role, userToken){
+        return EventApi.updateRoleOfMember(data, role, userToken);
     }
 
     static createBudget(data){

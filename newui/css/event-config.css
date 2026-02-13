@@ -350,7 +350,6 @@ textarea.form-input,
     transform: translateY(3px);
     box-shadow: 0 -5px 5px 0 #ffffff;
 }
-
 /* ===== SCROLLBARS ===== */
 .settings-panel .event-form::-webkit-scrollbar,
 textarea.form-input::-webkit-scrollbar,
@@ -715,7 +714,7 @@ textarea.form-input,
         max-width: 100%;
         width: 100%;
     }
-    
+
     .form-row label {
         text-align: left;
         min-width: auto;
