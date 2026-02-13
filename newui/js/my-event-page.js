@@ -278,13 +278,38 @@ document.addEventListener('DOMContentLoaded', function() {
 
     approveBtn.addEventListener("click", async function (){
         // Валидация полей
-        if (!eventNameInput.value.trim()) {
+        const eventName = eventNameInput.value.trim();
+        const eventDate = eventDateInput.value;
+        const eventPlace = eventPlaceInput.value.trim();
+        const eventDescription = eventDescriptionInput.value.trim();
+
+        if (!eventName) {
+            alert('Пожалуйста, введите название мероприятия');
             eventNameInput.focus();
             return;
         }
 
-        if (!eventDateInput.value) {
+        if (eventName.length > 100) {
+            alert('Название мероприятия не должно превышать 100 символов');
+            eventNameInput.focus();
+            return;
+        }
+
+        if (!eventDate) {
+            alert('Пожалуйста, выберите дату проведения');
             eventDateInput.focus();
+            return;
+        }
+
+        if (eventPlace.length > 200) {
+            alert('Место проведения не должно превышать 200 символов');
+            eventPlaceInput.focus();
+            return;
+        }
+
+        if (eventDescription.length > 1000) {
+            alert('Описание мероприятия не должно превышать 1000 символов');
+            eventDescriptionInput.focus();
             return;
         }
 

@@ -305,6 +305,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const newPlace = evPlace.value.trim();
         const newDesc = evDesc.value.trim();
 
+        // Валидация длины полей
+        if (newTitle.length > 100) {
+            alert('Название мероприятия не должно превышать 100 символов');
+            return false;
+        }
+
+        if (newPlace.length > 200) {
+            alert('Место проведения не должно превышать 200 символов');
+            return false;
+        }
+
+        if (newDesc.length > 1000) {
+            alert('Описание мероприятия не должно превышать 1000 символов');
+            return false;
+        }
+
         // Сохраняем значения
         eventData.name = newTitle;
         eventData.start_date = newDate;
@@ -314,6 +330,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Обновляем отображение
         updateDisplayFields();
+
+        return true;
     }
 
     // Init fields
@@ -618,7 +636,8 @@ document.addEventListener('DOMContentLoaded', () => {
             toggleEditMode(true);
         } else {
             // Exiting edit mode - save data and send to backend
-            saveFormData();
+            const ok = saveFormData();
+            if (!ok) return; // validation failed, stay in edit mode
             await sendEventDataToBackend();
             toggleEditMode(false);
         }
