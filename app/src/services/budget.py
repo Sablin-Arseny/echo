@@ -125,8 +125,9 @@ class BudgetService:
                 "share_amount": share_amount,
             }
             await self._budget_db.create_expense_participant(participant_data)
+        await self._budget_db.recalculate_budget_status(budget_orm.id)
 
-        return await self._build_budget_response(budget_orm)
+        return await self.get_budget_detail(budget_orm.id)
 
     async def mark_participant_paid(
         self, request: MarkParticipantPaidRequest, current_user: User
