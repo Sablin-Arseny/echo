@@ -8,6 +8,7 @@ BUDGET_STATUS = Literal[
     "ACTIVE",
     "PARTIALLY_PAID",
     "CLOSED",
+    "DELETED",
 ]
 
 PARTICIPANT_STATUS = Literal[

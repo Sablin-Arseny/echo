@@ -155,24 +155,15 @@ class BudgetService:
         if expense_participant.status == "CONFIRMED":
             raise ValueError("This debt is already confirmed")
 
-        # Получаем полную сумму оплаты, которая приходит с фронта
         paid_amount = request.amount
-        
+
         if paid_amount is None or paid_amount <= 0:
             raise ValueError("Payment amount must be positive")
 
-        # Проверяем, что сумма не должна быть меньше уже оплаченной
-        if paid_amount < expense_participant.paid_amount:
-            raise ValueError(f"Payment amount cannot be less than already paid {expense_participant.paid_amount}")
-        
-        # Проверяем, что сумма не превышает требуемую (автоматически приводим к максимуму)
         if paid_amount > expense_participant.share_amount:
             paid_amount = expense_participant.share_amount
 
-        # Просто устанавливаем полную сумму оплаты
-        await self._budget_db.mark_participant_paid(
-            expense_participant.id, paid_amount
-        )
+        await self._budget_db.mark_participant_paid(expense_participant.id, paid_amount)
 
         await self._budget_db.recalculate_budget_status(request.budget_id)
 
@@ -269,3 +260,15 @@ class BudgetService:
             raise ValueError(f"Budget with id {budget_id} not found")
 
         return await self._build_budget_response(budget)
+
+    async def delete_budget(self, budget_id: int, paid_by: User) -> BudgetResponse:
+        budget = await self._budget_db.get_budget_by_id(budget_id)
+        if not budget:
+            raise ValueError(f"Budget with id {budget_id} not found")
+
+        if paid_by.id != budget.paid_by_id:
+            raise ValueError("Only the budget creator can delete it")
+
+        await self._budget_db.update_budget_status(budget_id, "DELETED")
+
+        return await self.get_budget_detail(budget_id)
