@@ -1,105 +1,141 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Настройка мероприятия</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../css/event-config.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Настройка мероприятия</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/event-config.css">
+  <link rel="icon" href="../images/Logo.svg" sizes="any">
 </head>
 <body>
 <header>
-    <img src="../images/Logo.svg" alt="наше лого" class="logo">
-    <button id="authButton" class="auth-button">
-        <span id="authText" class="auth-text"><b>Войти</b></span>
-        <span class="user-icon">
+  <img src="../images/Logo.svg" alt="наше лого" class="logo">
+  <button id="authButton" class="auth-button">
+    <span id="authText" class="auth-text"><b>Войти</b></span>
+    <span class="user-icon">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
               <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
               <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
             </svg>
         </span>
-    </button>
+  </button>
 </header>
 
 <main class="main-content">
-    <div class="content-row">
-        <div class="panel settings-panel">
-            <h2>Настройка мероприятия</h2>
-            <form id="event-form" class="event-form">
-                <div class="form-row">
-                    <label for="ev-title">Название:</label>
-                    <div class="field-wrapper">
-                        <div class="field-display" id="ev-title-display"></div>
-                        <input type="text" id="ev-title" class="form-input edit-field">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <label for="ev-date">Дата:</label>
-                    <div class="field-wrapper">
-                        <div class="field-display" id="ev-date-display"></div>
-                        <input type="date" id="ev-date" class="form-input edit-field">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <label for="ev-maxdate">Максимальная дата выхода:</label>
-                    <div class="field-wrapper">
-                        <div class="field-display" id="ev-maxdate-display"></div>
-                        <input type="date" id="ev-maxdate" class="form-input edit-field">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <label for="ev-place">Место проведения:</label>
-                    <div class="field-wrapper">
-                        <div class="field-display" id="ev-place-display"></div>
-                        <input type="text" id="ev-place" class="form-input edit-field">
-                    </div>
-                </div>
-                <div class="form-row form-row-full">
-                    <label for="ev-desc">Описание:</label>
-                    <div class="field-wrapper">
-                        <div class="field-display" id="ev-desc-display"></div>
-                        <textarea id="ev-desc" class="form-input edit-field" rows="2"></textarea>
-                    </div>
-                </div>
-            </form>
-            <div class="panel-actions">
-                <button class="btn btn-primary" id="edit-btn">Редактировать</button>
-            </div>
+  <div class="content-row">
+
+    <!-- ===== SETTINGS PANEL ===== -->
+
+    <div class="panel settings-panel">
+      <h2>Настройка мероприятия</h2>
+      <form id="event-form" class="event-form">
+        <div class="form-row">
+          <label for="ev-title">Название:</label>
+          <div class="field-wrapper">
+            <div class="field-display" id="ev-title-display"></div>
+            <input type="text" id="ev-title" class="form-input edit-field" maxlength="100">
+          </div>
         </div>
 
-        <div class="panel participants-panel">
-            <div class="panel-header-row">
-                <h2>Участники</h2>
-                <button id="add-participant-btn" class="icon-btn" title="Добавить участника">+</button>
-            </div>
-            <div class="participants-list" id="participants-list">
-                <!-- элементы участников появятся здесь -->
-            </div>
+        <div class="form-row">
+          <label for="ev-date">Дата:</label>
+          <div class="field-wrapper">
+            <div class="field-display" id="ev-date-display"></div>
+            <input type="date" id="ev-date" class="form-input edit-field">
+          </div>
         </div>
+
+        <div class="form-row">
+          <label for="ev-maxdate">Максимальная дата выхода:</label>
+          <div class="field-wrapper">
+            <div class="field-display" id="ev-maxdate-display"></div>
+            <input type="date" id="ev-maxdate" class="form-input edit-field">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label for="ev-place">Место проведения:</label>
+          <div class="field-wrapper">
+            <div class="field-display" id="ev-place-display"></div>
+            <input type="text" id="ev-place" class="form-input edit-field" maxlength="200">
+          </div>
+        </div>
+
+        <div class="form-row form-row-full">
+          <label for="ev-desc">Описание:</label>
+          <div class="field-wrapper">
+            <div class="field-display" id="ev-desc-display"></div>
+            <textarea id="ev-desc" class="form-input edit-field" rows="2" maxlength="1000"></textarea>
+          </div>
+        </div>
+      </form>
+
+      <div class="panel-actions">
+        <button class="btn btn-primary" id="edit-btn">Редактировать</button>
+      </div>
     </div>
 
-    <div class="btn budget">
-        <button class="btn btn-primary-budget" id="budget-btn">Бюджет мероприятия</button>
+    <!-- ===== PARTICIPANTS PANEL ===== -->
+
+    <div class="panel participants-panel">
+      <div class="panel-header-row">
+        <h2>Участники</h2>
+        <button id="add-participant-btn" class="icon-btn" title="Добавить участника">+</button>
+      </div>
+
+      <div class="participants-list" id="participants-list">
+
+        <!--
+        Пример структуры одного участника
+        (создаётся через JS)
+
+        <div class="participant-item participant-row participant-owner">
+            <div class="participant-info">
+                username
+                <span class="participant-role role-owner">OWNER</span>
+            </div>
+
+            <div class="participant-actions">
+                <div class="role-buttons">
+                    <button class="make-admin-btn">Сделать ADMIN</button>
+                    <button class="remove-admin-btn">Убрать ADMIN</button>
+                </div>
+
+                <button class="btn btn-secondary small delete-btn">x</button>
+            </div>
+        </div>
+        -->
+
+      </div>
     </div>
+
+  </div>
+
+  <div class="buttons budget">
+    <button class="btn btn-primary-budget" id="budget-btn">Бюджет мероприятия</button>
+    <button class="btn btn-primary-task" id="task-btn">Задачи</button>
+  </div>
 
 </main>
 
-<!-- Модалка добавления участника -->
+<!-- ===== МОДАЛКА ДОБАВЛЕНИЯ УЧАСТНИКА ===== -->
+
 <div class="popup-overlay" id="participant-modal">
-    <div class="popup-content">
-        <button class="popup-close" id="close-participant-modal">×</button>
-        <h2 class="modal-title">Добавить участника</h2>
-        <div class="popup-body">
-            <label for="participant-tg">Username:</label>
-            <input id="participant-tg" class="form-input" placeholder="Type username">
-            <div class="error-message" id="userAddError"></div>
-            <div class="popup-buttons">
-                <button id="confirm-add" class="popup-confirm">Добавить</button>
-            </div>
-        </div>
+  <div class="popup-content">
+    <button class="popup-close" id="close-participant-modal">×</button>
+    <h2 class="modal-title">Добавить участника</h2>
+    <div class="popup-body">
+      <label for="participant-tg">Username:</label>
+      <input id="participant-tg" class="form-input" placeholder="Type username">
+      <div class="error-message" id="userAddError"></div>
+      <div class="popup-buttons">
+        <button id="confirm-add" class="popup-confirm">Добавить</button>
+      </div>
     </div>
+  </div>
 </div>
 
 <script type="module" src="../js/event-config.js"></script>

@@ -83,11 +83,23 @@ class BudgetDB(BaseDB):
         return await self.get_budget_by_id(budget_id)
 
     async def mark_participant_paid(self, participant_id: int, paid_amount: float):
-        paid_amount = round(paid_amount, 2)
+        participant = await self.get_participant_by_id(participant_id)
+        if not participant:
+            raise ValueError(f"Participant with id {participant_id} not found")
+
+        paid_amount = round(paid_amount + participant.paid_amount, 2)
+
+        share_amount = round(participant.share_amount, 2)
+        if paid_amount >= share_amount:
+            new_status = "PAID"
+            paid_amount = share_amount
+        else:
+            new_status = "PENDING"
+
         stmt = (
             update(ExpenseParticipant)
             .where(ExpenseParticipant.id == participant_id)
-            .values(paid_amount=paid_amount, status="PAID")
+            .values(paid_amount=paid_amount, status=new_status)
         )
         async with self.create_session() as session:
             await session.execute(stmt)

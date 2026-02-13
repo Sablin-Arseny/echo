@@ -82,3 +82,15 @@ async def get_budget_detail(
         return await budget_service.get_budget_detail(budget_id)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=repr(e))
+
+
+@router.delete("/{budget_id}")
+async def delete_budget(
+    budget_id: int,
+    budget_service: BudgetService = Depends(BudgetService.get_as_dependency),
+    user: User = Depends(AuthService.check_auth),
+) -> BudgetResponse:
+    try:
+        return await budget_service.delete_budget(budget_id, user)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=repr(e))

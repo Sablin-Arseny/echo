@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/budget.css">
+    <link rel="icon" href="../images/Logo.svg" sizes="any">
 </head>
 <body>
 <header>
@@ -22,7 +23,11 @@
         </span>
     </button>
 </header>
-
+<div class="back-container">
+  <button id="backBtn" class="back-button">
+    ← Назад
+  </button>
+</div>
 <main class="main-content">
     <h1 class="page-title">Бюджет мероприятия</h1>
     <div class="container">
@@ -32,16 +37,37 @@
                 <h2>Расходы</h2>
                 <button type="button" class="create-button" id="add-expense-btn">+ Новая трата</button>
             </div>
+            
+            <!-- Фильтры -->
+            <div class="filters-section">
+                <div class="filter-group">
+                    <label for="status-filter">Статус траты:</label>
+                    <select id="status-filter" class="filter-select">
+                        <option value="">Все траты</option>
+                        <option value="ACTIVE">Активные</option>
+                        <option value="PARTIALLY_PAID">Частично оплаченные</option>
+                        <option value="CLOSED">Закрытые</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="role-filter">Роль:</label>
+                    <select id="role-filter" class="filter-select">
+                        <option value="">Все траты</option>
+                        <option value="owner">Мои траты (я автор)</option>
+                        <option value="participant">Мои долги (я участник)</option>
+                    </select>
+                </div>
+            </div>
+
             <div class="all-my-events expenses-table-container">
                 <table class="expenses-table" id="expenses-table">
                     <thead>
                         <tr>
                             <th>Статья расхода</th>
                             <th>Автор траты</th>
-                            <th>Участники</th>
-                            <th>Сумма с человека</th>
-                            <th>Общая сумма</th>
-                            <th>Статус</th>
+                            <th>Сумма</th>
+                            <th>Статус траты</th>
+                            <th>Детали</th>
                         </tr>
                     </thead>
                     <tbody id="expenses-tbody"></tbody>
@@ -71,6 +97,17 @@
     </div>
 
 </main>
+
+<!-- Модальное окно для деталей траты -->
+<div class="popup-overlay" id="expense-detail-modal">
+    <div class="popup-content">
+        <button class="popup-close" id="close-detail-btn">×</button>
+        <h2 class="modal-title">Детали траты</h2>
+        <div class="popup-body">
+            <div id="expense-detail-content"></div>
+        </div>
+    </div>
+</div>
 
 <!-- Модальное окно для добавления траты -->
 <div class="popup-overlay" id="expense-modal">

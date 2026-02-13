@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Задачи мероприятия</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/task-page.css">
+  <link rel="icon" href="../images/Logo.svg" sizes="any">
+</head>
+<body>
+<header>
+  <img src="../images/Logo.svg" alt="наше лого" class="logo">
+  <button id="authButton" class="auth-button">
+    <span id="authText" class="auth-text"><b>Войти</b></span>
+    <span class="user-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
+              <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+              <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
+            </svg>
+        </span>
+  </button>
+</header>
+<div class="back-container">
+  <button id="backBtn" class="back-button">
+    ← Назад
+  </button>
+</div>
+<main class="main-content">
+  <h1 class="page-title">Задачи мероприятия</h1>
+
+  <div class="tracker-container">
+    <!-- Верхняя панель -->
+    <div class="tracker-controls">
+      <div class="filter-buttons">
+        <button class="filter-btn active" data-filter="all">Все задачи</button>
+        <button class="filter-btn" data-filter="my">Мои задачи</button>
+      </div>
+
+      <button class="create-task-btn" id="createTaskBtn">
+        <span>+</span> Создать задачу
+      </button>
+    </div>
+
+    <!-- Kanban доска с 4 колонками -->
+    <div class="kanban-board">
+      <!-- Колонка TO DO -->
+      <div class="kanban-column" data-status="todo">
+        <div class="column-header">
+          <div class="column-title">
+            <span class="status-dot todo"></span>
+            <h3>Нужно сделать</h3>
+            <span class="task-count" id="todo-count">0</span>
+          </div>
+        </div>
+        <div class="column-content" id="todo-column"></div>
+      </div>
+
+      <!-- Колонка IN PROGRESS -->
+      <div class="kanban-column" data-status="progress">
+        <div class="column-header">
+          <div class="column-title">
+            <span class="status-dot progress"></span>
+            <h3>В процессе</h3>
+            <span class="task-count" id="progress-count">0</span>
+          </div>
+        </div>
+        <div class="column-content" id="progress-column"></div>
+      </div>
+
+      <!-- Колонка IN REVIEW -->
+      <div class="kanban-column" data-status="review">
+        <div class="column-header">
+          <div class="column-title">
+            <span class="status-dot review"></span>
+            <h3>Ревью</h3>
+            <span class="task-count" id="review-count">0</span>
+          </div>
+        </div>
+        <div class="column-content" id="review-column"></div>
+      </div>
+
+      <!-- Колонка DONE -->
+      <div class="kanban-column" data-status="done">
+        <div class="column-header">
+          <div class="column-title">
+            <span class="status-dot done"></span>
+            <h3>Готово</h3>
+            <span class="task-count" id="done-count">0</span>
+          </div>
+        </div>
+        <div class="column-content" id="done-column"></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Попап создания/редактирования задачи -->
+<div id="taskPopup" class="popup-overlay">
+  <div class="popup-content">
+    <button class="popup-close" id="closeTaskPopup">×</button>
+    <h2 id="popupTitle">Создание задачи</h2>
+    <div class="popup-body">
+      <form class="task-form" id="taskForm">
+        <!-- Автор задачи (отображается только для чтения) -->
+        <div class="form-row">
+          <label>Автор задачи:</label>
+          <div id="task-author-display" class="author-display"></div>
+        </div>
+
+        <!-- Название задачи -->
+        <div class="form-row">
+          <label for="taskTitle">Название:</label>
+          <input type="text" id="taskTitle" class="form-input" placeholder="Введите название задачи">
+        </div>
+
+        <!-- Описание -->
+        <div class="form-row form-row-full">
+          <label for="taskDescription">Описание:</label>
+          <textarea id="taskDescription" class="form-input form-textarea" placeholder="Опишите задачу..."></textarea>
+        </div>
+
+        <!-- Исполнитель (одиночный селект) -->
+        <div class="form-row">
+          <label>Исполнитель:</label>
+          <div class="custom-select" id="task-executor-select">
+            <div class="select-selected" id="task-executor-selected">Выберите исполнителя</div>
+            <div class="select-items select-hide" id="task-executor-items"></div>
+          </div>
+        </div>
+
+        <!-- Наблюдатели (мультиселект) -->
+        <div class="form-row form-row-full">
+          <label>Наблюдатели:</label>
+          <div class="custom-multi-select" id="task-observers-select">
+            <div class="multi-selected">Выберите наблюдателей</div>
+            <div class="multi-items select-hide"></div>
+          </div>
+          <div class="help-text small">Автор автоматически добавлен в наблюдатели</div>
+        </div>
+      </form>
+
+      <div class="popup-buttons">
+        <button type="button" class="popup-cancel" id="cancelTaskBtn">Отмена</button>
+        <button type="button" class="popup-delete" id="deleteTaskBtn" style="display:none;">Удалить</button>
+        <button type="button" class="popup-confirm" id="saveTaskBtn">Сохранить</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Попап просмотра задачи -->
+<div id="viewTaskPopup" class="popup-overlay">
+  <div class="popup-content">
+    <button class="popup-close" id="closeViewPopup">×</button>
+    <div class="task-header">
+      <span class="task-id" id="viewTaskId">TASK-1</span>
+      <span class="task-status-badge" id="viewTaskStatus">В процессе</span>
+    </div>
+    <h2 id="viewTaskTitle">Название задачи</h2>
+    <div class="task-metadata">
+      <div class="metadata-item">
+        <span class="metadata-label">Автор:</span>
+        <span id="viewTaskAuthor">@username</span>
+      </div>
+      <div class="metadata-item">
+        <span class="metadata-label">Исполнитель:</span>
+        <span id="viewTaskExecutor">Не назначен</span>
+      </div>
+      <div class="metadata-item">
+        <span class="metadata-label">Наблюдатели:</span>
+        <span id="viewTaskObservers">-</span>
+      </div>
+    </div>
+
+    <div class="task-description">
+      <h4>Описание</h4>
+      <p id="viewTaskDescription">Описание задачи</p>
+    </div>
+
+    <div class="task-actions">
+      <button class="task-action-btn edit" id="editTaskBtn">Редактировать</button>
+      <button class="task-action-btn delete" id="deleteViewTaskBtn">Удалить</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="../js/task-page.js"></script>
+</body>
+</html>

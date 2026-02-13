@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const tgInput = document.getElementById('participant-tg');
     const editBtn = document.getElementById('edit-btn');
     const budgetBtn = document.getElementById('budget-btn');
+    const taskBtn = document.getElementById("task-btn");
     const authText = document.getElementById("authText");
     const authButton = document.getElementById('authButton');
     const registerError = document.getElementById('userAddError');
@@ -35,6 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let editing = false;
     let currentUser = null;
+    let currentUserRole = null;
 
     getUserInfoByToken();
     initEventData();
@@ -45,8 +47,18 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('eventData', JSON.stringify(eventData));
         const participants = JSON.parse(localStorage.getItem("eventData")).participants;
         checkUserAccess(participants);
+        setCurrentUserRole(participants);
 
         renderParticipants(participants);
+    }
+
+    function setCurrentUserRole(participants) {
+        const currentUserId = currentUser.id;
+        const me = participants.find(p => p.id === currentUserId);
+
+        if (me) {
+            currentUserRole = me.role;
+        }
     }
 
     async function getUserInfoByToken(){
@@ -112,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             // Пробуем распарсить как дату
             let date;
-            
+
             // Если это строка в формате YYYY-MM-DD или ISO с временем
             if (dateString.includes('T') || /^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
                 // Для избежания проблем с часовыми поясами, парсим дату явно
@@ -293,6 +305,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const newPlace = evPlace.value.trim();
         const newDesc = evDesc.value.trim();
 
+        // Валидация длины полей
+        if (newTitle.length > 100) {
+            alert('Название мероприятия не должно превышать 100 символов');
+            return false;
+        }
+
+        if (newPlace.length > 200) {
+            alert('Место проведения не должно превышать 200 символов');
+            return false;
+        }
+
+        if (newDesc.length > 1000) {
+            alert('Описание мероприятия не должно превышать 1000 символов');
+            return false;
+        }
+
         // Сохраняем значения
         eventData.name = newTitle;
         eventData.start_date = newDate;
@@ -302,6 +330,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Обновляем отображение
         updateDisplayFields();
+
+        return true;
     }
 
     // Init fields
@@ -318,20 +348,112 @@ document.addEventListener('DOMContentLoaded', () => {
         participantsList.innerHTML = '';
 
         // Фильтруем участников, оставляя только тех, у кого статус не REFUSED
-        const activeParticipants = participants.filter(p =>
-            p.status !== "REFUSED" && p.status !== "DELETED"
-        );
+        const activeParticipants = participants
+            .filter(p => p.status !== "REFUSED" && p.status !== "DELETED")
+            .sort((a, b) => {
+
+                // 1️Сначала сортируем по статусу (DRAFT в самый низ)
+                if (a.status === "DRAFT" && b.status !== "DRAFT") return 1;
+                if (a.status !== "DRAFT" && b.status === "DRAFT") return -1;
+
+                // 2️Затем по роли
+                const rolePriority = {
+                    "OWNER": 1,
+                    "ADMIN": 2,
+                    "PARTICIPATING": 3
+                };
+
+                const aPriority = rolePriority[a.role] || 4;
+                const bPriority = rolePriority[b.role] || 4;
+
+                return aPriority - bPriority;
+            });
 
         activeParticipants.forEach((p) => {
             if (p.status === "PARTICIPATING") {
+
+                const isOwner = p.role === "OWNER";
+                const isAdmin = p.role === "ADMIN";
+                const isMember = p.role === "PARTICIPATING";
+
+                let roleClass = "";
+                let roleBadgeClass = "";
+                let roleText = p.role;
+
+                if (isOwner) {
+                    roleClass = "participant-owner";
+                    roleBadgeClass = "role-owner";
+                    roleText = "OWNER";
+                } else if (isAdmin) {
+                    roleClass = "participant-admin";
+                    roleBadgeClass = "role-admin";
+                    roleText = "ADMIN";
+                } else {
+                    roleClass = "participant-member";
+                    roleBadgeClass = "role-member";
+                    roleText = "PARTICIPANT";
+                }
+
+                const canManageRoles = currentUserRole === "OWNER";
+                const isCurrentUser = p.id === currentUser.id;
+
+                const canDelete =
+                    // Любой может удалить себя
+                    isCurrentUser ||
+
+                    // OWNER может удалить любого (кроме себя — если захочешь, можно запретить)
+                    (currentUserRole === "OWNER" && !isCurrentUser) ||
+
+                    // ADMIN может удалить только PARTICIPATING
+                    (
+                        currentUserRole === "ADMIN" &&
+                        p.role === "PARTICIPANT"
+                    );
+
                 const el = document.createElement('div');
-                el.className = 'participant-item participant-accepted';
+                el.className = `participant-item ${roleClass}`;
+
                 el.innerHTML = `
-                    <div class="participant-tg">${p.username}</div>
+                    <div>
+                        ${p.username}
+                        <span class="participant-role ${roleBadgeClass}">
+                            ${roleText}
+                        </span>
+                    </div>
+            
                     <div class="participant-actions">
-                        <button class="btn btn-secondary small delete-btn" data-user-id="${p.id}" data-username="${p.username}">x</button>
+            
+                        ${
+                                canManageRoles && !isOwner && !isAdmin
+                                    ? `<button class="make-admin-btn"
+                                     data-user-id="${p.id}">
+                                     Сделать ADMIN
+                                   </button>`
+                                    : ''
+                            }
+            
+                        ${
+                                canManageRoles && isAdmin
+                                    ? `<button class="remove-admin-btn"
+                                     data-user-id="${p.id}">
+                                     Убрать ADMIN
+                                   </button>`
+                                    : ''
+                            }
+            
+                        ${
+                                canDelete
+                                    ? `<button class="btn btn-secondary small delete-btn"
+                                     data-user-id="${p.id}"
+                                     data-username="${p.username}">
+                                     x
+                                   </button>`
+                                    : ''
+                            }
+            
                     </div>
                 `;
+
                 participantsList.appendChild(el);
             } else {
                 // Участники с другими статусами (приглашенные и т.д.)
@@ -354,6 +476,50 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Attach delete handlers
         attachDeleteHandlers();
+        attachRoleHandlers();
+    }
+
+    function attachRoleHandlers() {
+        const makeButtons = participantsList.querySelectorAll('.make-admin-btn');
+        const removeButtons = participantsList.querySelectorAll('.remove-admin-btn');
+
+        const userToken = JSON.parse(localStorage.getItem("userToken"));
+
+        makeButtons.forEach(btn => {
+            btn.addEventListener('click', async function () {
+
+                const userId = parseInt(this.dataset.userId);
+
+                await SmartAPI.updateRoleOfMember(
+                    {
+                        event_id: eventId,
+                        user_id: userId
+                    },
+                    "ADMIN",
+                    userToken
+                );
+
+                await initEventData();
+            });
+        });
+
+        removeButtons.forEach(btn => {
+            btn.addEventListener('click', async function () {
+
+                const userId = parseInt(this.dataset.userId);
+
+                await SmartAPI.updateRoleOfMember(
+                    {
+                        event_id: eventId,
+                        user_id: userId
+                    },
+                    "PARTICIPANT",
+                    userToken
+                );
+
+                await initEventData();
+            });
+        });
     }
 
     // Функция для добавления обработчиков удаления
@@ -434,7 +600,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     id: userData.id,
                 }
                 try {
-                    const inviteResult = await SmartAPI.addUserToEvent(data);
+                    const userToken = JSON.parse(localStorage.getItem("userToken"));
+                    const inviteResult = await SmartAPI.addUserToEvent(data, userToken);
                     renderParticipants(inviteResult.participants);
                     modal.style.display = 'none';
                 }catch (error){
@@ -469,7 +636,8 @@ document.addEventListener('DOMContentLoaded', () => {
             toggleEditMode(true);
         } else {
             // Exiting edit mode - save data and send to backend
-            saveFormData();
+            const ok = saveFormData();
+            if (!ok) return; // validation failed, stay in edit mode
             await sendEventDataToBackend();
             toggleEditMode(false);
         }
@@ -519,6 +687,11 @@ document.addEventListener('DOMContentLoaded', () => {
     budgetBtn.addEventListener('click', () => {
         const eventData = localStorage.getItem('currentEventId', JSON.stringify(eventId));
         window.location.href = `budget.html?eventId=${eventData}`;
+    });
+
+    taskBtn.addEventListener('click', () => {
+        const eventData = localStorage.getItem('currentEventId', JSON.stringify(eventId));
+        window.location.href = `task-page.html?eventId=${eventData}`;
     });
 
     // Logo click handler - navigate to events page and refresh

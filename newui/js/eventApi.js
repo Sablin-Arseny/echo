@@ -91,12 +91,13 @@ class EventApi {
         }
     }
 
-    static async addUserToEvent(data){
+    static async addUserToEvent(data, userToken){
         try {
             const response = await fetch(`${API_BASE}/event/add_user_to_event?event_id=${data.event_id}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${userToken}`,
                     'accept': 'application/json',
                 },
                 body: JSON.stringify({
@@ -135,6 +136,31 @@ class EventApi {
             return await response.json();
         } catch (error) {
             console.error('Ошибка приглашения изменения состояния пользователя:', error);
+            throw error;
+        }
+    }
+
+    static async updateRoleOfMember(data, role, userToken){
+        try {
+            const response = await fetch(`${API_BASE}/event/update_role_of_member?event_id=${data.event_id}&role=${role}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${userToken}`,
+                    'accept': 'application/json',
+                },
+                body: JSON.stringify({
+                    id: data.user_id,
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('Ошибка изменения роли пользователя:', error);
             throw error;
         }
     }

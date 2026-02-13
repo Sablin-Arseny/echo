@@ -16,7 +16,7 @@ services:
     restart: unless-stopped
 
   postgre-db:
-      image: postgres:latest
+      image: postgres:17
       environment:
         POSTGRES_DB: echo_db
         POSTGRES_USER: postgres
