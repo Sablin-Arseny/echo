@@ -81,7 +81,21 @@ class SmartAPI {
         return BudgetApi.getBudget(EventId);
     }
 
-    // task api
+    static getBudgetDetail(budgetId){
+        return BudgetApi.getBudgetDetail(budgetId);
+    }
+
+    static markParticipantPaid(budgetId, amount){
+        return BudgetApi.markParticipantPaid(budgetId, amount);
+    }
+
+    static confirmPayment(budgetId, participantTgId){
+        return BudgetApi.confirmPayment(budgetId, participantTgId);
+    }
+
+    static getUserExpenses(eventId){
+        return BudgetApi.getUserExpenses(eventId);
+    }
 
     static getTasksByEventId(EventId, userToken){
         return TaskApi.getTasksByEventId(EventId, userToken);
@@ -97,6 +111,10 @@ class SmartAPI {
 
     static updateTask(taskData, userToken){
         return TaskApi.updateTask(taskData, userToken);
+    }
+
+    static deleteBudget(budgetId){
+        return BudgetApi.deleteBudget(budgetId);
     }
 
 }

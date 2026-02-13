@@ -73,6 +73,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const viewTaskObservers = document.getElementById('viewTaskObservers');
     const viewTaskStatus = document.getElementById('viewTaskStatus');
 
+    const authButton = document.getElementById('authButton');
+
     // ===== ИНИЦИАЛИЗАЦИЯ =====
     init();
 
@@ -889,6 +891,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 observersItems.classList.add('select-hide');
             }
         });
+        
+        // --- Auth button click handler ---
+        if (authButton) {
+            authButton.addEventListener('click', () => {
+                window.location.href = 'personal-account.html';
+            });
+        }
 
         // Открытие мультиселекта наблюдателей
         observersSelected.addEventListener('click', function(e) {

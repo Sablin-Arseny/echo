@@ -144,14 +144,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // Save data from input fields
     function saveFormData() {
         const tgIdValue = accTgId.value.trim();
-        
+        const usernameValue = accUsername.value.trim();
+
         // Validate Telegram ID
         if (tgIdValue && !tgIdValue.startsWith('@')) {
             showError('Telegram ID должен начинаться с символа @');
             return false;
         }
-        
-        userData.username = accUsername.value.trim();
+
+        // Validate username length (max 20)
+        if (usernameValue.length > 20) {
+            showError('Никнейм не должен превышать 20 символов');
+            return false;
+        }
+
+        userData.username = usernameValue;
         userData.tg_id = tgIdValue;
         userData.full_name = accFullName.value.trim();
 
@@ -195,6 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Function to send updated user data to backend
     async function sendUserDataToBackend() {
+        let usernameChanged = false;
         try {
             const updateData = {
                 username: userData.username,
@@ -205,11 +213,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
             console.log('Sending updated user data to backend:', updateData);
 
+            // Если имя пользователя изменилось, проверим уникальность на фронте
+            usernameChanged = updateData.username !== originalUsername;
+            if (usernameChanged && updateData.username) {
+                try {
+                    const exists = await SmartAPI.checkUserByUserName(updateData.username);
+                    if (exists) {
+                        // Если существует пользователь с таким именем, получим его данные
+                        const existing = await SmartAPI.getUserByUserName(updateData.username).catch(() => null);
+                        if (existing && existing.id !== userData.id) {
+                            alert('Никнейм уже занят. Пожалуйста, выберите другой.');
+                            // Возвращаемся в режим редактирования
+                            toggleEditMode(true);
+                            return;
+                        }
+                    }
+                } catch (err) {
+                    // Если проверка уникальности упала, позволим сервер обработать это, но предупредим пользователя
+                    console.warn('Не удалось проверить уникальность ника на фронте:', err);
+                }
+            }
+
             const response = await SmartAPI.updateUserInfo(userToken, updateData);
             console.log('Server response:', response);
 
             // Check if username was actually changed (compare with saved original)
-            const usernameChanged = updateData.username !== originalUsername;
             console.log('Username changed check:', {
                 original: originalUsername,
                 current: updateData.username,

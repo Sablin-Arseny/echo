@@ -636,3 +636,387 @@ header {
         margin-right: 8px;
     }
 }
+
+/* --- СТИЛИ ДЛЯ ФИЛЬТРОВ --- */
+.filters-section {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.filter-group label {
+    color: #FD9C00;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.filter-select {
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(253, 156, 0, 0.5);
+    border-radius: 8px;
+    color: #ffffff;
+    cursor: pointer;
+    min-width: 200px;
+}
+
+.filter-select option {
+    background-color: #1A1919;
+    color: #ffffff;
+}
+
+.filter-select:hover {
+    border-color: #FD9C00;
+    box-shadow: 0 0 8px rgba(253, 156, 0, 0.3);
+}
+
+/* --- СТАТУСЫ РАСХОДОВ --- */
+.status-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.status-badge.status-active {
+    background-color: rgba(100, 200, 255, 0.3);
+    color: #64c8ff;
+    border: 1px solid rgba(100, 200, 255, 0.5);
+}
+
+.status-badge.status-partially_paid {
+    background-color: rgba(255, 190, 0, 0.3);
+    color: #ffbe00;
+    border: 1px solid rgba(255, 190, 0, 0.5);
+}
+
+.status-badge.status-closed {
+    background-color: rgba(0, 200, 83, 0.3);
+    color: #00c853;
+    border: 1px solid rgba(0, 200, 83, 0.5);
+}
+
+.status-badge.status-deleted {
+    background-color: rgba(200, 100, 100, 0.3);
+    color: #c86464;
+    border: 1px solid rgba(200, 100, 100, 0.5);
+}
+
+/* --- СТАТУСЫ УЧАСТНИКОВ --- */
+.participant-status {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.participant-status.status-pending {
+    background-color: rgba(255, 107, 107, 0.2);
+    color: #ff6b6b;
+    border: 1px solid rgba(255, 107, 107, 0.4);
+}
+
+.participant-status.status-paid {
+    background-color: rgba(255, 190, 0, 0.2);
+    color: #ffbe00;
+    border: 1px solid rgba(255, 190, 0, 0.4);
+}
+
+.participant-status.status-partially_paid {
+    background-color: rgba(255, 190, 0, 0.2);
+    color: #ffbe00;
+    border: 1px solid rgba(255, 190, 0, 0.4);
+}
+
+.participant-status.status-confirmed {
+    background-color: rgba(0, 200, 83, 0.2);
+    color: #00c853;
+    border: 1px solid rgba(0, 200, 83, 0.4);
+}
+
+/* --- КНОПКИ ДЕЙСТВИЙ В ТАБЛИЦЕ --- */
+.detail-btn, .paid-btn, .confirm-btn {
+    padding: 6px 12px;
+    background-color: rgba(100, 200, 255, 0.2);
+    color: #64c8ff;
+    border: 1px solid rgba(100, 200, 255, 0.5);
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+}
+
+.detail-btn:hover {
+    background-color: rgba(100, 200, 255, 0.4);
+    box-shadow: 0 0 8px rgba(100, 200, 255, 0.3);
+}
+
+.paid-btn {
+    background-color: rgba(255, 190, 0, 0.2);
+    color: #ffbe00;
+    border-color: rgba(255, 190, 0, 0.5);
+}
+
+.paid-btn:hover {
+    background-color: rgba(255, 190, 0, 0.4);
+    box-shadow: 0 0 8px rgba(255, 190, 0, 0.3);
+}
+
+.confirm-btn {
+    background-color: rgba(0, 200, 83, 0.2);
+    color: #00c853;
+    border-color: rgba(0, 200, 83, 0.5);
+}
+
+.confirm-btn:hover {
+    background-color: rgba(0, 200, 83, 0.4);
+    box-shadow: 0 0 8px rgba(0, 200, 83, 0.3);
+}
+
+.detail-delete-btn {
+    padding: 8px 16px;
+    background-color: rgba(200, 100, 100, 0.2);
+    color: #c86464;
+    border: 1px solid rgba(200, 100, 100, 0.5);
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-top: 16px;
+    transition: all 0.3s ease;
+}
+
+.detail-delete-btn:hover {
+    background-color: rgba(200, 100, 100, 0.4);
+    box-shadow: 0 0 8px rgba(200, 100, 100, 0.3);
+}
+
+/* --- ПОЛЕ ВВОДА СУММЫ ОПЛАТЫ --- */
+.payment-input-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 8px;
+}
+
+.payment-input {
+    flex: 1;
+    padding: 8px 12px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(100, 200, 255, 0.5);
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 0.9rem;
+}
+
+.payment-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.payment-input:focus {
+    outline: none;
+    border-color: #64c8ff;
+    box-shadow: 0 0 8px rgba(100, 200, 255, 0.3);
+    background-color: rgba(100, 200, 255, 0.1);
+}
+
+.pay-submit-btn {
+    padding: 8px 16px;
+    background-color: rgba(100, 200, 255, 0.3);
+    color: #64c8ff;
+    border: 1px solid rgba(100, 200, 255, 0.5);
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+}
+
+.pay-submit-btn:hover {
+    background-color: rgba(100, 200, 255, 0.4);
+    box-shadow: 0 0 8px rgba(100, 200, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.pay-submit-btn:active {
+    transform: translateY(0);
+}
+
+/* --- УВЕДОМЛЕНИЕ О ХОДЕ ОПЛАТЫ --- */
+.payment-progress {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background-color: rgba(255, 190, 0, 0.15);
+    border: 1px solid rgba(255, 190, 0, 0.4);
+    border-radius: 8px;
+    text-align: center;
+}
+
+.progress-text {
+    color: #ffbe00;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+/* --- СТИЛИ СТРОК ПО СТАТУСАМ --- */
+.status-active,
+.status-active td {
+    background-color: rgba(100, 200, 255, 0.05);
+}
+
+.status-partially_paid,
+.status-partially_paid td {
+    background-color: rgba(255, 190, 0, 0.05);
+}
+
+.status-closed,
+.status-closed td {
+    background-color: rgba(0, 200, 83, 0.05);
+}
+
+.status-deleted,
+.status-deleted td {
+    background-color: rgba(200, 100, 100, 0.05);
+}
+
+/* --- МОДАЛЬНОЕ ОКНО ДЕТАЛЕЙ ТРАТЫ --- */
+.expense-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.detail-row {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.detail-row.full-width {
+    grid-template-columns: 1fr;
+}
+
+.detail-label {
+    color: #FD9C00;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.detail-value {
+    color: #ffffff;
+    font-size: 0.95rem;
+    word-break: break-word;
+}
+
+/* --- СПИСОК УЧАСТНИКОВ В ДЕТАЛЯХ --- */
+.participants-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.participant-item {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(253, 156, 0, 0.3);
+    border-radius: 10px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.participant-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.participant-name {
+    font-weight: 600;
+    color: #ffffff;
+    min-width: 120px;
+}
+
+.participant-amounts {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    color: #ffffff;
+    font-size: 0.9rem;
+}
+
+.amount-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.amount-label {
+    color: #FD9C00;
+    font-weight: 600;
+    min-width: 100px;
+}
+
+.amount-value {
+    color: #ffffff;
+    text-align: right;
+    flex-grow: 1;
+}
+
+@media (max-width: 1350px) {
+    .filters-section {
+        flex-direction: column;
+    }
+    
+    .filter-group {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .filter-select {
+        width: 100%;
+        min-width: auto;
+    }
+    
+    .detail-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .participant-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .amount-row {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+    
+    .payment-input-group {
+        width: 100%;
+        flex-direction: column;
+    }
+    
+    .payment-input {
+        width: 100%;
+    }
+    
+    .pay-submit-btn {
+        width: 100%;
+    }
+}
