@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:8000';
+const API_BASE = '/api';
 class EventApi {
     static async createEvent(eventData) {
         try {
