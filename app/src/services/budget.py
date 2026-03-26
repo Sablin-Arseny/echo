@@ -84,47 +84,84 @@ class BudgetService:
         if not paid_by_user_orm:
             raise ValueError(f"User with tg_id {paid_by.tg_id} not found")
 
+        # Получить всех участников и валидировать
+        participants_map = {}  # tg_id -> User ORM
+        for participant_request in budget_request.participants:
+            user_orm = await self._user_db.get(User(tg_id=participant_request.tg_id))
+            if not user_orm:
+                raise ValueError(
+                    f"User with tg_id {participant_request.tg_id} not found"
+                )
+            participants_map[participant_request.tg_id] = user_orm
+
+        # Рассчитать общую сумму
+        if budget_request.is_equally:
+            total_amount = budget_request.amount
+        else:
+            # Рассчитать сумму из share_amount всех участников
+            total_amount = sum(
+                participant.share_amount or 0
+                for participant in budget_request.participants
+            )
+            total_amount = round(total_amount, 2)
+
         budget_data = {
             "event_id": budget_request.event_id,
             "paid_by_id": paid_by_user_orm.id,
-            "amount": budget_request.amount,
+            "amount": total_amount,
             "description": budget_request.description,
         }
         budget_orm = await self._budget_db.create_budget(budget_data)
 
-        share_amount = round(
-            (
-                budget_request.amount / len(budget_request.participants)
-                if budget_request.participants
-                else 0
-            ),
-            2,
-        )
+        # Вычислить доли
+        if budget_request.is_equally:
+            # Делить поровну
+            share_amount = round(
+                total_amount / len(budget_request.participants),
+                2,
+            )
+            for participant_request in budget_request.participants:
+                user_orm = participants_map[participant_request.tg_id]
 
-        if paid_by.tg_id in budget_request.participants:
-            creator_participant_data = {
-                "expense_id": budget_orm.id,
-                "participant_id": paid_by_user_orm.id,
-                "share_amount": share_amount,
-                "paid_amount": share_amount,
-                "status": "CONFIRMED",
-            }
-            await self._budget_db.create_expense_participant(creator_participant_data)
+                # Если это создатель бюджета - отмечаем как CONFIRMED
+                if user_orm.id == paid_by_user_orm.id:
+                    participant_data = {
+                        "expense_id": budget_orm.id,
+                        "participant_id": user_orm.id,
+                        "share_amount": share_amount,
+                        "paid_amount": share_amount,
+                        "status": "CONFIRMED",
+                    }
+                else:
+                    participant_data = {
+                        "expense_id": budget_orm.id,
+                        "participant_id": user_orm.id,
+                        "share_amount": share_amount,
+                    }
+                await self._budget_db.create_expense_participant(participant_data)
+        else:
+            # Использовать индивидуальные доли
+            for participant_request in budget_request.participants:
+                user_orm = participants_map[participant_request.tg_id]
+                share_amount = round(participant_request.share_amount or 0, 2)
 
-        for tg_id in budget_request.participants:
-            if tg_id == paid_by.tg_id:
-                continue
+                # Если это создатель бюджета - отмечаем как CONFIRMED
+                if user_orm.id == paid_by_user_orm.id:
+                    participant_data = {
+                        "expense_id": budget_orm.id,
+                        "participant_id": user_orm.id,
+                        "share_amount": share_amount,
+                        "paid_amount": share_amount,
+                        "status": "CONFIRMED",
+                    }
+                else:
+                    participant_data = {
+                        "expense_id": budget_orm.id,
+                        "participant_id": user_orm.id,
+                        "share_amount": share_amount,
+                    }
+                await self._budget_db.create_expense_participant(participant_data)
 
-            user_orm = await self._user_db.get(User(tg_id=tg_id))
-            if not user_orm:
-                raise ValueError(f"User with tg_id {tg_id} not found")
-
-            participant_data = {
-                "expense_id": budget_orm.id,
-                "participant_id": user_orm.id,
-                "share_amount": share_amount,
-            }
-            await self._budget_db.create_expense_participant(participant_data)
         await self._budget_db.recalculate_budget_status(budget_orm.id)
 
         return await self.get_budget_detail(budget_orm.id)

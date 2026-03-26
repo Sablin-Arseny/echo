@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 from typing import Literal
 
 from app.src.schemas.user import User
@@ -41,11 +41,23 @@ class BudgetResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class BudgetParticipantRequest(BaseModel):
+    tg_id: str
+    share_amount: float | None = None
+
+
 class CreateBudgetRequest(BaseModel):
     event_id: int
-    amount: float
+    amount: float | None = None
+    is_equally: bool
     description: str = ""
-    participants: list[str]
+    participants: list[BudgetParticipantRequest]
+
+    @model_validator(mode="after")
+    def validate_amount_requirement(self):
+        if self.is_equally and self.amount is None:
+            raise ValueError("amount is required when is_equally is True")
+        return self
 
 
 class UserExpenseResponse(BaseModel):
