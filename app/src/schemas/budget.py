@@ -41,11 +41,17 @@ class BudgetResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class BudgetParticipantRequest(BaseModel):
+    username: str
+    share_amount: int | None = None
+
+
 class CreateBudgetRequest(BaseModel):
     event_id: int
     amount: float
+    is_equally: bool
     description: str = ""
-    participants: list[str]
+    participants: list[BudgetParticipantRequest]
 
 
 class UserExpenseResponse(BaseModel):
