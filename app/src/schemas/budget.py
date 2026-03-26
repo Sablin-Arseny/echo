@@ -43,7 +43,7 @@ class BudgetResponse(BaseModel):
 
 class BudgetParticipantRequest(BaseModel):
     tg_id: str
-    share_amount: int | None = None
+    share_amount: float | None = None
 
 
 class CreateBudgetRequest(BaseModel):
