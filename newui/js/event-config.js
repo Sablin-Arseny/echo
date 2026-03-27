@@ -34,6 +34,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const openBtn = document.getElementById('add-participant-btn');
     const closeBtn = document.getElementById('close-participant-modal');
 
+    const inviteInput = document.getElementById('invite-link');
+    const copyInviteBtn = document.getElementById('copy-invite');
+
     let editing = false;
     let currentUser = null;
     let currentUserRole = null;
@@ -105,6 +108,20 @@ document.addEventListener('DOMContentLoaded', () => {
     openBtn.addEventListener('click', () => {
         if (!addBtn.disabled) {
             modal.classList.add('active'); // показываем модалку
+        }
+
+        setInviteLink();
+    });
+
+    copyInviteBtn.addEventListener('click', async () => {
+        try {
+            await navigator.clipboard.writeText(inviteInput.value);
+            copyInviteBtn.textContent = "Скопировано!";
+            setTimeout(() => {
+                copyInviteBtn.textContent = "Копировать";
+            }, 2000);
+        } catch (e) {
+            console.error('Ошибка копирования:', e);
         }
     });
 
@@ -579,6 +596,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (addBtn.disabled) return;
         tgInput.value = '';
         modal.style.display = 'flex';
+        setInviteLink();
         tgInput.focus();
     });
 
@@ -722,4 +740,12 @@ document.addEventListener('DOMContentLoaded', () => {
             registerError.classList.add('show');
         }
     }
+
+    function setInviteLink() {
+        if (!eventId) return;
+
+        const link = `${window.location.origin}/invite?eventId=${eventId}`;
+        inviteInput.value = link;
+    }
+
 });
