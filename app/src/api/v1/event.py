@@ -103,7 +103,7 @@ async def add_user_to_event(
     return event_response
 
 
-@router.post("./add_user_by_invite")
+@router.post("/add_user_by_invite")
 async def add_user_by_invite(
     event_id: int,
     user_to_add: User,
