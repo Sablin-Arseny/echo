@@ -190,10 +190,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     const formattedDate = eventDate.toLocaleDateString('ru-RU');
 
     eventInfoDiv.innerHTML = `
-        <h2>${eventData.name}</h2>
-        <p>Дата: ${formattedDate}</p>
-        <p>Место: ${eventData.event_place}</p>
-        <p>Описание: ${eventData.description}</p>
+        <div class="event-panel">
+            <div class="event-row">
+                <span class="field-label">Название:</span>
+                <span class="field-value">${eventData.name}</span>
+            </div>
+            <div class="event-row">
+                <span class="field-label">Дата:</span>
+                <span class="field-value">${formattedDate}</span>
+            </div>
+            <div class="event-row">
+                <span class="field-label">Место:</span>
+                <span class="field-value">${eventData.event_place}</span>
+            </div>
+            <div class="event-row">
+                <span class="field-label">Описание:</span>
+                <span class="field-value">${eventData.description}</span>
+            </div>
+        </div>
     `;
 
     // --- Проверка авторизации при загрузке ---

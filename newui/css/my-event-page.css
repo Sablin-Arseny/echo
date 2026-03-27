@@ -370,6 +370,8 @@ h1 {
     border-bottom: 2px solid rgba(255, 255, 255, 0.1);
     padding-bottom: 10px;
     flex-shrink: 0; /* Заголовок не сжимается */
+    position: relative;
+    z-index: 10;
 }
 
 .tab-btn {
@@ -477,6 +479,7 @@ h1 {
     background-color: rgba(253, 156, 0, 0.1);
     transform: translateX(5px);
     cursor: pointer;
+    z-index: 20;
 }
 
 .event-label {
@@ -669,4 +672,361 @@ h1 {
     border-color: rgba(253, 156, 0, 0.2);
     color: rgba(255, 255, 255, 0.4);
     cursor: not-allowed;
+}
+
+/* =========================
+   BASE
+========================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Montserrat Alternates', sans-serif;
+}
+
+body {
+    background: #121212 url("../images/bottom_light.png") no-repeat bottom;
+    color: #f5f5f5;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* =========================
+   HEADER
+========================= */
+header {
+    max-width: 1510px;
+    margin: 0 auto;
+    height: 124px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+}
+
+/* =========================
+   TITLES
+========================= */
+h1, .popup-content h2 {
+    background: linear-gradient(to right, #fff, #FD9C00);
+    -webkit-background-clip: text;
+    color: transparent;
+}
+
+/* =========================
+   MAIN
+========================= */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 40px 20px;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    height: 600px;
+
+    padding: 25px;
+    border-radius: 16px;
+
+    background: #1e1c1c;
+    border: 1px solid rgba(255,255,255,0.1);
+
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+
+    display: flex;
+    flex-direction: column;
+}
+
+/* =========================
+   TABS
+========================= */
+.tabs-header {
+    display: flex;
+    gap: 15px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 10px;
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    color: #888;
+    font-weight: 600;
+    padding: 10px 16px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.tab-btn:hover {
+    color: #FD9C00;
+}
+
+.tab-btn.active {
+    color: #FD9C00;
+}
+
+.tab-btn.active::after {
+    content: "";
+    display: block;
+    height: 3px;
+    background: #FD9C00;
+    border-radius: 2px;
+    margin-top: 6px;
+}
+
+/* =========================
+   EVENTS LIST
+========================= */
+.all-my-events {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-right: 6px;
+}
+
+.all-my-events::-webkit-scrollbar {
+    width: 6px;
+}
+.all-my-events::-webkit-scrollbar-thumb {
+    background: #FD9C00;
+    border-radius: 4px;
+}
+
+/* =========================
+   EVENT CARD
+========================= */
+.event-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    padding: 16px;
+    border-radius: 12px;
+
+    background: #2a2828;
+    border: 1px solid transparent;
+
+    transition: 0.3s;
+}
+
+.event-card:hover {
+    transform: translateY(-3px);
+    border-color: #FD9C00;
+    box-shadow: 0 8px 20px rgba(253,156,0,0.3);
+}
+
+.event-label {
+    color: #FD9C00;
+    font-size: 0.9rem;
+}
+
+.event-name {
+    flex: 1;
+    font-weight: 600;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+.create-button,
+.popup-confirm,
+.auth-button {
+    background: linear-gradient(135deg, #FD9C00, #FFB740);
+    border: none;
+    border-radius: 25px;
+    color: #000;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.create-button:hover,
+.popup-confirm:hover,
+.auth-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(253,156,0,0.5);
+}
+
+.create-button {
+    padding: 14px 28px;
+    margin-top: auto;
+}
+
+/* secondary */
+.popup-cancel {
+    border: 2px solid #FD9C00;
+    background: transparent;
+    color: #FD9C00;
+    border-radius: 25px;
+}
+
+/* =========================
+   POPUP
+========================= */
+.popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+.popup-content {
+    background: #1e1c1c;
+    border-radius: 16px;
+    padding: 30px;
+    width: 90%;
+    max-width: 500px;
+
+    box-shadow: 0 20px 40px rgba(0,0,0,0.7);
+    animation: popup 0.3s ease;
+}
+
+@keyframes popup {
+    from {opacity:0; transform: translateY(-20px) scale(0.95);}
+    to {opacity:1; transform: translateY(0) scale(1);}
+}
+
+/* =========================
+   INPUTS
+========================= */
+.form-input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #444;
+    background: #2a2828;
+    color: #fff;
+}
+
+.form-input:focus {
+    border-color: #FD9C00;
+    box-shadow: 0 0 8px rgba(253,156,0,0.4);
+    outline: none;
+}
+
+/* =========================
+   EMPTY STATE
+========================= */
+.empty-state {
+    text-align: center;
+    opacity: 0.6;
+}
+
+.empty-state span {
+    font-size: 40px;
+}
+
+/* =========================
+   MOBILE
+========================= */
+@media (max-width: 768px) {
+    .event-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .create-button {
+        width: 100%;
+    }
+}
+
+.all-my-events {
+    padding-top: 12px;
+}
+
+.event-card {
+    position: relative;
+    transition: 0.3s;
+}
+
+.event-card:hover {
+    transform: translateY(-3px);
+    z-index: 5;
+}
+
+/* =========================
+   PARTICLES BACKGROUND
+========================= */
+.particles {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+/* ОБЩИЕ СЛОИ */
+.particles::before,
+.particles::after {
+    content: "";
+    position: absolute;
+    width: 300%;
+    height: 300%;
+    background-repeat: repeat;
+}
+
+/* ===== СЛОЙ 1 (крупные и средние звезды) ===== */
+.particles::before {
+    background-image:
+        radial-gradient(5px 5px at 10% 20%, #FD9C00, transparent),
+        radial-gradient(4px 4px at 30% 80%, #ffffff, transparent),
+        radial-gradient(6px 6px at 70% 40%, #FFB740, transparent),
+        radial-gradient(3px 3px at 90% 70%, #ffffff, transparent),
+        radial-gradient(5px 5px at 50% 10%, #FD9C00, transparent),
+        radial-gradient(4px 4px at 80% 20%, #ffffff, transparent),
+        radial-gradient(6px 6px at 20% 60%, #FFB740, transparent);
+
+    opacity: 0.5;
+    animation: starsMoveSlow 80s linear infinite;
+}
+
+/* ===== СЛОЙ 2 (мелкие + дополнительные) ===== */
+.particles::after {
+    background-image:
+        radial-gradient(2px 2px at 15% 30%, #ffffff, transparent),
+        radial-gradient(3px 3px at 40% 60%, #FD9C00, transparent),
+        radial-gradient(2px 2px at 60% 90%, #ffffff, transparent),
+        radial-gradient(3px 3px at 85% 50%, #FFB740, transparent),
+        radial-gradient(2px 2px at 75% 15%, #ffffff, transparent),
+        radial-gradient(3px 3px at 25% 85%, #FD9C00, transparent),
+        radial-gradient(2px 2px at 55% 35%, #ffffff, transparent),
+        radial-gradient(3px 3px at 95% 10%, #FFB740, transparent);
+
+    opacity: 0.3;
+    animation: starsMoveFast 50s linear infinite;
+}
+
+.particles::before,
+.particles::after {
+    background-repeat: repeat;
+    background-size: 300px 300px;
+}
+
+/* ===== АНИМАЦИЯ ===== */
+@keyframes starsMoveSlow {
+    from {
+        transform: translate(0, 0);
+    }
+    to {
+        transform: translate(-200px, -300px);
+    }
+}
+
+@keyframes starsMoveFast {
+    from {
+        transform: translate(0, 0);
+    }
+    to {
+        transform: translate(300px, -400px);
+    }
 }

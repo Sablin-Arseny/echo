@@ -45,12 +45,6 @@ h1, h2 {
     gap: 20px;
 }
 
-/* ===== EVENT INFO ===== */
-#event-info p {
-    margin-bottom: 8px;
-    font-size: 0.95rem;
-}
-
 /* ===== AUTH SECTION ===== */
 #auth-section {
     display: flex;
@@ -86,6 +80,8 @@ h1, h2 {
     display: flex;
     flex-direction: column;
     gap: 15px;
+    margin: 10px;
+    padding: 10px;
 }
 
 .buttons {
@@ -105,12 +101,6 @@ h1, h2 {
     font-weight: 600;
     cursor: pointer;
     transition: 0.2s ease;
-}
-
-.btn-primary:hover,
-#join-btn:hover {
-    transform: translateY(2px);
-    box-shadow: 0 -3px 5px 0 #ffffff;
 }
 
 .btn-secondary,
@@ -164,5 +154,188 @@ h1, h2 {
     .buttons {
         flex-direction: column;
         gap: 10px;
+    }
+}
+
+/* =========================
+   PARTICLES BACKGROUND
+========================= */
+.particles {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+/* ОБЩИЕ СЛОИ */
+.particles::before,
+.particles::after {
+    content: "";
+    position: absolute;
+    width: 300%;
+    height: 300%;
+    background-repeat: repeat;
+}
+
+/* ===== СЛОЙ 1 (крупные и средние звезды) ===== */
+.particles::before {
+    background-image:
+        radial-gradient(5px 5px at 10% 20%, #FD9C00, transparent),
+        radial-gradient(4px 4px at 30% 80%, #ffffff, transparent),
+        radial-gradient(6px 6px at 70% 40%, #FFB740, transparent),
+        radial-gradient(3px 3px at 90% 70%, #ffffff, transparent),
+        radial-gradient(5px 5px at 50% 10%, #FD9C00, transparent),
+        radial-gradient(4px 4px at 80% 20%, #ffffff, transparent),
+        radial-gradient(6px 6px at 20% 60%, #FFB740, transparent);
+
+    opacity: 0.5;
+    animation: starsMoveSlow 80s linear infinite;
+}
+
+/* ===== СЛОЙ 2 (мелкие + дополнительные) ===== */
+.particles::after {
+    background-image:
+        radial-gradient(2px 2px at 15% 30%, #ffffff, transparent),
+        radial-gradient(3px 3px at 40% 60%, #FD9C00, transparent),
+        radial-gradient(2px 2px at 60% 90%, #ffffff, transparent),
+        radial-gradient(3px 3px at 85% 50%, #FFB740, transparent),
+        radial-gradient(2px 2px at 75% 15%, #ffffff, transparent),
+        radial-gradient(3px 3px at 25% 85%, #FD9C00, transparent),
+        radial-gradient(2px 2px at 55% 35%, #ffffff, transparent),
+        radial-gradient(3px 3px at 95% 10%, #FFB740, transparent);
+
+    opacity: 0.3;
+    animation: starsMoveFast 50s linear infinite;
+}
+
+.particles::before,
+.particles::after {
+    background-repeat: repeat;
+    background-size: 300px 300px;
+}
+
+/* ===== АНИМАЦИЯ ===== */
+@keyframes starsMoveSlow {
+    from {
+        transform: translate(0, 0);
+    }
+    to {
+        transform: translate(-200px, -300px);
+    }
+}
+
+@keyframes starsMoveFast {
+    from {
+        transform: translate(0, 0);
+    }
+    to {
+        transform: translate(300px, -400px);
+    }
+}
+
+body {
+    background: #121212 url("../images/bottom_light.png") no-repeat bottom;
+    color: #f5f5f5;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.btn-primary, .join-btn {
+    background: linear-gradient(135deg, #FD9C00, #FFB740);
+    border: none;
+    border-radius: 25px;
+    color: #000;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-primary:hover, .join-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(253,156,0,0.5);
+}
+
+.invite-card {
+    background: #1e1c1c;
+    border: 2px solid #FD9C00;
+    border-radius: 16px;
+    padding: 25px;
+    max-width: 500px;
+    width: 90%;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    background: #1e1c1c;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.text {
+    margin-bottom: 35px;
+    font-size: 1.25rem;
+}
+
+/* Ряд с заголовком и значением */
+.event-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;  /* для многострочного текста */
+    gap: 10px;
+    flex-wrap: wrap;          /* чтобы длинный текст переносился */
+    margin: 20px;
+}
+
+/* Заголовок поля */
+.field-label {
+    font-weight: 800;
+    background-clip: text;
+    color: #FD9C00;
+    min-width: 120px;
+    justify-self: start;
+    display: flex;
+    margin-bottom: 10px;
+    align-self: center;
+}
+
+/* Значение поля */
+.field-value {
+    flex: 1;                  /* занимает оставшееся пространство */
+    color: #ffffff;
+    word-break: break-word;
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: flex-end;
+    text-shadow: 0 0 2px #ffffff;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    overflow: hidden;
+}
+
+/* ===== MOBILE RESPONSIVE ===== */
+@media (max-width: 650px) {
+    /* Панель события */
+    .invite-card {
+        padding: 20px;
+        width: 95%;
+    }
+
+    /* Каждый ряд превращается в колонку */
+    .event-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+
+    /* Заголовок сверху */
+    .field-label {
+        min-width: auto; /* убираем фиксированную ширину */
+        font-size: 0.95rem;
+        margin-bottom: 2px;
+    }
+
+    /* Значение под заголовком */
+    .field-value {
+        flex: unset;
+        font-size: 0.95rem;
     }
 }
