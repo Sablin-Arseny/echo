@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Приглашение на мероприятие</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/invite.css">
+    <link rel="stylesheet" href="/css/first-page.css">
+    <link rel="icon" href="../images/Logo.svg" sizes="any">
+</head>
+<body>
+    <div class="invite-container">
+        <div class="invite-card">
+            <h1>Приглашение на мероприятие</h1>
+            <div id="event-info">
+                <!-- Информация о мероприятии будет загружена сюда -->
+            </div>
+            <div id="auth-section">
+                <!-- Формы авторизации -->
+            </div>
+            <div id="choice-section" style="display: none;">
+                <p>Хотите присоединиться к этому мероприятию?</p>
+                <button id="join-btn" class="btn btn-primary">Присоединиться</button>
+                <button id="decline-btn" class="btn btn-secondary">Отказаться</button>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="/js/invite.js"></script>
+
+    <div id="authPopup" class="popup-overlay">
+        <div class="popup-content">
+            <!-- Форма входа -->
+            <div id="loginForm" class="login-form">
+                <div class="popup-header">
+                    <h2>Вход</h2>
+                    <button class="close-btn" id="closePopup">&times;</button>
+                </div>
+                <form id="authForm">
+                    <div class="form-group">
+                        <label for="login">Логин</label>
+                        <input
+                                type="text"
+                                id="login"
+                                name="login"
+                                placeholder="Введите логин"
+                                required
+                        >
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Пароль</label>
+                        <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                placeholder="Введите пароль"
+                                required
+                        >
+                    </div>
+                    <div class="error-message" id="loginError"></div>
+                    <button type="submit" class="submit-btn">Войти</button>
+                </form>
+                <div class="popup-footer">
+                    <p>Нет аккаунта? <a href="#" class="register-link" id="showRegisterForm">Зарегистрироваться</a></p>
+                </div>
+            </div>
+
+            <!-- Форма регистрации -->
+            <div id="registerForm" class="register-form">
+                <div class="popup-header">
+                    <h2>Регистрация</h2>
+                    <button class="close-btn" id="closeRegisterForm">&times;</button>
+                </div>
+                <form id="registrationForm">
+                    <div class="form-group">
+                        <label for="regUsername">Имя пользователя</label>
+                        <input
+                                type="text"
+                                id="regUsername"
+                                name="username"
+                                placeholder="Введите имя пользователя"
+                                required
+                        >
+                    </div>
+                    <div class="form-group">
+                        <label for="regTelegramId">Telegram ID</label>
+                        <input
+                                type="text"
+                                id="regTelegramId"
+                                name="tg_id"
+                                placeholder="Введите Telegram ID"
+                                required
+                        >
+                        <small style="color: #888; font-size: 12px; display: block; margin-top: 5px;">
+                            Чтобы получить Telegram ID, напишите боту @userinfobot
+                        </small>
+                        <div class="error-message" id="regTgIdError"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="regFullName">Полное имя</label>
+                        <input
+                                type="text"
+                                id="regFullName"
+                                name="full_name"
+                                placeholder="Введите полное имя"
+                                required
+                        >
+                    </div>
+                    <div class="form-group">
+                        <label for="regPassword">Пароль</label>
+                        <input
+                                type="password"
+                                id="regPassword"
+                                name="password"
+                                placeholder="Введите пароль"
+                                required
+                        >
+                    </div>
+                    <div class="form-group">
+                        <label for="regConfirmPassword">Подтвердите пароль</label>
+                        <input
+                                type="password"
+                                id="regConfirmPassword"
+                                placeholder="Подтвердите пароль"
+                                required
+                        >
+                    </div>
+                    <div class="error-message" id="registerError"></div>
+                    <button type="submit" class="submit-btn">Зарегистрироваться</button>
+                </form>
+                <div class="form-switch">
+                    <a href="#" class="back-to-login" id="showLoginForm">← Вернуться ко входу</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script type="module" src="../js/invite.js"></script>
+
+</html>

@@ -61,6 +61,10 @@ class SmartAPI {
         return EventApi.addUserToEvent(data, userToken);
     }
 
+    static addUserToEventByInviteLink(data){
+        return EventApi.addUserToEventByInviteLink(data);
+    }
+
     static getInvitedGUserEvents(userToken){
         return EventApi.getInvitedGUserEvents(userToken);
     }
