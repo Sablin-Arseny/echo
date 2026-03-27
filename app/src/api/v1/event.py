@@ -103,6 +103,29 @@ async def add_user_to_event(
     return event_response
 
 
+@router.post("./add_user_by_invite")
+async def add_user_by_invite(
+    event_id: int,
+    user_to_add: User,
+    event_service: EventService = Depends(EventService.get_as_dependency),
+) -> EventResponse:
+    try:
+        event = await event_service.add_user_by_invite(
+            event_id=event_id, user_to_add=user_to_add
+        )
+        participants = await event_service.get_participants(event_id)
+        participants = [Participant.model_validate(user) for user in participants]
+        event_response = EventResponse.model_validate(event)
+        event_response.participants = participants
+    except LookupError as e:
+        raise HTTPException(status_code=404, detail=repr(e))
+    except ValueError as e:
+        raise HTTPException(status_code=403, detail=repr(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=repr(e))
+    return event_response
+
+
 @router.post("/update_status_of_member")
 async def update_status_of_member(
     event_id: int,
