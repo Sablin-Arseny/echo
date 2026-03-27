@@ -7,7 +7,7 @@
 
 body {
     background-color: #1A1919;
-    background-image: url("../images/bottom_light.png");
+    background-image: url("../images/Looper\ BG.png");
     background-position: bottom;
     background-repeat: no-repeat;
     min-height: 100vh;
@@ -465,7 +465,8 @@ main {
 
 body {
     background-color: #121212;
-    background-image: url("../images/bottom_light.png");
+    background-image: url("../images/Looper\ BG.png");
+    background-size: cover;
     background-position: bottom;
     background-repeat: no-repeat;
     min-height: 100vh;
@@ -720,7 +721,11 @@ header {
     padding: 40px 20px;
     color: #aaa;
     font-size: 14px;
-    border-top: 1px solid #333;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
 }
 
 /* ===========================
@@ -739,4 +744,52 @@ header {
     .submit-btn { padding: 14px; font-size: 16px; }
     .hero h1 { font-size: 32px; }
     .hero p { font-size: 16px; }
+}
+
+/* Анимации при скролле */
+.animate-on-scroll {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.animate-on-scroll.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Дополнительные эффекты для карточек и шагов */
+.feature-card.animate-on-scroll {
+    transform: translateY(50px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.step.animate-on-scroll {
+    transform: translateX(-30px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+/* Canvas под hero */
+.hero {
+    position: relative;
+    overflow: hidden;
+}
+
+#waveCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0; /* под текстом */
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1; /* поверх волн */
+}
+
+/* Если нужно, фон hero прозрачный, чтобы волны были видны */
+.hero {
+    background: transparent;
 }

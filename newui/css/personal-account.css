@@ -598,7 +598,7 @@ textarea.form-input::-webkit-scrollbar-thumb:hover,
 }
 
 .btn-logout {
-    background: linear-gradient(135deg, #ff0000, #ff7777);
+    background: linear-gradient(135deg, #ff3535, #ff7777);
 }
 
 .btn-primary:hover,
@@ -614,4 +614,17 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+}
+
+.modal-content {
+    background: #1e1c1c;
+    border: 2px solid #FD9C00;
+    border-radius: 16px;
+    padding: 25px;
+    max-width: 500px;
+    width: 90%;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    background: #1e1c1c;
+    border: 1px solid rgba(255,255,255,0.1);
 }
