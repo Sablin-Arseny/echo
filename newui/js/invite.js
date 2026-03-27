@@ -213,13 +213,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     // --- Обработка кнопок ---
     joinBtn.addEventListener('click', async () => {
         try {
-            const userData = await SmartAPI.getUserInfo(token);
+            const userData = await SmartAPI.getUserInfo(JSON.parse(localStorage.getItem("userToken")));
             const existingParticipant = eventData.participants.find(p => p.id === userData.id);
 
             if (!existingParticipant) {
-                await SmartAPI.addUserToEvent({ event_id: eventId, id: userData.id }, token);
+                await SmartAPI.addUserToEventByInviteLink({ event_id: eventId, id: userData.id });
+                await SmartAPI.updateStatusOfMemberToInvited({ event_id: eventId, id: userData.id }, "PARTICIPATING");
             } else if (['REFUSED','DELETED'].includes(existingParticipant.status)) {
-                await SmartAPI.updateStatusOfMemberToInvited({ event_id: eventId, id: userData.id }, "DRAFT");
+                await SmartAPI.updateStatusOfMemberToInvited({ event_id: eventId, id: userData.id }, "PARTICIPATING");
             }
 
             window.location.href = '/my-event-page.html';

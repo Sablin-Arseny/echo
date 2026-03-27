@@ -116,6 +116,30 @@ class EventApi {
         }
     }
 
+    static async addUserToEventByInviteLink(data){
+        try {
+            const response = await fetch(`${API_BASE}/event/add_user_by_invite?event_id=${data.event_id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    id: data.id
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('Ошибка приглашения пользователя:', error);
+            throw error;
+        }
+    }
+
     static async updateStatusOfMember(data, status){
         try {
             const response = await fetch(`${API_BASE}/event/update_status_of_member?event_id=${data.event_id}&status=${status}`, {
