@@ -95,6 +95,12 @@ class EventService:
             event_id, user_to_add, "PARTICIPANT"
         )
 
+    async def add_user_by_invite(self, event_id: int, user_to_add: User):
+        user_to_add = await self._user_db.get(user_to_add)
+        return await self._event_db.add_relation_event_member(
+            event_id, user_to_add, "PARTICIPANT"
+        )
+
     async def update_member_role(
         self, event_id: int, user_to_update: User, role: ROLES, user: User
     ):
