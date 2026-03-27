@@ -13,6 +13,7 @@ class BudgetApi {
                     event_id: Data.event_id,
                     amount: Data.amount,
                     description: Data.description,
+                    is_equally: Data.is_equally,
                     participants: Data.participants
                 })
             });
