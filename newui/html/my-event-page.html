@@ -4,100 +4,169 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Мои мероприятия</title>
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
     <link rel="stylesheet" href="/css/my-event-page.css">
+
+    <!-- Icon -->
     <link rel="icon" href="../images/Logo.svg" sizes="any">
 </head>
+
 <body>
+
+<div class="particles"></div>
+
+<!-- ================= HEADER ================= -->
 <header>
-    <img src="../images/Logo.svg" alt="наше лого" class="logo">
+    <img src="../images/Logo.svg" alt="Логотип" class="logo">
+
     <button id="authButton" class="auth-button">
         <span id="authText" class="auth-text"><b>Войти</b></span>
-        <span class="user-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
-              <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
-              <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
-            </svg>
-        </span>
+        <span class="user-icon">👤</span>
     </button>
 </header>
+
+<!-- ================= MAIN ================= -->
 <main class="main-content">
+
     <h1 class="page-title">Мои мероприятия</h1>
-    <div class="container">
-        <!-- ===== НАЧАЛО: Панель вкладок ===== -->
+
+    <section class="container">
+
+        <!-- ===== TABS ===== -->
         <div class="tabs-container">
+
+            <!-- Header -->
             <div class="tabs-header">
-                <button class="tab-btn active" data-tab="participating">Участвую</button>
-                <button class="tab-btn" data-tab="invitations">Приглашение</button>
+                <button class="tab-btn active" data-tab="participating">
+                    Участвую
+                </button>
+                <button class="tab-btn" data-tab="invitations">
+                    Приглашения
+                </button>
             </div>
 
+            <!-- Content -->
             <div class="tabs-content">
-                <!-- Вкладка "Участвую" -->
+
+                <!-- Участвую -->
                 <div class="tab-pane active" id="participating-tab">
                     <div class="all-my-events" id="participating-events">
-                        <!-- Здесь будут мероприятия, в которых пользователь участвует -->
+
+                        <!-- Пример карточки -->
+                        <!--
+                        <div class="event-card">
+                            <span>📅</span>
+                            <div class="event-label">Событие</div>
+                            <div class="event-name">День рождения</div>
+                        </div>
+                        -->
+
+                        <div class="empty-state">
+                            <span>📭</span>
+                            <p>У вас пока нет мероприятий</p>
+                        </div>
+
                     </div>
                 </div>
 
-                <!-- Вкладка "Приглашение" -->
+                <!-- Приглашения -->
                 <div class="tab-pane" id="invitations-tab">
                     <div class="all-my-events" id="invitation-events">
-                        <!-- Здесь будут приглашения на мероприятия -->
+
                         <div class="empty-state">
+                            <span>📨</span>
                             <p>Нет новых приглашений</p>
                         </div>
+
+                        <!-- Пример приглашения -->
+                        <!--
+                        <div class="event-card">
+                            <span>📅</span>
+                            <div class="event-label">Приглашение</div>
+                            <div class="event-name">Корпоратив</div>
+
+                            <div class="event-actions">
+                                <button class="btn-accept">✔ Принять</button>
+                                <button class="btn-decline">✖ Отклонить</button>
+                            </div>
+                        </div>
+                        -->
+
                     </div>
                 </div>
+
             </div>
         </div>
-        <!-- ===== КОНЕЦ: Панель вкладок ===== -->
 
-        <button class="create-button" id="createBtn">Создать</button>
-    </div>
+        <!-- CREATE BUTTON -->
+        <button class="create-button" id="createBtn">
+            ➕ Создать мероприятие
+        </button>
+
+    </section>
+
 </main>
 
+<!-- ================= POPUP ================= -->
 <div id="createPopup" class="popup-overlay">
+
     <div class="popup-content">
+
         <button class="popup-close" id="closeBtn">×</button>
+
         <h2>Создание мероприятия</h2>
+
         <div class="popup-body">
+
             <form class="event-form" id="eventForm">
+
                 <div class="form-row">
-                    <label for="eventName">Название:</label>
-                    <input type="text" id="eventName" class="form-input" placeholder="Введите название мероприятия" maxlength="100">
+                    <label for="eventName">Название</label>
+                    <input type="text" id="eventName" class="form-input" placeholder="Например: День рождения" maxlength="100">
                 </div>
 
                 <div class="form-row">
-                    <label for="eventDate">Дата проведения:</label>
+                    <label for="eventDate">Дата проведения</label>
                     <input type="date" id="eventDate" class="form-input">
                 </div>
 
                 <div class="form-row">
-                    <label for="eventExitDate">Максимальная дата выхода:</label>
+                    <label for="eventExitDate">Дата выхода</label>
                     <input type="date" id="eventExitDate" class="form-input">
                 </div>
 
                 <div class="form-row">
-                    <label for="eventPlace">Место проведения:</label>
-                    <input type="text" id="eventPlace" class="form-input" placeholder="Введите место проведения" maxlength="200">
+                    <label for="eventPlace">Место</label>
+                    <input type="text" id="eventPlace" class="form-input" placeholder="Город, адрес..." maxlength="200">
                 </div>
 
                 <div class="form-row form-row-full">
-                    <label for="eventDescription">Описание:</label>
-                    <textarea id="eventDescription" class="form-input form-textarea" placeholder="Опишите ваше мероприятие..." maxlength="1000"></textarea>
+                    <label for="eventDescription">Описание</label>
+                    <textarea id="eventDescription" class="form-input form-textarea"
+                              placeholder="Добавьте описание мероприятия..." maxlength="1000"></textarea>
                 </div>
+
             </form>
 
+            <!-- Buttons -->
             <div class="popup-buttons">
                 <button class="popup-cancel" id="cancelBtn">Отмена</button>
                 <button class="popup-confirm" id="approveBtn">Создать</button>
             </div>
+
         </div>
     </div>
+
 </div>
 
+<!-- ================= SCRIPTS ================= -->
 <script type="module" src="/js/my-event-page.js"></script>
+
 </body>
 </html>

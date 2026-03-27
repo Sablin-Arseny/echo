@@ -452,3 +452,291 @@ main {
         padding: 14px;
     }
 }
+
+/* ===========================
+   БАЗОВЫЕ СТИЛИ
+=========================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Montserrat Alternates', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #121212;
+    background-image: url("../images/bottom_light.png");
+    background-position: bottom;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    color: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* ===========================
+   HEADER
+=========================== */
+header {
+    width: 100%;
+    max-width: 1510px;
+    height: 124px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 auto;
+    padding: 0 20px;
+    box-sizing: border-box;
+    background: rgba(18, 18, 18, 0.95);
+    backdrop-filter: blur(10px);
+}
+
+.auth-button {
+    height: 60px;
+    width: 100%;
+    max-width: 168px;
+    min-width: 60px;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: linear-gradient(135deg, #FD9C00, #FFB740);
+    color: #000;
+    font-size: 20px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.auth-button:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 20px rgba(253, 156, 0, 0.5);
+}
+
+.auth-text {
+    flex: 1;
+    text-align: left;
+    font-weight: 600;
+}
+
+/* ===========================
+   POPUP
+=========================== */
+.popup-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.3s ease;
+}
+
+.popup-content {
+    background-color: #1E1C1C;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 480px;
+    padding: 35px 30px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    border: 1px solid #333;
+    animation: popupShow 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+@keyframes popupShow {
+    from {
+        opacity: 0;
+        transform: translateY(-30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.popup-header h2 {
+    font-size: 28px;
+    color: #FFB740;
+    font-weight: 700;
+}
+
+/* Close Button */
+.close-btn {
+    font-size: 32px;
+    color: #fff;
+    transition: color 0.3s, transform 0.3s;
+}
+
+.close-btn:hover {
+    color: #FD9C00;
+    transform: rotate(90deg);
+}
+
+/* Form Fields */
+.form-group input {
+    background-color: #2A2828;
+    border: 2px solid #444;
+    border-radius: 12px;
+    padding: 14px 16px;
+    color: #fff;
+    font-size: 16px;
+    transition: all 0.3s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #FFB740;
+    box-shadow: 0 0 8px rgba(255, 183, 64, 0.4);
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #FD9C00, #FFB740);
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.submit-btn:hover {
+    background: linear-gradient(135deg, #FFB740, #FFD37A);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(253, 156, 0, 0.5);
+}
+
+/* ===========================
+   HERO
+=========================== */
+.hero h1 {
+    font-size: 50px;
+    color: #FFB740;
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.5);
+}
+
+.hero p {
+    font-size: 20px;
+    color: #ccc;
+    line-height: 1.6;
+}
+
+/* Hero Buttons */
+.hero-buttons .primary-btn {
+    background: linear-gradient(135deg, #FD9C00, #FFB740);
+    border-radius: 25px;
+    font-weight: 700;
+    transition: all 0.3s ease;
+}
+
+.hero-buttons .primary-btn:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 20px rgba(253, 156, 0, 0.5);
+}
+
+.hero-buttons .secondary-btn {
+    border: 2px solid #FFB740;
+    color: #FFB740;
+    border-radius: 25px;
+}
+
+.hero-buttons .secondary-btn:hover {
+    background-color: #FFB740;
+    color: #121212;
+}
+
+/* ===========================
+   FEATURES
+=========================== */
+.feature-card {
+    background-color: #2A2828;
+    padding: 30px;
+    border-radius: 18px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.feature-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 25px rgba(253, 156, 0, 0.4);
+    border: 1px solid #FFB740;
+}
+
+.feature-card h3 {
+    color: #FFB740;
+    margin-bottom: 12px;
+    font-size: 22px;
+}
+
+/* ===========================
+   HOW IT WORKS
+=========================== */
+.step span {
+    background: linear-gradient(135deg, #FD9C00, #FFB740);
+    color: #121212;
+    font-size: 18px;
+    font-weight: bold;
+    transition: transform 0.3s;
+}
+
+.step span:hover {
+    transform: scale(1.2);
+}
+
+/* ===========================
+   CTA
+=========================== */
+.cta h2 {
+    font-size: 36px;
+    color: #FFB740;
+}
+
+.cta .primary-btn {
+    font-size: 20px;
+    padding: 18px 40px;
+    border-radius: 30px;
+    background: linear-gradient(135deg, #FD9C00, #FFB740);
+}
+
+.cta .primary-btn:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 10px 25px rgba(253, 156, 0, 0.5);
+}
+
+/* ===========================
+   FOOTER
+=========================== */
+.footer {
+    text-align: center;
+    padding: 40px 20px;
+    color: #aaa;
+    font-size: 14px;
+    border-top: 1px solid #333;
+}
+
+/* ===========================
+   RESPONSIVE
+=========================== */
+@media (max-width: 768px) {
+    .hero h1 { font-size: 40px; }
+    .hero p { font-size: 18px; }
+    .features-grid { gap: 20px; }
+}
+
+@media (max-width: 480px) {
+    .popup-content { padding: 20px; margin: 15px; }
+    .popup-header h2 { font-size: 24px; }
+    .form-group input { padding: 12px; }
+    .submit-btn { padding: 14px; font-size: 16px; }
+    .hero h1 { font-size: 32px; }
+    .hero p { font-size: 16px; }
+}
