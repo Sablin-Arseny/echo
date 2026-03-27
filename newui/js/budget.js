@@ -24,16 +24,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     const amountInput = document.getElementById("expense-amount");
     const deleteExpenseBtn = document.getElementById('delete-expense-btn');
     const modalTitle = document.getElementById('modal-title');
+    const isEquallyCheckbox = document.getElementById("is-equally-checkbox");
 
     // --- Таблицы ---
     const expensesTbody = document.getElementById("expenses-tbody");
     const debtsTbody = document.getElementById("debts-tbody");
     const totalAmountEl = document.getElementById("total-amount");
 
-    // --- Multi-select участников ---
-    const multiSelect = document.getElementById('expense-participants');
-    const multiSelected = multiSelect.querySelector('.multi-selected');
-    const multiItems = multiSelect.querySelector('.multi-items');
+    // --- Новые элементы для работы с участниками ---
+    const participantsCheckboxes = document.getElementById('participants-checkboxes');
+    const participantSharesContainer = document.getElementById('participant-shares-container');
+    const participantSharesList = document.getElementById('participant-shares-list');
+    let selectedParticipants = []; // { username, tg_id, share }
 
     // --- Переменные состояния ---
     let allExpenses = [];
@@ -42,37 +44,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     const currentUser = await getCurrentUserInfo();
     const currentEventId = JSON.parse(localStorage.getItem('currentEventId'));
     let editingBudgetId = null;
-    let filters = {
-        status: "",
-        role: ""
-    };
+    let filters = { status: "", role: "" };
 
     // --- Инициализация ---
     await getEventUsers();
     await updateExpensesFromServer();
 
-    // --- Logo click handler ---
+    // --- Обработчики навигации ---
     if (logo) {
-        logo.addEventListener('click', () => {
-            window.location.href = 'my-event-page.html';
-        });
+        logo.addEventListener('click', () => window.location.href = 'my-event-page.html');
     }
-
     if (backBtn) {
-        backBtn.addEventListener('click', () => {
-            if (window.history.length > 1) {
-                window.history.back();
-            } else {
-                window.location.href = 'my-event-page.html';
-            }
-        });
+        backBtn.addEventListener('click', () => window.history.length > 1 ? window.history.back() : window.location.href = 'my-event-page.html');
     }
-
-    // --- Auth button click handler ---
     if (authButton) {
-        authButton.addEventListener('click', () => {
-            window.location.href = 'personal-account.html';
-        });
+        authButton.addEventListener('click', () => window.location.href = 'personal-account.html');
     }
 
     // --- Фильтры ---
@@ -80,7 +66,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         filters.status = e.target.value;
         updateExpensesTable();
     });
-
     roleFilter.addEventListener('change', (e) => {
         filters.role = e.target.value;
         updateExpensesTable();
@@ -90,27 +75,55 @@ document.addEventListener('DOMContentLoaded', async () => {
     function openModal(modal) { modal.style.display = 'flex'; }
     function closeModal(modal) { modal.style.display = 'none'; }
 
+    // --- Открытие формы добавления траты ---
     addExpenseBtn.addEventListener('click', () => {
         editingBudgetId = null;
         expenseForm.reset();
-        multiSelected.textContent = 'Выберите участников';
-        multiItems.querySelectorAll('input').forEach(cb => cb.checked = false);
+        // Сброс выбранных участников
+        selectedParticipants = [];
+        // Сброс чекбоксов
+        document.querySelectorAll('#participants-checkboxes input[type="checkbox"]').forEach(cb => cb.checked = false);
+        // Автоматически отметить автора
+        const authorCheckbox = document.querySelector(`#participants-checkboxes input[value="${currentUser.username}"]`);
+        if (authorCheckbox) {
+            authorCheckbox.checked = true;
+            updateSelectedParticipants(authorCheckbox);
+        }
+        // Скрыть блок долей, сбросить флаг равного деления
+        participantSharesContainer.style.display = 'none';
+        isEquallyCheckbox.checked = false;
         deleteExpenseBtn.style.display = 'none';
         modalTitle.textContent = 'Новая трата';
         document.getElementById("expense-author-display").textContent = currentUser.username;
         openModal(expenseModal);
     });
 
+    // --- Закрытие модалок ---
     closeExpenseBtn.addEventListener('click', () => closeModal(expenseModal));
     closeDetailBtn.addEventListener('click', () => closeModal(detailModal));
-    cancelExpenseBtn.addEventListener('click', () => { 
-        expenseForm.reset(); 
-        closeModal(expenseModal); 
+    cancelExpenseBtn.addEventListener('click', () => {
+        expenseForm.reset();
+        closeModal(expenseModal);
     });
 
-    // --- Закрытие мультиселекта при клике снаружи ---
-    document.addEventListener('click', e => {
-        if (!multiSelect.contains(e.target)) multiItems.classList.add('select-hide');
+    // --- Обработка изменения суммы ---
+    amountInput.addEventListener('input', () => {
+        if (!isEquallyCheckbox.checked) {
+            renderParticipantShares();
+        } else {
+            updateEqualShares();
+        }
+    });
+
+    // --- Переключение режима "разделить поровну" ---
+    isEquallyCheckbox.addEventListener('change', () => {
+        if (isEquallyCheckbox.checked) {
+            participantSharesContainer.style.display = 'none';
+            updateEqualShares();
+        } else {
+            participantSharesContainer.style.display = 'block';
+            renderParticipantShares();
+        }
     });
 
     // --- Загрузка участников события ---
@@ -123,6 +136,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                     participantsDict[p.username] = p.tg_id;
                 }
             });
+            // Убедимся, что текущий пользователь есть в списке (если его нет – добавим)
+            if (!participantsDict[currentUser.username]) {
+                participantsDict[currentUser.username] = currentUser.tg_id;
+            }
             loadParticipants(Object.keys(participantsDict));
         } catch (error) {
             console.error("Ошибка загрузки участников события:", error);
@@ -156,34 +173,104 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // --- Загрузка участников в мультиселект ---
+    // --- Загрузка участников в чекбоксы ---
     function loadParticipants(usernames) {
-        multiItems.innerHTML = '';
+        participantsCheckboxes.innerHTML = '';
         usernames.forEach(username => {
             const wrapper = document.createElement('label');
-            wrapper.className = 'multi-item';
+            wrapper.className = 'participant-checkbox';
             wrapper.innerHTML = `
-                <div class="multi-item">
-                    <label>
-                        <input type="checkbox" value="${username}">
-                        <span>${username}</span>
-                    </label>
-                </div>
+                <input type="checkbox" value="${username}" data-tg-id="${participantsDict[username]}">
+                <span>${username}</span>
             `;
-            multiItems.appendChild(wrapper);
-        });
-        multiItems.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-            cb.addEventListener('change', updateMultiSelectedText);
+            const cb = wrapper.querySelector('input');
+            cb.addEventListener('change', (e) => {
+                updateSelectedParticipants(e.target);
+            });
+            participantsCheckboxes.appendChild(wrapper);
         });
     }
 
-    // --- Обновление текста мультиселекта ---
-    function updateMultiSelectedText() {
-        const checked = Array.from(multiItems.querySelectorAll('input:checked')).map(c => c.value);
-        multiSelected.textContent = checked.length ? checked.join(', ') : 'Выберите участников';
+    // --- Обновление выбранных участников ---
+    function updateSelectedParticipants(checkbox) {
+        const username = checkbox.value;
+        const tg_id = checkbox.getAttribute('data-tg-id');
+        const isChecked = checkbox.checked;
+
+        if (isChecked) {
+            if (!selectedParticipants.some(p => p.username === username)) {
+                selectedParticipants.push({ username, tg_id, share: 0 });
+            }
+        } else {
+            selectedParticipants = selectedParticipants.filter(p => p.username !== username);
+        }
+
+        if (isEquallyCheckbox.checked) {
+            updateEqualShares();
+        } else {
+            renderParticipantShares();
+        }
     }
 
-    multiSelected.addEventListener('click', () => multiItems.classList.toggle('select-hide'));
+    // --- Пересчёт долей поровну ---
+    function updateEqualShares() {
+        const totalAmount = parseFloat(amountInput.value) || 0;
+        const count = selectedParticipants.length;
+        const equalShare = count ? totalAmount / count : 0;
+        selectedParticipants.forEach(p => p.share = equalShare);
+        // Если включен режим поровну, не отображаем поля ввода, но сохраняем доли в selectedParticipants
+    }
+
+    // --- Отображение полей ввода долей (режим ручного ввода) ---
+    function renderParticipantShares() {
+        if (selectedParticipants.length === 0) {
+            participantSharesContainer.style.display = 'none';
+            return;
+        }
+        participantSharesContainer.style.display = 'block';
+        participantSharesList.innerHTML = '';
+
+        const totalAmount = parseFloat(amountInput.value) || 0;
+        const equalShare = selectedParticipants.length ? totalAmount / selectedParticipants.length : 0;
+
+        selectedParticipants.forEach((participant, index) => {
+            // Если доля ещё не задана, подставляем поровну
+            if (participant.share === 0) participant.share = equalShare;
+            const item = document.createElement('div');
+            item.className = 'share-item';
+            item.innerHTML = `
+                <span class="participant-name">${participant.username}</span>
+                <input type="number" step="0.01" min="0" value="${participant.share.toFixed(2)}" data-index="${index}">
+            `;
+            const input = item.querySelector('input');
+            input.addEventListener('input', (e) => {
+                let value = parseFloat(e.target.value) || 0;
+                if (value > totalAmount) value = totalAmount;
+                selectedParticipants[parseInt(e.target.getAttribute('data-index'))].share = value;
+                validateTotalShares();
+            });
+            participantSharesList.appendChild(item);
+        });
+        validateTotalShares();
+    }
+
+    let validationMessage = null;
+
+    function validateTotalShares() {
+        const totalAmount = parseFloat(amountInput.value) || 0;
+        let sharesSum = selectedParticipants.reduce((sum, p) => sum + p.share, 0);
+        if (validationMessage) validationMessage.remove();
+
+        if (Math.abs(sharesSum - totalAmount) > 0.01) {
+            validationMessage = document.createElement('div');
+            validationMessage.className = 'total-validation';
+            validationMessage.textContent = `Сумма долей (${sharesSum.toFixed(2)} ₽) не равна общей сумме (${totalAmount.toFixed(2)} ₽)`;
+            participantSharesContainer.appendChild(validationMessage);
+            saveExpenseBtn.disabled = true;
+        } else {
+            saveExpenseBtn.disabled = false;
+        }
+    }
 
     // --- Преобразование статуса траты в русский ---
     function getStatusBudgetRu(status) {
@@ -210,25 +297,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // --- Фильтрация расходов ---
     function getFilteredExpenses() {
         return allExpenses.filter(expense => {
-            // Фильтр по статусу траты
-            if (filters.status && expense.status !== filters.status) {
-                return false;
-            }
-
-            // Фильтр по роли
-            if (filters.role === "owner") {
-                // Показываем только траты, где я автор
-                if (expense.paid_by.username !== currentUser.username) {
-                    return false;
-                }
-            } else if (filters.role === "participant") {
-                // Показываем траты, где я участник
-                const isParticipant = expense.participants.some(p => p.user.username === currentUser.username);
-                if (!isParticipant) {
-                    return false;
-                }
-            }
-
+            if (filters.status && expense.status !== filters.status) return false;
+            if (filters.role === "owner" && expense.paid_by.username !== currentUser.username) return false;
+            if (filters.role === "participant" && !expense.participants.some(p => p.user.username === currentUser.username)) return false;
             return true;
         });
     }
@@ -245,28 +316,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             const statusRu = getStatusBudgetRu(expense.status);
             if (expense.status !== 'DELETED') {
                 row.innerHTML = `
-                    <td data-label="Статья расхода">${expense.description || "Без описания"}</td>
-                    <td data-label="Автор">${expense.paid_by.username}</td>
-                    <td data-label="Сумма">${expense.amount.toFixed(2)} ₽</td>
-                    <td data-label="Статус"><span class="status-badge status-${expense.status.toLowerCase()}">${statusRu}</span></td>
-                    <td data-label="Детали"><button class="detail-btn" data-budget-id="${expense.id}">Посмотреть</button></td>
+                    <td data-label="Статья расхода">${expense.description || "Без описания"}<\/td>
+                    <td data-label="Автор">${expense.paid_by.username}<\/td>
+                    <td data-label="Сумма">${expense.amount.toFixed(2)} ₽<\/td>
+                    <td data-label="Статус"><span class="status-badge status-${expense.status.toLowerCase()}">${statusRu}<\/span><\/td>
+                    <td data-label="Детали"><button class="detail-btn" data-budget-id="${expense.id}">Посмотреть<\/button><\/td>
                 `;
-
-                row.addEventListener('click', () => {
-                    showExpenseDetail(expense);
-                });
+                row.addEventListener('click', () => showExpenseDetail(expense));
             }
-
             expensesTbody.appendChild(row);
         });
 
-        // Всегда показываем общую сумму всех трат, исключая удаленные, независимо от фильтров
+        // Общая сумма всех трат (исключая удалённые)
         let totalAmount = 0;
         allExpenses.forEach(expense => {
-            // Исключаем удаленные траты из общей суммы
-            if (expense.status !== 'DELETED') {
-                totalAmount += expense.amount;
-            }
+            if (expense.status !== 'DELETED') totalAmount += expense.amount;
         });
         totalAmountEl.textContent = totalAmount.toFixed(2) + ' ₽';
     }
@@ -279,32 +343,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         let participantsHtml = expense.participants.map(participant => {
             const statusRu = getStatusParticipantRu(participant.status);
             const remainingAmount = Math.max(0, (participant.share_amount - participant.paid_amount).toFixed(2));
-            
+
             let actionBtn = '';
             if (isOwner && (participant.status === "PENDING" || participant.status === "PARTIALLY_PAID" || participant.status === "PAID")) {
-                // Владелец может подтвердить при PAID или PARTIALLY_PAID (если участник внес достаточно)
                 if (participant.status === "PAID" || (participant.status === "PARTIALLY_PAID" && parseFloat(remainingAmount) <= 0)) {
                     actionBtn = `<button class="confirm-btn" data-participant-id="${participant.id}" data-participant-tg-id="${participant.user.tg_id}">Подтвердить</button>`;
                 } else if (participant.status === "PARTIALLY_PAID") {
-                    // При частичной оплате показываем статус процесса
                     const progressPercent = ((participant.paid_amount / participant.share_amount) * 100).toFixed(0);
                     actionBtn = `<div class="payment-progress"><span class="progress-text">Оплачено ${progressPercent}%</span></div>`;
-                } else if (participant.status === "PENDING") {
-                    actionBtn = '';
                 }
             }
-            
-            // Участник может вводить сумму оплаты при PENDING или PARTIALLY_PAID, пока долг не погашен
-            if (!isOwner && participant.user.username === currentUser.username && 
+
+            if (!isOwner && participant.user.username === currentUser.username &&
                 (participant.status === "PENDING" || participant.status === "PARTIALLY_PAID")) {
                 const remainingValue = Math.max(0, parseFloat(remainingAmount));
-                
                 if (remainingValue > 0) {
                     const buttonText = participant.status === "PENDING" ? "Оплатить" : "Добавить";
                     actionBtn = `
                         <div class="payment-input-group">
-                            <input type="number" class="payment-input" data-participant-id="${participant.id}" data-share-amount="${participant.share_amount}" data-paid-amount="${participant.paid_amount}" placeholder="0.00" min="0" step="0.01">
-                            <button class="pay-submit-btn" data-participant-id="${participant.id}" data-share-amount="${participant.share_amount}" data-paid-amount="${participant.paid_amount}">${buttonText}</button>
+                            <input type="number" class="payment-input" data-participant-id="${participant.id}" placeholder="0.00" min="0" step="0.01">
+                            <button class="pay-submit-btn" data-participant-id="${participant.id}">${buttonText}</button>
                         </div>
                     `;
                 }
@@ -326,7 +384,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             `;
         }).join('');
 
-        const deleteBtn = isOwner && expense.status !== 'DELETED' ? 
+        const deleteBtn = isOwner && expense.status !== 'DELETED' ?
             `<button class="detail-delete-btn" data-budget-id="${expense.id}">Удалить трату</button>` : '';
 
         detailContent.innerHTML = `
@@ -357,23 +415,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>
         `;
 
-        // Обработчики кнопок в модальном окне
+        // Обработчики для кнопок оплаты
         detailContent.querySelectorAll('.pay-submit-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 e.stopPropagation();
                 const participantId = parseInt(btn.getAttribute('data-participant-id'));
-                const shareAmount = parseFloat(btn.getAttribute('data-share-amount'));
-                const currentPaidAmount = parseFloat(btn.getAttribute('data-paid-amount'));
                 const input = detailContent.querySelector(`input[data-participant-id="${participantId}"]`);
                 let addAmount = parseFloat(input.value);
-                
-                // Валидация
                 if (isNaN(addAmount) || addAmount <= 0) {
                     alert('Пожалуйста, введите корректную сумму!');
                     return;
                 }
-
-                // Отправляем ПОЛНУЮ сумму оплаты (которую backend просто установит как есть)
                 await markParticipantPaid(expense.id, addAmount);
             });
         });
@@ -402,16 +454,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     // --- Отметить участника как оплачено ---
     async function markParticipantPaid(budgetId, totalPaidAmount) {
         try {
-            // Отправляем ПОЛНУЮ сумму оплаты, которую backend просто установит
             await SmartAPI.markParticipantPaid(budgetId, totalPaidAmount);
             await updateExpensesFromServer();
-            
-            // Находим обновленный расход и перестраиваем модальное окно
             const updatedExpense = allExpenses.find(e => e.id === budgetId);
-            if (updatedExpense) {
-                showExpenseDetail(updatedExpense);
-                // alert('Платеж зафиксирован!');
-            }
+            if (updatedExpense) showExpenseDetail(updatedExpense);
         } catch (error) {
             console.error('Ошибка при фиксации платежа:', error);
             alert('Ошибка при обновлении статуса!');
@@ -423,13 +469,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             await SmartAPI.confirmPayment(budgetId, participantTgId);
             await updateExpensesFromServer();
-            
-            // Находим обновленный расход и перестраиваем модальное окно
             const updatedExpense = allExpenses.find(e => e.id === budgetId);
-            if (updatedExpense) {
-                showExpenseDetail(updatedExpense);
-                // alert('Платеж подтвержден!');
-            }
+            if (updatedExpense) showExpenseDetail(updatedExpense);
         } catch (error) {
             console.error('Ошибка при подтверждении платежа:', error);
             alert('Ошибка при подтверждении платежа!');
@@ -442,23 +483,43 @@ document.addEventListener('DOMContentLoaded', async () => {
             await SmartAPI.deleteBudget(budgetId);
             await updateExpensesFromServer();
             closeModal(detailModal);
-            // alert('Трата удалена!');
         } catch (error) {
             console.error('Ошибка при удалении траты:', error);
             alert('Ошибка при удалении траты!');
         }
     }
 
-    // --- Сохранение новой траты ---
+    // --- Сохранение новой траты (адаптировано под is_equally) ---
     saveExpenseBtn.addEventListener('click', async () => {
         const desc = descInput.value.trim();
-        const participantsUsername = Array.from(multiItems.querySelectorAll('input:checked')).map(cb => cb.value);
-        const participantsTgIds = participantsUsername.map(u => String(participantsDict[u]));
         const amount = parseFloat(amountInput.value);
+        const isEqually = isEquallyCheckbox.checked;
 
-        if (!desc || participantsUsername.length === 0 || isNaN(amount) || amount <= 0) {
+        if (!desc || selectedParticipants.length === 0 || isNaN(amount) || amount <= 0) {
             alert('Пожалуйста, заполните все поля корректно!');
             return;
+        }
+
+        // Проверка суммы долей, если не поровну
+        if (!isEqually) {
+            const totalShares = selectedParticipants.reduce((sum, p) => sum + p.share, 0);
+            if (Math.abs(totalShares - amount) > 0.01) {
+                alert('Сумма долей должна равняться общей сумме траты!');
+                return;
+            }
+        }
+
+        // Формируем данные для API
+        let participantsData;
+        if (isEqually) {
+            // Отправляем только tg_id (share_amount не нужен)
+            participantsData = selectedParticipants.map(p => ({ tg_id: p.tg_id })); // Сделано под новую
+        } else {
+            // Отправляем tg_id и share_amount
+            participantsData = selectedParticipants.map(p => ({
+                tg_id: p.tg_id,
+                share_amount: p.share
+            }));
         }
 
         try {
@@ -466,41 +527,21 @@ document.addEventListener('DOMContentLoaded', async () => {
                 event_id: currentEventId,
                 amount,
                 description: desc,
-                participants: participantsTgIds
+                is_equally: isEqually,
+                participants: participantsData
             };
-            
-            // Проверка: если владелец - единственный участник (фиктивная трата)
-            // То после создания нужно сразу отметить как оплачено
-            const isFictitious = participantsUsername.length === 1 && participantsUsername[0] === currentUser.username;
-            
             await SmartAPI.createBudget(data);
-            
+
             // Очистка формы
             expenseForm.reset();
-            multiSelected.textContent = 'Выберите участников';
-            multiItems.querySelectorAll('input').forEach(cb => cb.checked = false);
-            deleteExpenseBtn.style.display = 'none';
+            selectedParticipants = [];
+            renderParticipantShares();
+            document.querySelectorAll('#participants-checkboxes input[type="checkbox"]').forEach(cb => cb.checked = false);
             closeModal(expenseModal);
 
-            // Обновление таблицы
             await updateExpensesFromServer();
-            
-            if (isFictitious) {
-                // Для фиктивной траты автоматически отмечаем как оплачено
-                const latestExpense = allExpenses[allExpenses.length - 1];
-                if (latestExpense && latestExpense.participants.length === 1) {
-                    try {
-                        await SmartAPI.markParticipantPaid(latestExpense.id, amount);
-                        await updateExpensesFromServer();
-                    } catch (err) {
-                        console.error('Автоматическая отметка фиктивной траты:', err);
-                    }
-                }
-            }
-            
-            // alert('Трата успешно добавлена!');
         } catch (error) {
-            console.error('Ошибка при создании бюджета:', error);
+            console.error('Ошибка при создании траты:', error);
             alert('Ошибка при создании траты!');
         }
     });
@@ -510,13 +551,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         debtsTbody.innerHTML = '';
         debts = {};
 
-        // Посчитаем долги каждого участника, исключая удаленные траты
         allExpenses.forEach(expense => {
-            // Исключаем удаленные траты из подсчета долгов
-            if (expense.status === 'DELETED') {
-                return;
-            }
-            
+            if (expense.status === 'DELETED') return;
             expense.participants.forEach(participant => {
                 const remaining = participant.share_amount - participant.paid_amount;
                 if (remaining > 0) {
@@ -526,19 +562,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         });
 
-        // Отсортируем и отобразим
         Object.entries(debts).sort((a, b) => b[1] - a[1]).forEach(([participant, amt]) => {
             const row = document.createElement('tr');
-            row.innerHTML = `<td>${participant}</td><td>${amt.toFixed(2)} ₽</td>`;
+            row.innerHTML = `<td data-label="Участник">${participant}<\/td><td data-label="Сумма долга">${amt.toFixed(2)} ₽<\/td>`;
             debtsTbody.appendChild(row);
         });
     }
 
-    document.addEventListener('keydown', e => { 
+    document.addEventListener('keydown', e => {
         if (e.key === 'Escape') {
             closeModal(expenseModal);
             closeModal(detailModal);
         }
     });
-
 });
